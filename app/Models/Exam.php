@@ -16,8 +16,8 @@ class Exam extends Model
     protected $fillable = ['name', 'description', 'max_ponit', 'ponit', 'external_url', 'round_id', 'time', 'time_type', "type", "status", "room_code", "room_token", "room_progress"];
     use HasFactory;
     protected $casts = [
-        'created_at' => FormatDate::class,
-        'updated_at' =>  FormatDate::class,
+//        'created_at' => FormatDate::class,
+//        'updated_at' =>  FormatDate::class,
         'external_url' => FormatImageGet::class,
     ];
     public function newEloquentBuilder($query)

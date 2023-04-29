@@ -71,11 +71,7 @@
                                 </span>
                             </th>
                             <th scope="col">Nội dung câu hỏi
-                                <a
-                                    href="{{ route('admin.teams', [
-                                        'sortBy' => request()->has('sortBy') ? (request('sortBy') == 'desc' ? 'asc' : 'desc') : 'asc',
-                                        'orderBy' => 'name',
-                                    ]) }}">
+                                <a>
                                     <span role="button" data-key="name"
                                         class=" svg-icon svg-icon-primary  svg-icon-2x format-database">
                                         <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo2/dist/../src/media/svg/icons/Navigation/Up-down.svg--><svg

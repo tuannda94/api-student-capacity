@@ -215,11 +215,7 @@
                     <thead>
                         <tr>
                             <th scope="col">Nội dung câu hỏi
-                                <a
-                                    href="{{ route('admin.teams', [
-                                        'sort_by' => request()->has('sort_by') ? (request('sort_by') == 'desc' ? 'asc' : 'desc') : 'asc',
-                                        'orderBy' => 'name',
-                                    ]) }}">
+                                <a>
                                     <span role="button" data-key="name" data-bs-toggle="tooltip"
                                         title="Lọc theo nội dung câu hỏi "
                                         class=" svg-icon svg-icon-primary  svg-icon-2x format-database">

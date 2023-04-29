@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -20,13 +21,16 @@ class AuthController extends Controller
 
     public function redirectToGoogle()
     {
-
         return Socialite::driver('google')->redirect();
     }
 
     public function adminGoogleCallback()
     {
-        $ggUser = Socialite::driver('google')->user();
+        Session::forget('token');
+//        $ggUser = Socialite::driver('google')->user();
+        $ggUser = Socialite::driver('google')->stateless()->user();
+//        dd(Session::all());
+//        dd(1);
         $user = User::where('email', $ggUser->email)->first();
         // dd($user->hasRole(config('util.ADMIN_ROLE')));
         if ($user && $user->hasRole([config('util.SUPER_ADMIN_ROLE'), config('util.ADMIN_ROLE'), config('util.JUDGE_ROLE'), config('util.TEACHER_ROLE')])) {
@@ -85,11 +89,11 @@ class AuthController extends Controller
         if (strlen($googleUser->email) < 8) $flagRoleAdmin = true;
         if (!$flagRoleAdmin) foreach (config('util.MS_SV') as $ks) {
             $MSSV = \Str::lower($ks) . \Str::afterLast(
-                \Str::of($googleUser->email)
-                    ->before(config('util.END_EMAIL_FPT'))
-                    ->toString(),
-                \Str::lower($ks)
-            );
+                    \Str::of($googleUser->email)
+                        ->before(config('util.END_EMAIL_FPT'))
+                        ->toString(),
+                    \Str::lower($ks)
+                );
         };
         try {
             $user = null;

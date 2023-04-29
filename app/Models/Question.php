@@ -21,8 +21,8 @@ class Question extends Model
         'rank'
     ];
     protected $casts = [
-        'created_at' => FormatDate::class,
-        'updated_at' =>  FormatDate::class,
+//        'created_at' => FormatDate::class,
+//        'updated_at' =>  FormatDate::class,
         // 'image' => FormatImageGet::class,
     ];
     public function newEloquentBuilder($query)
