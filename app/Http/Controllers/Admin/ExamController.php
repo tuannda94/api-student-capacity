@@ -22,13 +22,14 @@ class ExamController extends Controller
     use TUploadImage, TResponse;
 
     public function __construct(
-        private MExamInterface $repoExam,
-        private Exam $exam,
+        private MExamInterface  $repoExam,
+        private Exam            $exam,
         private MRoundInterface $repoRound,
-        private Round $round,
-        private Question $question,
-        private DB $db
-    ) {
+        private Round           $round,
+        private Question        $question,
+        private DB              $db
+    )
+    {
     }
 
     public function getHistory($id)
@@ -120,11 +121,13 @@ class ExamController extends Controller
                 'type' => $type,
                 'status' => 1
             ];
-            if ($type == 1)  $dataMer = [
+            if ($type == 1) $dataMer = [
                 'round_id' => $id_round,
                 'type' => $type,
                 'status' => 1,
                 'external_url' => 'null',
+                'time' => $round->time_exam,
+                'time_type' => $round->time_type_exam,
             ];
 
             // $filename = $this->uploadFile($request->external_url);
@@ -143,7 +146,6 @@ class ExamController extends Controller
             return abort(404);
         }
     }
-
 
 
     public function destroy($id)
@@ -205,7 +207,7 @@ class ExamController extends Controller
         try {
 
             if ($request->has('external_url')) {
-                $fileImage =  $request->file('external_url');
+                $fileImage = $request->file('external_url');
                 $external_url = $this->uploadFile($fileImage, $examModel->external_url);
                 $examModel->external_url = $external_url;
             }

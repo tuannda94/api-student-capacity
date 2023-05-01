@@ -23,18 +23,20 @@ use Illuminate\Support\Facades\Validator;
 class TakeExamController extends Controller
 {
     use TUploadImage, TResponse;
+
     public function __construct(
-        private Round $round,
-        private MExamInterface $exam,
-        private Contest $contest,
-        private  Team $team,
-        private  RoundTeam $roundTeam,
-        private  TakeExam $takeExam,
-        private  MResultCapacityInterface $resultCapacity,
-        private  Question $question,
-        private Answer $answer,
+        private Round                          $round,
+        private MExamInterface                 $exam,
+        private Contest                        $contest,
+        private Team                           $team,
+        private RoundTeam                      $roundTeam,
+        private TakeExam                       $takeExam,
+        private MResultCapacityInterface       $resultCapacity,
+        private Question                       $question,
+        private Answer                         $answer,
         private MResultCapacityDetailInterface $resultCapacityDetail
-    ) {
+    )
+    {
     }
 
     public function takeExamStudent(Request $request)
@@ -51,7 +53,7 @@ class TakeExamController extends Controller
                 'round_id.required' => 'Chưa nhập trường này !',
             ]
         );
-        if ($validate->fails()) return $this->responseApi(true,  $validate->errors());
+        if ($validate->fails()) return $this->responseApi(true, $validate->errors());
         $round = $this->round->find($request->round_id, ['teams']);
         DB::beginTransaction();
         try {
@@ -238,8 +240,9 @@ class TakeExamController extends Controller
             $round = $this->round->find($request->round_id);
             $exam = $this->exam->whereGet(['round_id' => $request->round_id])->pluck('id');
             if (is_null($round) || is_null($exam)) return $this->responseApi(false, 'Lỗi truy cập hệ thống !!');
-            $resultCapacity = $this->resultCapacity->whereInExamUser($exam, $user_id)->load('exam:id,max_ponit');
+            $resultCapacity = $this->resultCapacity->whereInExamUser($exam, $user_id);
             if ($resultCapacity) {
+                $resultCapacity->load('exam:id,max_ponit');
                 if ($resultCapacity->status == config('util.STATUS_RESULT_CAPACITY_DOING')) {
                     return $this->responseApi(true, config('util.STATUS_RESULT_CAPACITY_DOING'), ['message' => "Đang làm !!"]);
                 } else {
@@ -305,7 +308,7 @@ class TakeExamController extends Controller
                 $exam = $this->exam->find($resultCapacity->exam_id);
             } else {
                 $exam = $this->exam->where(['round_id' => $request->round_id])->inRandomOrder()->first();
-                $resultCapacityNew =  $this->resultCapacity->create([
+                $resultCapacityNew = $this->resultCapacity->create([
                     'scores' => 0,
                     'status' => config('util.STATUS_RESULT_CAPACITY_DOING'),
                     'exam_id' => $exam->id,
@@ -328,7 +331,7 @@ class TakeExamController extends Controller
             }
         } catch (\Throwable $th) {
             $dB::rollBack();
-            dd($th);
+//            dd($th);
             return $this->responseApi(false, 'Lỗi hệ thống !!');
         }
     }
@@ -371,47 +374,25 @@ class TakeExamController extends Controller
         $score_one_question = $exam->max_ponit / $exam->questions_count;
         $donotAnswer = $exam->questions_count - count($request->data);
         foreach ($request->data as $key => $data) {
-            if ($data['type'] == 0) {
-                if ($data['answerId'] == null) {
-                    $donotAnswer += 1;
-                } else {
-                    $answer = $this->answer->findById(
-                        $data['answerId'],
-                        [
-                            'question_id' => $data['questionId'],
-                            'is_correct' => config('util.ANSWER_TRUE'),
-                        ]
-                    );
-                    if ($answer && $data['answerId'] === $answer->id) {
-                        $score += $score_one_question;
-                        $trueAnswer += 1;
-                    } else {
-                        $falseAnswer += 1;
-                    }
-                }
+            if ($data['answerId'] == null) {
+                $donotAnswer += 1;
             } else {
-                if (count($data['answerIds']) > 0 && count($data['answerIds']) <= 1) {
-                    $falseAnswer += 1;
-                } else if (count($data['answerIds']) <= 0) {
-                    $donotAnswer += 1;
+                $answer = $this->answer->findById(
+                    $data['answerId'],
+                    [
+                        'question_id' => $data['questionId'],
+                        'is_correct' => config('util.ANSWER_TRUE'),
+                    ]
+                );
+                if ($answer && $data['answerId'] === $answer->id) {
+                    $score += $score_one_question;
+                    $trueAnswer += 1;
                 } else {
-                    $answer = $this->answer->whereInId(
-                        $data['answerIds'],
-                        [
-                            'question_id' => $data['questionId'],
-                            'is_correct' => config('util.ANSWER_TRUE'),
-                        ]
-                    );
-                    if (count($data['answerIds']) === count($answer)) {
-                        $score += $score_one_question;
-                        $trueAnswer += 1;
-                    } else {
-                        $falseAnswer += 1;
-                    }
+                    $falseAnswer += 1;
                 }
             }
         }
-        $resultCapacity =  $this->resultCapacity->findByUserExam($user_id, $request->exam_id);
+        $resultCapacity = $this->resultCapacity->findByUserExam($user_id, $request->exam_id);
         $db::beginTransaction();
         try {
             $resultCapacity->update([
@@ -422,21 +403,11 @@ class TakeExamController extends Controller
                 'true_answer' => $trueAnswer,
             ]);
             foreach ($request->data as $data) {
-                if ($data['type'] == 0) {
-                    $this->resultCapacityDetail->create([
-                        'result_capacity_id' => $resultCapacity->id,
-                        'question_id' => $data['questionId'],
-                        'answer_id' => $data['answerId'],
-                    ]);
-                } else {
-                    foreach ($data['answerIds'] as  $dataAns) {
-                        $this->resultCapacityDetail->create([
-                            'result_capacity_id' => $resultCapacity->id,
-                            'question_id' => $data['questionId'],
-                            'answer_id' => $dataAns,
-                        ]);
-                    }
-                }
+                $this->resultCapacityDetail->create([
+                    'result_capacity_id' => $resultCapacity->id,
+                    'question_id' => $data['questionId'],
+                    'answer_id' => $data['answerId'],
+                ]);
             }
             $db::commit();
             return $this->responseApi(
@@ -484,13 +455,13 @@ class TakeExamController extends Controller
      */
     public function takeExamStudentCapacityHistory(Request $request)
     {
-        $resultCapacity =  $this->resultCapacity->where(['id' => $request->result_capacity_id]);
+        $resultCapacity = $this->resultCapacity->where(['id' => $request->result_capacity_id]);
         $exam = $this->exam->find($resultCapacity->exam_id);
         $exam->load([
             'questions' => function ($q) use ($resultCapacity) {
                 return $q->with([
                     'answers',
-                    'resultCapacityDetail' => function ($q)  use ($resultCapacity) {
+                    'resultCapacityDetail' => function ($q) use ($resultCapacity) {
                         return $q
                             ->where('result_capacity_id', $resultCapacity->id);
                         // ->selectRaw('result_capacity_detail.answer_id as answer_id, question_id')
