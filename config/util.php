@@ -23,7 +23,13 @@ return [
     "CONTEST_STATUS_2" => "Cuộc thi đã kết thúc",
     "END_EMAIL_FPT" => "@fpt.edu.vn",
     "MS_SV" => [
-        "ph"
+        "ps",
+        "pc",
+        "ph",
+        "pp",
+        "pd",
+        "pk",
+        "ht"
     ],
     "TYPE_CONTEST" => 0,
     "TYPE_TEST" => 1,

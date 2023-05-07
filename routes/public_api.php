@@ -1,6 +1,7 @@
 <?php
 
 use App\Events\ChatSupportEvent;
+use App\Http\Controllers\Admin\CampusController;
 use App\Http\Controllers\Admin\ContestController as AdminContestController;
 use App\Http\Controllers\Admin\ExamController;
 use App\Http\Controllers\Admin\QuestionController;
@@ -29,6 +30,9 @@ Route::prefix('rounds')->group(function () {
 
 Route::prefix('sliders')->group(function () {
     Route::get('', [SliderController::class, 'apiIndex'])->name('slider.api.index');
+});
+Route::prefix('campuses')->group(function () {
+    Route::get('', [CampusController::class, 'apiIndex'])->name('campus.api.index');
 });
 
 Route::prefix('exam')->group(function () {

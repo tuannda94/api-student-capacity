@@ -15,6 +15,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles, SoftDeletes;
+
     protected $table = 'users';
 
     protected $fillable = [
@@ -22,7 +23,8 @@ class User extends Authenticatable
         'email',
         'status',
         'avatar',
-        'mssv'
+        'mssv',
+        'campus_code'
     ];
 
     protected $hidden = [
@@ -58,6 +60,11 @@ class User extends Authenticatable
     public function contest_user()
     {
         return $this->hasMany(ContestUser::class, 'user_id');
+    }
+
+    public function campus()
+    {
+        return $this->belongsTo(Campus::class, 'campus_code', 'code');
     }
 
     // public function wishlistContests()

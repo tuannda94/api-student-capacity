@@ -20,7 +20,7 @@ Route::redirect('/', '/admin');
 Route::group(['prefix' => 'auth', 'middleware' => "guest"], function () {
     Route::get('login', [AuthController::class, 'adminLogin'])->name('login');
 
-    Route::get('google', [AuthController::class, 'redirectToGoogle'])->name('auth.redirect-google');
+    Route::post('google', [AuthController::class, 'redirectToGoogle'])->name('auth.redirect-google');
     Route::get('callback', [AuthController::class, 'adminGoogleCallback'])->name('google-auth.callback');
 });
 Route::any('logout', [AuthController::class, 'logout'])->name('logout');
@@ -33,20 +33,6 @@ Route::get('download-file', function () {
     if (!\Storage::disk('s3')->has($fileName)) return 'Không tồn tại file trong hệ thống ';
     return \Response::make(\Storage::disk('s3')->get($fileName), 200, $headers);
 })->name('dowload.file');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 Route::get('test', function () {

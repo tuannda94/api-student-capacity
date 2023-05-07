@@ -8,6 +8,7 @@
             <div class="alert alert-primary">
                 Xin chào {{ auth()->user()->name }} , bạn thuộc quyền
                 {{ \Str::ucfirst(auth()->user()->roles[0]->name) }}
+                cơ sở {{ auth()->user()->campus->name }}
                 <span data-bs-toggle="tooltip" title="Tải lại trang " role="button"
                     class="refresh-btn svg-icon svg-icon-primary svg-icon-2x">
                     <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo2/dist/../src/media/svg/icons/General/Update.svg--><svg
