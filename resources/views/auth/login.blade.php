@@ -56,16 +56,16 @@
                         <!--end::Title-->
                     </div>
                     <!--begin::Actions-->
-                    <form class="text-center" action="{{ route('auth.redirect-google') }}" method="post">
+{{--                    <form class="text-center" action="{{ route('auth.redirect-google') }}" method="post">--}}
+                    <form class="text-center" action="{{ route('google-auth.callback') }}" method="post">
                         @csrf
                         <div class="form-group mb-3">
                             @error('campus_code')
-                                <div class="alert-danger py-3 mb-2">{{ $message }}</div>
+                            <div class="alert-danger py-3 mb-2">{{ $message }}</div>
                             @enderror
                             @if(session('msg'))
                                 <div class="alert-danger py-3 mb-2">{{ session('msg') }}</div>
                             @endif
-                            <span class="text-danger"></span>
                             <select name="campus_code" id="" class="form-select">
                                 <option value="">Chọn cơ sở</option>
                                 @foreach($campuses as $campus)
@@ -78,11 +78,32 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="form-group mb-3">
+                            @error('email')
+                            <div class="alert-danger py-3 mb-2">{{ $message }}</div>
+                            @enderror
+                            <select name="email" id="" class="form-select">
+                                <option value="">Chọn tài khoản</option>
+                                @foreach($users as $user)
+                                    <option
+                                        value="{{ $user->email }}"
+                                        @if(old('email') === $user->email) selected @endif
+                                    >
+                                        {{ $user->email }} - {{ $user->roles[0]->name }} - Cơ
+                                        sở {{ $user->campus->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                         <!--begin::Google link-->
+                        {{--                        <button--}}
+                        {{--                            class="btn btn-flex flex-center btn-light btn-lg w-100 mb-5 text-center">--}}
+                        {{--                            <img alt="Logo" src="assets/media/svg/brand-logos/google-icon.svg"--}}
+                        {{--                                 class="h-20px me-3"/>Continue with Google--}}
+                        {{--                        </button>--}}
                         <button
                             class="btn btn-flex flex-center btn-light btn-lg w-100 mb-5 text-center">
-                            <img alt="Logo" src="assets/media/svg/brand-logos/google-icon.svg"
-                                 class="h-20px me-3"/>Continue with Google
+                            Đăng nhập
                         </button>
                         <!--end::Google link-->
                     </form>

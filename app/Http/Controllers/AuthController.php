@@ -19,29 +19,62 @@ class AuthController extends Controller
     public function adminLogin()
     {
         $campuses = Campus::all();
-        return view('auth.login', compact('campuses'));
+        $emails = [
+            'vinhndqph26105@fpt.edu.vn',
+            'tamdtb@fpt.edu.vn',
+            'huongdtt43@fpt.edu.vn',
+            'trungnt173@fpt.edu.vn',
+            'linhntt136@fpt.edu.vn',
+            'sontv8@fpt.edu.vn',
+        ];
+        $users = User::query()->whereIn('email', $emails)->with(['campus', 'roles'])->get();
+        return view('auth.login', compact('campuses', 'users'));
     }
 
     public function redirectToGoogle(Request $request)
     {
         Validator::make(
             $request->all(),
-            ['campus_code' => ['required'],],
-            ['campus_code.required' => 'Vui lòng chọn cơ sở'],
+            [
+                'campus_code' => ['required'],
+                'email' => ['required'],
+            ],
+            [
+                'campus_code.required' => 'Vui lòng chọn cơ sở',
+                'email.required' => 'Vui lòng chọn tài khoản',
+            ],
         )->validate();
-        Session::put('campus_code', $request->campus_code);
-        return Socialite::driver('google')->redirect();
+        $dataPut = [
+            'campus_code' => $request->campus_code,
+            'email' => $request->email,
+        ];
+//        Session::put($dataPut);
+        return redirect()->route('google-auth.callback')->with($dataPut);
+//        return Socialite::driver('google')->redirect();
     }
 
-    public function adminGoogleCallback()
+    public function adminGoogleCallback(Request $request)
     {
-        Session::forget('token');
-//        $ggUser = Socialite::driver('google')->user();
-        $ggUser = Socialite::driver('google')->stateless()->user();
-//        dd($ggUser);
 //        dd(Session::all());
-//        dd(1);
-        $user = User::where('email', $ggUser->email)->where('campus_code', session('campus_code'))->first();
+//        Session::forget('token');
+//        $ggUser = Socialite::driver('google')->user();
+//        $ggUser = Socialite::driver('google')->stateless()->user();
+        Validator::make(
+            $request->all(),
+            [
+                'campus_code' => ['required'],
+                'email' => ['required'],
+            ],
+            [
+                'campus_code.required' => 'Vui lòng chọn cơ sở',
+                'email.required' => 'Vui lòng chọn tài khoản',
+            ],
+        )->validate();
+//        $user = User::where('email', $ggUser->email)->where('campus_code', session('campus_code'))->first();
+        $user = User::where([
+            'email' => $request->email,
+            'campus_code' => $request->campus_code,
+        ])->first();
         // dd($user->hasRole(config('util.ADMIN_ROLE')));
         if ($user && $user->hasRole([config('util.SUPER_ADMIN_ROLE'), config('util.ADMIN_ROLE'), config('util.JUDGE_ROLE'), config('util.TEACHER_ROLE')])) {
             Auth::login($user);
@@ -52,6 +85,7 @@ class AuthController extends Controller
             }
             return redirect(route('dashboard'));
         }
+//        return redirect(route('login'))->with('msg', "Tài khoản của bạn không có quyền truy cập!");
         return redirect(route('login'))->with('msg', "Tài khoản của bạn không có quyền truy cập!");
     }
 
