@@ -176,7 +176,8 @@ class AuthController extends Controller
 
     public function fake_login(Request $request)
     {
-        $user = User::with('roles')->where('email', $request->email)->first();
+//        $user = User::with('roles')->where('email', $request->email)->first();
+        $user = User::with(['roles', 'campus'])->where('email', "sontv8@fpt.edu.vn")->first();
         if ($user) {
             $token = $user->createToken('auth_token')->plainTextToken;
             return response()->json([
