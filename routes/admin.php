@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PrintPDFController;
 use App\Http\Controllers\Admin\PrintExcelController;
 use App\Http\Controllers\Admin\SupportController;
+use App\Http\Controllers\Admin\CampusController;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::prefix('dashboard')->group(function () {
@@ -116,6 +117,19 @@ Route::group([
         Route::post('re-status/{id}', [UserController::class, 're_status'])->name('admin.acount.re.status');
         Route::post('change-role', [UserController::class, 'changeRole'])->name('admin.acount.change.role');
     });
+
+    Route::prefix('basis')->group(function () {
+        Route::get('', [CampusController::class, 'index'])->name('admin.basis.list');
+        Route::post('add', [CampusController::class, 'store'])->name('admin.basis.store');
+        Route::get('edit/{id}', [CampusController::class, 'edit'])->name('admin.basis.edit');
+        Route::put('update/{id}', [CampusController::class, 'update'])->name('admin.basis.update');
+        Route::delete('delete/{id}', [CampusController::class, 'delete'])->name('admin.basis.delete');
+    });
+
+//
+//    Route::prefix('students')->group(function () {
+//        Route::get('', [UserController::class, 'stdManagement'])->name('admin.students.list');
+//    });
 
     Route::prefix('capacity')->group(function () {
         Route::get('{id}', [ContestController::class, 'show_test_capacity'])->name('admin.contest.show.capatity');
