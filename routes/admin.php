@@ -33,8 +33,10 @@ Route::prefix('rounds')->group(function () {
     ], function () {
         Route::post('send-mail/{id}', [SendMailController::class, 'sendMailRoundUser'])->name('round.send.mail.pass');
         Route::get('{id}/form-send-mail', [RoundController::class, 'sendMail'])->name('admin.round.send.mail');
-        Route::get('form-add', [RoundController::class, 'create'])->name('admin.round.create');
-        Route::post('form-add-save', [RoundController::class, 'store'])->name('admin.round.store');
+//        Route::get('form-add', [RoundController::class, 'create'])->name('admin.round.create');
+        Route::get('form-add', [RoundController::class, 'creatRound'])->name('admin.round.create');
+//        Route::post('form-add-save', [RoundController::class, 'store'])->name('admin.round.store');
+        Route::post('form-add-save', [RoundController::class, 'storeNew'])->name('admin.round.store');
         Route::get('{id}/edit', [RoundController::class, 'edit'])->name('admin.round.edit');
         Route::put('{id}', [RoundController::class, 'update'])->name('admin.round.update');
         Route::delete('{id}', [RoundController::class, 'destroy'])->name('admin.round.destroy');
@@ -47,6 +49,16 @@ Route::prefix('rounds')->group(function () {
 
     Route::prefix('{id}/detail')->group(function () {
         Route::get('', [RoundController::class, 'adminShow'])->name('admin.round.detail');
+
+//        Route::prefix('exam')->group(function () {
+//            Route::get('', [ExamController::class, 'index'])->name('admin.exam.index');
+//            Route::get('create', [ExamController::class, 'create'])->name('admin.exam.create');
+//            Route::post('store', [ExamController::class, 'store'])->name('admin.exam.store');
+//            Route::get('{id_exam}/edit', [ExamController::class, 'edit'])->name('admin.exam.edit');
+//            Route::post('{id_exam}/un-status', [ExamController::class, 'un_status'])->name('admin.exam.un_status');
+//            Route::post('{id_exam}/re-status', [ExamController::class, 're_status'])->name('admin.exam.re_status');
+//            Route::put('{id_exam}', [ExamController::class, 'update'])->name('admin.exam.update');
+//        });
 
         Route::prefix('exam')->group(function () {
             Route::get('', [ExamController::class, 'index'])->name('admin.exam.index');
@@ -64,6 +76,41 @@ Route::prefix('rounds')->group(function () {
     });
 });
 
+//Route::prefix('contests')->group(function () {
+//
+//    Route::get('', [ContestController::class, 'index'])->name('admin.contest.list');
+//    // Send mail method poss
+//
+//    Route::group([
+//        'middleware' => 'role_admin'
+//    ], function () {
+//        Route::get('form-add', [ContestController::class, 'create'])->name('admin.contest.create');
+//        Route::get('register-deadline/{id}', [ContestController::class, 'register_deadline'])->name('contest.register.deadline');
+//        Route::post('send-mail/{id}', [SendMailController::class, 'sendMailContestUser'])->name('contest.send.mail.pass');
+//        // Send mail method Get
+//        Route::get('{id}/form-send-mail', [ContestController::class, 'sendMail'])->name('admin.contest.send.mail');
+//        Route::post('form-add-save', [ContestController::class, 'store'])->name('admin.contest.store');
+//        Route::post('un-status/{id}', [ContestController::class, 'un_status'])->name('admin.contest.un.status');
+//        Route::post('re-status/{id}', [ContestController::class, 're_status'])->name('admin.contest.re.status');
+//        Route::delete('{id}', [ContestController::class, 'destroy'])->name('admin.contest.destroy');
+//        Route::get('{id}/edit', [ContestController::class, 'edit'])->name('admin.contest.edit');
+//        Route::put('{id}', [ContestController::class, 'update'])->name('admin.contest.update');
+//    });
+//
+//    Route::prefix('{id}/detail')->group(function () {
+//        Route::get('', [ContestController::class, 'show'])->name('admin.contest.show');
+//        Route::get('rounds', [RoundController::class, 'contestDetailRound'])->name('admin.contest.detail.round');
+//    });
+//    Route::group([
+//        'middleware' => 'role_admin'
+//    ], function () {
+//        Route::get('contest-soft-delete', [ContestController::class, 'softDelete'])->name('admin.contest.soft.delete');
+//        Route::get('contest-soft-delete/{id}/backup', [ContestController::class, 'backUpContest'])->name('admin.contest.soft.backup');
+//        Route::get('contest-soft-delete/{id}/delete', [ContestController::class, 'deleteContest'])->name('admin.contest.soft.destroy');
+//    });
+//});
+
+// contests cập nhật
 Route::prefix('contests')->group(function () {
 
     Route::get('', [ContestController::class, 'index'])->name('admin.contest.list');
@@ -97,7 +144,6 @@ Route::prefix('contests')->group(function () {
         Route::get('contest-soft-delete/{id}/delete', [ContestController::class, 'deleteContest'])->name('admin.contest.soft.destroy');
     });
 });
-
 // Middleware phân quyền ban giám khảo chấm thi , khi nào gộp code sẽ chỉnh sửa lại route để phân quyền route
 Route::group([
     'middleware' => 'role_admin:judge|admin|super admin'
@@ -118,7 +164,8 @@ Route::group([
     });
 
     Route::prefix('capacity')->group(function () {
-        Route::get('{id}', [ContestController::class, 'show_test_capacity'])->name('admin.contest.show.capatity');
+//        Route::get('{id}', [ContestController::class, 'show_test_capacity'])->name('admin.contest.show.capatity');
+        Route::get('', [ContestController::class, 'show_capacity'])->name('admin.contest.show.capatity');
     });
 
     Route::get('dowload-frm-excel', function () {

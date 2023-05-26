@@ -117,7 +117,44 @@ class RoundController extends Controller
         return view('pages.round.form-add', compact('contests', 'typeexams', 'nameTypeContest'));
     }
 
+
+    public function creatRound(TypeExam $typeExam)
+    {
+        $contests = $this->contest::all();
+        $typeexams = $typeExam::all();
+        // $nameTypeContest = request('type') == 1 ? ' bài làm  ' : ' vòng thi';
+        $nameTypeContest = ' vòng thi';
+        return view('pages.round.form-add-new', compact('contests', 'typeexams', 'nameTypeContest'));
+    }
+
     public function store(RequestRound $request)
+    {
+
+        $contest = $this->contest::findOrFail($request->contest_id);
+        if (Carbon::parse($request->start_time)->toDateTimeString() < Carbon::parse($contest->date_start)->toDateTimeString()) {
+            return redirect()->back()->withErrors(['start_time' => 'Thời gian bắt đầu không được bé hơn thời gian bắt đầu của cuộc thi !'])->withInput();
+        };
+        if (Carbon::parse($request->end_time)->toDateTimeString() > Carbon::parse($contest->register_deadline)->toDateTimeString()) {
+            return redirect()->back()->withErrors(['end_time' => 'Thời gian kết thúc không được lớn hơn thời gian kết thúc của cuộc thi và đánh giá năng lực  !'])->withInput();
+        };
+        $this->db::beginTransaction();
+        try {
+            $this->roundRepo->store($request);
+            $this->db::commit();
+            if ($contest->type == 1) return redirect()->route('admin.contest.show.capatity', ['id' => $contest->id]);
+            return redirect()->route('admin.contest.detail.round', ['id' => $contest->id]);
+        } catch (Exception $ex) {
+            if ($request->hasFile('image')) {
+                $fileImage = $request->file('image');
+                if (Storage::disk('s3')->has($fileImage)) {
+                    Storage::disk('s3')->delete($fileImage);
+                }
+            }
+            $this->db::rollBack();
+            return Redirect::back()->with(['error' => 'Thêm mới thất bại !']);
+        }
+    }
+    public function storeNew(RequestRound $request)
     {
 
         $contest = $this->contest::findOrFail($request->contest_id);

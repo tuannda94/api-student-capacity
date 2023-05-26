@@ -11,7 +11,7 @@ use Illuminate\Support\ServiceProvider;
 use Menu;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Blade;
-
+use Illuminate\Pagination\Paginator;
 class AppServiceProvider extends ServiceProvider
 {
     use RepositorySetup;
@@ -46,5 +46,7 @@ class AppServiceProvider extends ServiceProvider
             return auth()->user()->hasRole(config('util.ROLE_ADMINS'));
         });
         // Model::preventLazyLoading(!app()->isProduction());
+        Paginator::useBootstrapFive();
+        Paginator::useBootstrapFour();
     }
 }

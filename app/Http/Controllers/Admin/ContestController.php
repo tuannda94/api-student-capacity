@@ -364,10 +364,25 @@ class ContestController extends Controller
     public function show_test_capacity(Request $request, Skill $skillModel, $id)
     {
         $capacity = $this->contest->getContestByIdUpdate($id, config('util.TYPE_TEST'));
+//        dd($capacity);
         if (!$capacity) abort(404);
         $skills = $skillModel::all(['name', 'id']);
         // dd($capacity->toArray());
         return view('pages.contest.detail-capacity.detail', [
+            'test_capacity' => $capacity,
+            'skills' => $skills
+        ]);
+    }
+
+    public function show_capacity( Skill $skillModel)
+    {
+        $capacity = $this->contest->getListContest( config('util.TYPE_TEST'));
+//        dd($capacity);
+        if (!$capacity) abort(404);
+        $skills = $skillModel::all(['name', 'id']);
+//        dd($skills);
+//         dd($capacity->toArray());
+        return view('pages.contest.detail-capacity.detail2', [
             'test_capacity' => $capacity,
             'skills' => $skills
         ]);

@@ -27,9 +27,9 @@ return [
         "role" => $ROLE_HAS_ADMINS,
         "subs-menu" => [
             [
-                "name" => "Bài đánh giá",
+                "name" => "Danh sách Bộ Đề",
                 "param" => '?type=' . $TYPE_CAPACITY,
-                "link" => "admin.contest.list",
+                "link" => "admin.contest.show.capatity",
                 "role" => $ROLE_HAS_ADMINS
             ],
             [
