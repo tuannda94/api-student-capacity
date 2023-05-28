@@ -14,7 +14,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PrintPDFController;
 use App\Http\Controllers\Admin\PrintExcelController;
 use App\Http\Controllers\Admin\SupportController;
-
+use App\Http\Controllers\Admin\subjectController;
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::prefix('dashboard')->group(function () {
     Route::get('api-cuoc-thi', [DashboardController::class, 'chartCompetity'])->name('dashboard.chart-competity');
@@ -111,6 +111,9 @@ Route::prefix('rounds')->group(function () {
 //});
 
 // contests cập nhật
+Route::prefix('subject')->group(function () {
+    Route::get('', [subjectController::class, 'index'])->name('admin.subject.list');
+});
 Route::prefix('contests')->group(function () {
 
     Route::get('', [ContestController::class, 'index'])->name('admin.contest.list');
