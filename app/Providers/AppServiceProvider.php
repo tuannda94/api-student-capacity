@@ -12,7 +12,6 @@ use Illuminate\Support\ServiceProvider;
 use Menu;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Pagination\Paginator;
 class AppServiceProvider extends ServiceProvider
 {
     use RepositorySetup;
