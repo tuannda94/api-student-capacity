@@ -47,6 +47,11 @@ class Question extends Model
         return $this->hasMany(Answer::class, 'question_id');
     }
 
+    public function questions()
+    {
+        return $this->hasMany(ExamQuestion::class, 'question_id');
+    }
+
     public function resultCapacityDetail()
     {
         return $this->hasMany(ResultCapacityDetail::class, 'question_id');

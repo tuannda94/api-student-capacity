@@ -11,11 +11,13 @@ use Maatwebsite\Excel\Concerns\ToModel;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\ToCollection;
-
+use App\Models\Exam;
 class QuestionsImport implements ToCollection
 {
+    private $exams;
     public function __construct(public $exam_id = null)
     {
+        $this->exams = new Exam();
     }
 
     public function collection(Collection  $rows)
@@ -59,6 +61,9 @@ class QuestionsImport implements ToCollection
             }
         }
         $this->storeQuestionAnswer($arr);
+        $exams = $this->exams->find($this->exam_id);
+        $exams->total_questions	+= $count;
+        $exams->save();
     }
 
     public function catchError($data, $message)

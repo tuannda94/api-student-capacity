@@ -162,7 +162,6 @@ function fetchHistoryExam(id) {
 
 function checkUrlOut(key, value, urlParams, urlHasFetch) {
     let searchParams = new URLSearchParams(urlHasFetch);
-
     if (urlHasFetch.indexOf("?")) {
         tags.map(function (data) {
             if (data == key) {
