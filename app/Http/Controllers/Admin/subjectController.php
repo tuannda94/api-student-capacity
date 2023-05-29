@@ -86,6 +86,7 @@ class subjectController extends Controller
         DB::table('subject')->insert($data);
         $id = DB::getPdo()->lastInsertId();
         $data = $request->all();
+        $data['id'] = $id;
         return response( ['message' => "Thêm thành công",'data' =>$data],200);
     }
     public function update(Request $request,$id){
