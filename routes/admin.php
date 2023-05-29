@@ -14,7 +14,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PrintPDFController;
 use App\Http\Controllers\Admin\PrintExcelController;
 use App\Http\Controllers\Admin\SupportController;
-
+use App\Http\Controllers\Admin\SemeterController;
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::prefix('dashboard')->group(function () {
     Route::get('api-cuoc-thi', [DashboardController::class, 'chartCompetity'])->name('dashboard.chart-competity');
@@ -98,6 +98,9 @@ Route::prefix('contests')->group(function () {
     });
 });
 
+Route::prefix('semeter')->group(function () {
+    Route::get('', [SemeterController::class, 'index'])->name('admin.semeter.index');
+});
 // Middleware phân quyền ban giám khảo chấm thi , khi nào gộp code sẽ chỉnh sửa lại route để phân quyền route
 Route::group([
     'middleware' => 'role_admin:judge|admin|super admin'
