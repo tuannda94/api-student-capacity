@@ -67,6 +67,39 @@ class QuestionController extends Controller
         return $data;
     }
 
+    public function getQuestion($id)
+    {
+        $now = Carbon::now('Asia/Ho_Chi_Minh');
+
+        $data = $this->questionModel::when(request()->has('question_soft_delete'), function ($q) {
+            return $q->onlyTrashed();
+        })
+            ->status(request('status'))
+            ->search(request('q') ?? null, ['content'])
+            ->sort((request('sort') == 'asc' ? 'asc' : 'desc'), request('sort_by') ?? null, 'questions')
+            ->whenWhereHasRelationship(request('skill') ?? null, 'skills', 'skills.id', (request()->has('skill') && request('skill') == 0) ? true : false)
+            // ->hasRequest(['rank' => request('level') ?? null, 'type' => request('type') ?? null]);
+            ->when(request()->has('level'), function ($q) {
+                $q->where('rank', request('level'));
+            })
+            ->when(request()->has('type'), function ($q) {
+                $q->where('type', request('type'));
+            })->whereHas('questions', function ($q) use ($id) {
+                $q->where('exam_id',$id );
+            });
+        $data->with(['skills', 'answers']);
+        return $data;
+    }
+    public function indexSubject($id){
+        $skills = $this->skillModel::all();
+        if (!($questions = $this->getQuestion($id)->paginate(request('limit') ?? 10))) return abort(404);
+        return view('pages.subjects.question.list', [
+            'questions' => $questions,
+            'skills' => $skills,
+            'id' => $id
+        ]);
+    }
+
     public function index()
     {
         $skills = $this->skillModel::all();
@@ -188,6 +221,17 @@ class QuestionController extends Controller
         ]);
     }
 
+    public function editSubject(Question $questions, $id)
+    {
+        $skills = $this->skillModel::select('name', 'id')->get();
+        $question = $this->questionModel::find($id)->load(['answers', 'skills']);
+        // dd($question);
+        return view('pages.subjects.question.edit', [
+            'skills' => $skills,
+            'question' => $question,
+        ]);
+    }
+
     public function update(Request $request, $id)
     {
         $validator = Validator::make(
@@ -263,6 +307,15 @@ class QuestionController extends Controller
         return Redirect::route('admin.question.index');
     }
 
+    public function destroysubject($id,$id_exam)
+    {
+        $this->questionModel::find($id)->delete();
+        $exams =$this->examModel->find($id_exam);
+        $exams->total_questions	= $exams->total_questions-1;
+        $exams->save();
+        return redirect()->route('admin.subject.question.index',$id_exam);
+    }
+
     public function getModelDataStatus($id)
     {
         return $this->questionModel::find($id);
@@ -278,8 +331,28 @@ class QuestionController extends Controller
             'skills' => $skills,
         ]);
     }
+
+    public function softDeleteListSubject()
+    {
+        $skills = $this->skillModel::all();
+        if (!($questions = $this->getList()->paginate(request('limit') ?? 5))) return abort(404);
+        // dd($questions);
+        return view('pages.question.list-soft-delete', [
+            'questions' => $questions,
+            'skills' => $skills,
+        ]);
+    }
     public function delete($id)
     {
+        try {
+            $this->questionModel::withTrashed()->where('id', $id)->forceDelete();
+            return redirect()->back();
+        } catch (\Throwable $th) {
+            return abort(404);
+        }
+    }
+
+    public function deletesubject($id){
         try {
             $this->questionModel::withTrashed()->where('id', $id)->forceDelete();
             return redirect()->back();

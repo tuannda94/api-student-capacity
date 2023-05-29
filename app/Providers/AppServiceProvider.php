@@ -12,7 +12,7 @@ use Illuminate\Support\ServiceProvider;
 use Menu;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Blade;
-
+use Illuminate\Pagination\Paginator;
 class AppServiceProvider extends ServiceProvider
 {
     use RepositorySetup;
@@ -49,5 +49,7 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useBootstrapFive();
         Paginator::useBootstrapFour();
         // Model::preventLazyLoading(!app()->isProduction());
+        Paginator::useBootstrapFive();
+        Paginator::useBootstrapFour();
     }
 }

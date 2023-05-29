@@ -13,7 +13,7 @@ class Exam extends Model
 {
     use SoftDeletes;
     protected $table = 'exams';
-    protected $fillable = ['name', 'description', 'max_ponit', 'ponit', 'external_url', 'round_id', 'time', 'time_type', "type", "status", "room_code", "room_token", "room_progress"];
+    protected $fillable = ['name', 'description', 'max_ponit', 'ponit', 'external_url', 'round_id', 'time', 'time_type', "type", "status", "room_code", "room_token", "room_progress","subject_id","campus_id","total_questions"];
     use HasFactory;
     protected $casts = [
 //        'created_at' => FormatDate::class,
@@ -28,6 +28,11 @@ class Exam extends Model
     public function round()
     {
         return $this->hasOne(Round::class, 'id', 'round_id');
+    }
+
+    public function campus()
+    {
+        return $this->hasOne(Campus::class, 'id','campus_id');
     }
 
     public function questions()

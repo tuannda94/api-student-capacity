@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Exam\ExamNewRequest;
 use App\Http\Requests\Exam\RequestExam;
 use App\Models\Exam;
 use App\Models\Question;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
+use App\Services\Modules\MCampus\Campus;
 
 class ExamController extends Controller
 {
@@ -23,6 +25,7 @@ class ExamController extends Controller
 
     public function __construct(
         private MExamInterface  $repoExam,
+        private Campus $campus,
         private Exam            $exam,
         private MRoundInterface $repoRound,
         private Round           $round,
@@ -42,7 +45,7 @@ class ExamController extends Controller
         }
     }
 
-    public function un_status($id, $id_exam)
+    public function un_status($id_exam)
     {
         try {
             $data = $this->updateStatus($id_exam, 0);
@@ -52,7 +55,7 @@ class ExamController extends Controller
         }
     }
 
-    public function re_status($id, $id_exam)
+    public function re_status($id_exam)
     {
         try {
             $data = $this->updateStatus($id_exam, 1);
@@ -71,81 +74,142 @@ class ExamController extends Controller
         return $exam;
     }
 
-    public function index($id_round)
+//    public function index($id_round)
+//    {
+//        $round = $this->round::find($id_round);
+//        $exams = $this->exam::where('round_id', $id_round)->orderByDesc('id')->get()->load('round');
+//        return view(
+//            'pages.round.detail.exam.index',
+//            [
+//                'round' => $round,
+//                'exams' => $exams
+//            ]
+//        );
+//    }
+
+    public function index($id_subject)
     {
-        $round = $this->round::find($id_round);
-        $exams = $this->exam::where('round_id', $id_round)->orderByDesc('id')->get()->load('round');
+        $exams = $this->exam::where('subject_id', $id_subject)->orderByDesc('id')->get()->load('round');
+//        dd($exams[1]->campus->name);
         return view(
-            'pages.round.detail.exam.index',
+            'pages.subjects.exam_subject.index',
             [
-                'round' => $round,
-                'exams' => $exams
+                'exams' => $exams,
+                'id' => $id_subject
             ]
         );
     }
 
-    public function create($id_round)
+//    public function create($id_round)
+//    {
+//        $round = $this->round::find($id_round)->load('contest');
+//        if ($round->contest->type != request('type') ?? 0) abort(404);
+//        if (is_null($round)) return abort(404);
+//        return view(
+//            'pages.round.detail.exam.form-add',
+//            [
+//                'round' => $round,
+//            ]
+//        );
+//    }
+
+    public function create($id)
     {
-        $round = $this->round::find($id_round)->load('contest');
-        if ($round->contest->type != request('type') ?? 0) abort(404);
-        if (is_null($round)) return abort(404);
+        $campus = $this->campus->apiIndex();
+//        if ($round->contest->type != request('type') ?? 0) abort(404);
+//        if (is_null($round)) return abort(404);
         return view(
-            'pages.round.detail.exam.form-add',
+            'pages.subjects.exam_subject.form-add',
             [
-                'round' => $round,
+                'campus' => $campus,
+                'id' => $id
             ]
         );
     }
 
-    public function store(RequestExam $request, $id_round)
+//    public function store(RequestExam $request, $id_round)
+//    {
+//        try {
+//            $type = 0;
+//            $round = $this->round::findOrFail($id_round)->load('contest');
+//            if ($round->contest->type == 1) $type = 1;
+//            if ($type == 0) {
+//                $validatorContest = Validator::make(
+//                    $request->all(),
+//                    [
+//                        'external_url' => 'required|mimes:zip,docx,word|max:10000',
+//                    ]
+//                );
+//                if ($validatorContest->fails()) {
+//                    return redirect()->back()->withErrors($validatorContest)->withInput();
+//                }
+//            }
+//            $dataMer = [];
+//            if ($type == 0) $dataMer = [
+//                'round_id' => $id_round,
+//                'external_url' => $this->uploadFile($request->external_url),
+//                'type' => $type,
+//                'status' => 1
+//            ];
+//            if ($type == 1) $dataMer = [
+//                'round_id' => $id_round,
+//                'type' => $type,
+//                'status' => 1,
+//                'external_url' => 'null',
+//                'time' => $round->time_exam,
+//                'time_type' => $round->time_type_exam,
+//            ];
+//
+//            // $filename = $this->uploadFile($request->external_url);
+//            $dataCreate = array_merge($request->only([
+//                'name',
+//                'description',
+//                'max_ponit',
+//                'ponit',
+//            ]), $dataMer);
+//
+//            $this->exam::create($dataCreate);
+//            if ($round->contest->type == 1) return redirect()->route('admin.contest.show.capatity', ['id' => $round->contest->id]);
+//            return redirect()->route('admin.exam.index', ['id' => $id_round]);
+//        } catch (\Throwable $th) {
+//            Log::info($th->getMessage());
+//            return abort(404);
+//        }
+//    }
+    public function store(ExamNewRequest $request)
     {
         try {
-            $type = 0;
-            $round = $this->round::findOrFail($id_round)->load('contest');
-            if ($round->contest->type == 1) $type = 1;
-            if ($type == 0) {
-                $validatorContest = Validator::make(
-                    $request->all(),
-                    [
-                        'external_url' => 'required|mimes:zip,docx,word|max:10000',
-                    ]
-                );
-                if ($validatorContest->fails()) {
-                    return redirect()->back()->withErrors($validatorContest)->withInput();
-                }
-            }
-            $dataMer = [];
-            if ($type == 0) $dataMer = [
-                'round_id' => $id_round,
-                'external_url' => $this->uploadFile($request->external_url),
-                'type' => $type,
-                'status' => 1
-            ];
-            if ($type == 1) $dataMer = [
-                'round_id' => $id_round,
-                'type' => $type,
+//            dd($request->all());
+
+             $dataMer = [
+                 'name' => $request->name,
+                 'description' => $request->description,
+                'round_id' => 36,
+                'type' => 1,
                 'status' => 1,
                 'external_url' => 'null',
-                'time' => $round->time_exam,
-                'time_type' => $round->time_type_exam,
+                'time' => $request->time_exam,
+                'time_type' => 'null',
+                 'subject_id' => $request->id,
+                 'campus_id' =>  $request->campus_exam,
+
             ];
 
             // $filename = $this->uploadFile($request->external_url);
-            $dataCreate = array_merge($request->only([
-                'name',
-                'description',
-                'max_ponit',
-                'ponit',
-            ]), $dataMer);
-
-            $this->exam::create($dataCreate);
-            if ($round->contest->type == 1) return redirect()->route('admin.contest.show.capatity', ['id' => $round->contest->id]);
-            return redirect()->route('admin.exam.index', ['id' => $id_round]);
+//            $dataCreate = array_merge($request->only([
+//                'name',
+//                'description',
+//                'campus_exam'
+//            ]), $dataMer);
+//            dd($dataMer);
+            $this->exam::create($dataMer);
+            return redirect()->route('admin.exam.index', $request->id);
         } catch (\Throwable $th) {
             Log::info($th->getMessage());
             return abort(404);
         }
     }
+
 
 
     public function destroy($id)

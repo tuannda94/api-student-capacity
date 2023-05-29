@@ -1,6 +1,6 @@
 @extends('layouts.main')
-@section('title', 'Quản lý đánh giá năng lực')
-@section('page-title', 'Quản lý đánh giá năng lực')
+@section('title', 'Quản lý Bộ Đề')
+@section('page-title', 'Quản lý đánh Bộ Đề')
 @section('content')
     <style>
         .select2-container{
@@ -11,9 +11,9 @@
         <div class="col-lg-12">
             <ol class="breadcrumb text-muted fs-6 fw-bold">
                 <li class="breadcrumb-item pe-3">
-                    <a href="{{ route('admin.contest.list') . '?type=1' }}" class="pe-3">Đánh giá năng lực </a>
+                    <a href="{{ route('admin.contest.list') . '?type=1' }}" class="pe-3">Đánh giá Bộ Đề </a>
                 </li>
-                <li class="breadcrumb-item px-3 text-muted">Chi tiết : {{ $test_capacity->name }}</li>
+{{--                <li class="breadcrumb-item px-3 text-muted">Chi tiết : {{ $test_capacity->name }}</li>--}}
             </ol>
         </div>
     </div>
@@ -24,72 +24,17 @@
             }
         </style>
         <div class="d-flex justify-content-between flex-column flex-md-row">
-            <ul class="nav nav-tabs nav-pills flex-row border-0 flex-md-column me-5 mb-3 mb-md-0 fs-6">
-                <li class="nav-item me-0 mb-md-2">
-                    <a style="width: 100%" class="nav-link btn btn-flex btn-active-light-primary  " data-bs-toggle="tab"
-                        href="#kt_vtab_pane_6">
-                        <!--begin::Svg Icon | path: icons/duotune/general/gen017.svg-->
-                        <span class="svg-icon svg-icon-2 svg-icon-primary">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none">
-                                <path opacity="0.3" d="M5 8.04999L11.8 11.95V19.85L5 15.85V8.04999Z" fill="black"></path>
-                                <path
-                                    d="M20.1 6.65L12.3 2.15C12 1.95 11.6 1.95 11.3 2.15L3.5 6.65C3.2 6.85 3 7.15 3 7.45V16.45C3 16.75 3.2 17.15 3.5 17.25L11.3 21.75C11.5 21.85 11.6 21.85 11.8 21.85C12 21.85 12.1 21.85 12.3 21.75L20.1 17.25C20.4 17.05 20.6 16.75 20.6 16.45V7.45C20.6 7.15 20.4 6.75 20.1 6.65ZM5 15.85V7.95L11.8 4.05L18.6 7.95L11.8 11.95V19.85L5 15.85Z"
-                                    fill="black"></path>
-                            </svg>
-                        </span>
-                        <!--end::Svg Icon-->
-                        <span class="d-flex flex-column align-items-start">
-                            <span class="fs-4 fw-bolder">Chi tiết </span>
-                        </span>
-                    </a>
-
-                </li>
-                <li class="nav-item me-0 mb-md-2">
-                    <a style="width: 100%" class="nav-link nav-list btn btn-flex btn-active-light-success active"
-                        data-bs-toggle="tab" href="#kt_vtab_pane_4">
-                        <!--begin::Svg Icon | path: icons/duotune/general/gen001.svg-->
-                        <span class="svg-icon svg-icon-2 svg-icon-primary me-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none">
-                                <path
-                                    d="M11 2.375L2 9.575V20.575C2 21.175 2.4 21.575 3 21.575H9C9.6 21.575 10 21.175 10 20.575V14.575C10 13.975 10.4 13.575 11 13.575H13C13.6 13.575 14 13.975 14 14.575V20.575C14 21.175 14.4 21.575 15 21.575H21C21.6 21.575 22 21.175 22 20.575V9.575L13 2.375C12.4 1.875 11.6 1.875 11 2.375Z"
-                                    fill="black"></path>
-                            </svg>
-                        </span>
-                        <!--end::Svg Icon-->
-                        <span class="d-flex flex-column align-items-start">
-                            <span class="fs-4 fw-bolder">D.Sách</span>
-                        </span>
-                    </a>
-                </li>
-                {{-- <li class="nav-item me-0 mb-md-2" style="">
-                    <a style="width: 100%;cursor: no-drop;" class="nav-link nav-ql btn btn-flex btn-active-light-info ">
-                        <!--begin::Svg Icon | path: icons/duotune/general/gen003.svg-->
-                        <span class="svg-icon svg-icon-2 svg-icon-primary">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none">
-                                <path
-                                    d="M13.0079 2.6L15.7079 7.2L21.0079 8.4C21.9079 8.6 22.3079 9.7 21.7079 10.4L18.1079 14.4L18.6079 19.8C18.7079 20.7 17.7079 21.4 16.9079 21L12.0079 18.8L7.10785 21C6.20785 21.4 5.30786 20.7 5.40786 19.8L5.90786 14.4L2.30785 10.4C1.70785 9.7 2.00786 8.6 3.00786 8.4L8.30785 7.2L11.0079 2.6C11.3079 1.8 12.5079 1.8 13.0079 2.6Z"
-                                    fill="black"></path>
-                            </svg>
-                        </span>
-                        <!--end::Svg Icon-->
-                        <span class="d-flex flex-column align-items-start">
-                            <span class="fs-4 fw-bolder">Đề thi </span>
-                        </span>
-                    </a>
-                </li> --}}
-            </ul>
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade active show tab-list" id="kt_vtab_pane_4" role="tabpanel">
-                    <h2>
-                        Danh sách vòng thi thuộc <strong style="color: blue">{{ $test_capacity->name }}</strong>
-                        <a class="mx-2" target="_blank"
-                            href="{{ route('admin.round.soft.delete', 'round_soft_delete=1') }}">
+                   <div class="d-flex justify-content-between align-items-center">
+                       <h2>
+                           Danh sách Bộ Đề
+                           {{--                        <strong style="color: blue">{{ $test_capacity->name }}</strong>--}}
+                           <a class="mx-2" target="_blank"
+                              href="{{ route('admin.round.soft.delete', 'round_soft_delete=1') }}">
 
                             <span data-bs-toggle="tooltip" title="Kho lưu trữ bản xóa "
-                                class=" svg-icon svg-icon-primary svg-icon-2x">
+                                  class=" svg-icon svg-icon-primary svg-icon-2x">
                                 <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo2/dist/../src/media/svg/icons/Files/Deleted-folder.svg--><svg
                                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                                     width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
@@ -105,16 +50,17 @@
                                 </svg>
                                 <!--end::Svg Icon-->
                             </span>
-                        </a>
-                    </h2>
-                    <a class="btn btn-primary" target="_blank"
-                        href="{{ route('admin.round.create') . '?contest_id=' . $test_capacity->id . '&type=1' }}"
-                        style="float:right">Thêm vòng thi </a>
+                           </a>
+                       </h2>
+                       <a class="btn btn-primary" target="_blank"
+                          href="{{ route('admin.round.create') . '?contest_id='  . '&type=1' }}"
+                          style="float:right">Thêm Bộ Đề </a>
+                   </div>
                     <div style="width: 100%" class="table-responsive table-responsive-md ">
                         <table class="table table-striped table-row-bordered table-row-gray-300 gy-7  table-hover ">
                             <thead>
                                 <tr>
-                                    <th>Tên vòng thi </th>
+                                    <th>Tên Bộ Đề </th>
                                     <th>Đề thi</th>
                                     <th>Thời gian bắt đầu</th>
                                     <th>Thời gian kết thúc</th>
@@ -125,8 +71,9 @@
                                 </tr>
                             </thead>
                             <tbody class="panel">
-                                @if ($test_capacity->rounds)
-                                    @foreach ($test_capacity->rounds as $key => $round)
+                            @foreach($test_capacity as  $test)
+                                @if ($test->rounds)
+                                    @foreach ($test->rounds as $key => $round)
                                         <tr class="panel-heading" data-key="{{ $round->id }}">
                                             <td data-key="{{ $round->id }}" data-bs-toggle="tooltip"
                                                 title="Xem nhanh các cuộc thi">
@@ -656,8 +603,11 @@
                                         <h5>Không có đề thi lào !</h5>
                                     </tr>
                                 @endif
+                            @endforeach
                             </tbody>
                         </table>
+                        {{ $test_capacity->links() }}
+
                     </div>
 
 
@@ -691,77 +641,77 @@
                     {{--  --}}
 
                 </div>
-                <div class="tab-pane fade  " id="kt_vtab_pane_6" role="tabpanel">
+{{--                <div class="tab-pane fade  " id="kt_vtab_pane_6" role="tabpanel">--}}
 
-                    <!--begin::Post-->
-                    <div class="post d-flex flex-column-fluid" id="kt_post">
-                        <!--begin::Container-->
-                        <div id="kt_content_container" class="container-xxl">
-                            <!--begin::About card-->
-                            <div class="card">
-                                <!--begin::Body-->
-                                <div class="card-body p-lg-17">
-                                    <!--begin::Meet-->
-                                    <div class="mb-18">
-                                        <!--begin::Wrapper-->
-                                        <div class="mb-11">
-                                            <!--begin::Top-->
-                                            <div class="text-center mb-18">
-                                                <!--begin::Title-->
-                                                <h3 class="fs-2hx text-dark mb-6">đánh giá năng lực :
-                                                    <strong>{{ $test_capacity->name }}</strong>
-                                                </h3>
-                                                <!--end::Title-->
-                                                <div class="fs-5 text-muted fw-bold">
-                                                    <strong>Bắt đầu</strong> : {{ $test_capacity->date_start }}
-                                                    <br><strong>Kết thúc</strong> : {{ $test_capacity->register_deadline }}
-                                                    <br>
-                                                    <p><strong>Kỹ năng</strong></p>
-                                                    @if (count($test_capacity->skills) > 0)
-                                                        @foreach ($test_capacity->skills as $key => $skill)
-                                                            <span
-                                                                class="badge badge-{{ $key % 2 == 0 ? 'secondary' : 'success' }}">{{ $skill->name }}</span>
-                                                        @endforeach
-                                                    @else
-                                                        <span class="badge badge-success">Chưa có kỹ năng !</span>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                            <!--end::Top-->
-                                            <!--begin::Overlay-->
-                                            <div class="overlay">
-                                                <!--begin::Image-->
-                                                <img class="w-100 card-rounded" src="{{ $test_capacity->img }}"
-                                                    alt="" />
-                                                <!--end::Image-->
-                                                <!--begin::Links-->
-                                                <!--end::Links-->
-                                            </div>
-                                            <!--end::Overlay-->
-                                        </div>
-                                        <!--end::Wrapper-->
-                                        <!--begin::Description-->
-                                        <div class="fs-5 fw-bold text-gray-600">
-                                            <!--begin::Text-->
-                                            <p class="m-0">
-                                                {!! $test_capacity->description !!}
-                                            </p>
-                                            <!--end::Text-->
-                                        </div>
-                                        <!--end::Description-->
-                                    </div>
-                                    <!--end::Meet-->
-                                    <!--begin::Team-->
+{{--                    <!--begin::Post-->--}}
+{{--                    <div class="post d-flex flex-column-fluid" id="kt_post">--}}
+{{--                        <!--begin::Container-->--}}
+{{--                        <div id="kt_content_container" class="container-xxl">--}}
+{{--                            <!--begin::About card-->--}}
+{{--                            <div class="card">--}}
+{{--                                <!--begin::Body-->--}}
+{{--                                <div class="card-body p-lg-17">--}}
+{{--                                    <!--begin::Meet-->--}}
+{{--                                    <div class="mb-18">--}}
+{{--                                        <!--begin::Wrapper-->--}}
+{{--                                        <div class="mb-11">--}}
+{{--                                            <!--begin::Top-->--}}
+{{--                                            <div class="text-center mb-18">--}}
+{{--                                                <!--begin::Title-->--}}
+{{--                                                <h3 class="fs-2hx text-dark mb-6">đánh giá năng lực :--}}
+{{--                                                    <strong>{{ $test_capacity->name }}</strong>--}}
+{{--                                                </h3>--}}
+{{--                                                <!--end::Title-->--}}
+{{--                                                <div class="fs-5 text-muted fw-bold">--}}
+{{--                                                    <strong>Bắt đầu</strong> : {{ $test_capacity->date_start }}--}}
+{{--                                                    <br><strong>Kết thúc</strong> : {{ $test_capacity->register_deadline }}--}}
+{{--                                                    <br>--}}
+{{--                                                    <p><strong>Kỹ năng</strong></p>--}}
+{{--                                                    @if (count($test_capacity->skills) > 0)--}}
+{{--                                                        @foreach ($test_capacity->skills as $key => $skill)--}}
+{{--                                                            <span--}}
+{{--                                                                class="badge badge-{{ $key % 2 == 0 ? 'secondary' : 'success' }}">{{ $skill->name }}</span>--}}
+{{--                                                        @endforeach--}}
+{{--                                                    @else--}}
+{{--                                                        <span class="badge badge-success">Chưa có kỹ năng !</span>--}}
+{{--                                                    @endif--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                            <!--end::Top-->--}}
+{{--                                            <!--begin::Overlay-->--}}
+{{--                                            <div class="overlay">--}}
+{{--                                                <!--begin::Image-->--}}
+{{--                                                <img class="w-100 card-rounded" src="{{ $test_capacity->img }}"--}}
+{{--                                                    alt="" />--}}
+{{--                                                <!--end::Image-->--}}
+{{--                                                <!--begin::Links-->--}}
+{{--                                                <!--end::Links-->--}}
+{{--                                            </div>--}}
+{{--                                            <!--end::Overlay-->--}}
+{{--                                        </div>--}}
+{{--                                        <!--end::Wrapper-->--}}
+{{--                                        <!--begin::Description-->--}}
+{{--                                        <div class="fs-5 fw-bold text-gray-600">--}}
+{{--                                            <!--begin::Text-->--}}
+{{--                                            <p class="m-0">--}}
+{{--                                                {!! $test_capacity->description !!}--}}
+{{--                                            </p>--}}
+{{--                                            <!--end::Text-->--}}
+{{--                                        </div>--}}
+{{--                                        <!--end::Description-->--}}
+{{--                                    </div>--}}
+{{--                                    <!--end::Meet-->--}}
+{{--                                    <!--begin::Team-->--}}
 
-                                </div>
-                                <!--end::Body-->
-                            </div>
-                            <!--end::About card-->
-                        </div>
-                        <!--end::Container-->
-                    </div>
-                    <!--end::Post-->
-                </div>
+{{--                                </div>--}}
+{{--                                <!--end::Body-->--}}
+{{--                            </div>--}}
+{{--                            <!--end::About card-->--}}
+{{--                        </div>--}}
+{{--                        <!--end::Container-->--}}
+{{--                    </div>--}}
+{{--                    <!--end::Post-->--}}
+{{--                </div>--}}
                 <!--end::Content-->
 
             </div>
