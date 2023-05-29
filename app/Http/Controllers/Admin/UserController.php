@@ -52,6 +52,8 @@ class UserController extends Controller
         }
     }
 
+
+
     public function list(Request $request)
     {
         $keyword = $request->has('keyword') ? $request->keyword : "";
@@ -110,7 +112,19 @@ class UserController extends Controller
             return false;
         }
     }
-
+    private function getStudent()
+    {
+        try {
+            $limit = 10;
+            $users = $this->modeluser::sort(request('sort') == 'asc' ? 'asc' : 'desc', request('sort_by') ?? null, 'users')
+                ->search(request('q') ?? null, ['name', 'email'])
+                ->has_role('student')
+                ->paginate(request('limit') ?? $limit);
+            return $users;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
     public function index()
     {
         if (!$users = $this->getUser())    return response()->json(
@@ -149,6 +163,11 @@ class UserController extends Controller
         return view('pages.auth.index', ['users' => $users, 'roles' => $roles]);
     }
 
+    public function stdManagement(){
+        if (!$users = $this->getStudent()) return abort(404);
+        $roles =  $this->role::all();
+        return view('pages.Students.index', ['users' => $users, 'roles' => $roles]);
+    }
     private function checkRole()
     {
         if (auth()->user()->hasAnyRole(['admin', 'super admin'])) return true;
