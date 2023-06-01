@@ -12,30 +12,39 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use App\Models\Exam;
+
 class QuestionsImport implements ToCollection
 {
-    private $exams;
+    protected $exams;
+    private $data = [];
+    protected $drawings;
+    protected $array;
+
     public function __construct(public $exam_id = null)
     {
         $this->exams = new Exam();
     }
 
-    public function collection(Collection  $rows)
+    public function collection(Collection $rows)
     {
         $arr = [];
         $count = 0;
         foreach ($rows as $key => $row) {
             if ($key == 0) continue;
             $line = $key + 1;
+            $this->data[] = $row;
 
             if (
                 $row[config('util.EXCEL_QESTIONS')['KEY_COLUMNS']['TYPE']] != null
                 || trim($row[config('util.EXCEL_QESTIONS')['KEY_COLUMNS']['TYPE']]) != ""
             ) {
+
                 $count = $count + 1;
+//                $this->data[] = $count;
                 if ($count > 1) {
+//                    $this->data[] = true;
                     $this->storeQuestionAnswer($arr);
-                };
+                }
                 $arr = [];
                 $arr['questions']['content'] = $this->catchError($row[config('util.EXCEL_QESTIONS')['KEY_COLUMNS']['QUESTION']], "Thiếu câu hỏi dòng $line");
                 $arr['questions']['type'] = $row[config('util.EXCEL_QESTIONS')['KEY_COLUMNS']['TYPE']] == config("util.EXCEL_QESTIONS")["TYPE"] ? 0 : 1;
@@ -60,6 +69,7 @@ class QuestionsImport implements ToCollection
                 array_push($arr['answers'], $dataA);
             }
         }
+//        $this->data = $arr;
         $this->storeQuestionAnswer($arr);
         $exams = $this->exams->find($this->exam_id);
         $exams->total_questions	+= $count;
@@ -83,4 +93,5 @@ class QuestionsImport implements ToCollection
             app(MAnswerInterface::class)->createAnswerByIdQuestion($data['answers'], $question->id);
         });
     }
+
 }
