@@ -97,7 +97,7 @@
                                 <td>{{ $value->created_at == null ? 'Chưa có thời gian bắt đầu' :  $value->created_at 	 }}</td>
                                 <td>{{ $value->updated_at == null ? 'Chưa có thời gian kết thúc' : $value->updated_at }}</td>
                                 <td>
-                                    <button  class="btn btn-info" onclick="location.href='{{ route('admin.semeter.subject.index',$value->id) }}'"   type="button">
+                                    <button  class="btn btn-info" onclick="location.href='{{ route('admin.exam.index',$value->id) }}'"   type="button">
                                         Chi tiết
                                     </button>
 
