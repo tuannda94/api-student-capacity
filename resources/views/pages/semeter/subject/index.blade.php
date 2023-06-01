@@ -37,7 +37,7 @@
                     <table id="table-data" class="table table-row-bordered table-row-gray-300 gy-7  table-hover ">
                         <thead>
                         <tr>
-                            <th scope="col">Tên cơ sở
+                            <th scope="col">Tên môn học
                                 <span role="button" data-key="name" data-bs-toggle="tooltip" title="" class=" svg-icon svg-icon-primary  svg-icon-2x format-database" data-bs-original-title="Lọc theo tên đánh giá năng lực">
                                 <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo2/dist/../src/media/svg/icons/Navigation/Up-down.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 14px !important ; height: 14px !important" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
                                     <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -84,6 +84,7 @@
                         </tr>
                         </thead>
                         <tbody>
+                        @if (count($subjects) > 0)
                         @foreach($subjects as $key => $value)
                             <tr>
                                 <td>
@@ -91,26 +92,37 @@
                                 </td>
                                 <td>
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" data-id="{{ $value->id }}" type="checkbox" {{ $value->status == 1 ? 'checked' : '' }} role="switch" id="flexSwitchCheckDefault">
+                                        <input class="form-check-input" data-id-subject-semeter="{{ $value->id_subject_semeter }}" type="checkbox" {{ $value->statusSubject == 1 ? 'checked' : '' }} role="switch" id="flexSwitchCheckDefault">
                                     </div>
                                 </td>
                                 <td>{{ $value->created_at == null ? 'Chưa có thời gian bắt đầu' :  $value->created_at 	 }}</td>
                                 <td>{{ $value->updated_at == null ? 'Chưa có thời gian kết thúc' : $value->updated_at }}</td>
                                 <td>
-                                    <button  class="btn btn-info" onclick="location.href='{{ route('admin.semeter.subject.index',$value->id) }}'"   type="button">
-                                        Chi tiết
-                                    </button>
+{{--                                    <button  class="btn btn-info" onclick="location.href='{{ route('admin.semeter.subject.index',$value->id) }}'"   type="button">--}}
+{{--                                        Chi tiết--}}
+{{--                                    </button>--}}
 
-                                    <button  class="btn-edit btn btn-primary"  data-id="{{ $value->id }}" type="button">
-                                        Chỉnh sửa
-                                    </button>
+{{--                                    <button  class="btn-edit btn btn-primary"  data-id="{{ $value->id }}" type="button">--}}
+{{--                                        Chỉnh sửa--}}
+{{--                                    </button>--}}
 
-                                    <button  class="btn-delete btn btn-danger" data-id="{{ $value->id }}">
+                                    <button  class="btn-delete btn btn-danger" data-id="{{ $value->id }}" data-semeter="{{ $id_semeter }}">
                                         Xóa
                                     </button>
                                 </td>
                             </tr>
                         @endforeach
+                        @else
+                            <tr>
+                               <td colspan="4"> <h1 class="text-center">Không có bản ghi nào</h1></td>
+
+                            </tr>
+                            <tr>   <td colspan="4" class="text-end"> <button onclick="location.href='{{ route('admin.semeter.index') }}'" class="btn btn-danger ">
+                                        Trở về
+                                    </button></td></tr>
+
+                        @endif
+
                         </tbody>
                     </table>
                     <nav>
@@ -139,61 +151,63 @@
                     </div>
                     <!--end::Close-->
                 </div>
-                <form id="form-submit" action="{{ route('admin.subject.create') }}" >
+                <form id="form-submit" action="{{ route('admin.semeter.subject.create') }}" >
                     @csrf
+                    <input type="hidden" id="id_semeter" value="{{ $id_semeter }}">
+{{--                    <div class="form-group m-10">--}}
+{{--                        <label for="" class="form-label">Tên môn học</label>--}}
+{{--                        <input type="text" name="namebasis" id="namebasis" class=" form-control"--}}
+{{--                               placeholder="Nhập tên môn học...">--}}
+{{--                    </div>--}}
                     <div class="form-group m-10">
-                        <label for="" class="form-label">Tên môn học</label>
-                        <input type="text" name="namebasis" id="namebasis" class=" form-control"
-                               placeholder="Nhập tên môn học...">
-                    </div>
-                    <div class="form-group m-10">
-                    <select class="form-select" name="status" id="status_add">
-                        <option selected value="">Trạng thái</option>
-                        <option value="1">Kích hoạt</option>
-                        <option value="0">Chưa kích hoạt</option>
-                    </select>
+                        <select class="form-select" name="subject" id="subject_id">
+                            <option selected value="">Môn học</option>
+                            @foreach($listSubject as $value)
+                            <option value="{{ $value->id }}">{{ $value->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" id="upload-basis" class=" btn btn-primary">Tải lên </button>
+                        <button type="button" id="upload-basis" class=" btn btn-primary">Thêm </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
     {{--    form sửa--}}
-    <div class="modal fade" tabindex="-1" id="edit_modal" style="display: none;" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Sửa Môn học</h5>
-                    <!--begin::Close-->
-                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
-                        <span class="svg-icon svg-icon-2x"></span>
-                    </div>
-                    <!--end::Close-->
-                </div>
-                <form id="form-update"  >
-                    @csrf
-                    <input type="hidden" name="id_update" id="id_update">
-                    <div class="form-group m-10">
-                        <label for="" class="form-label">Tên Môn học</label>
-                        <input type="text" name="namebasis" id="nameUpdate" class=" form-control"
-                               placeholder="Nhập tên Môn học">
-                    </div>
-                    <div class="form-group m-10">
-                        <select class="form-select" name="status" id="status_update">
-                            <option selected value="">Trạng thái</option>
-                            <option value="1">Kích hoạt</option>
-                            <option value="0">Chưa kích hoạt</option>
-                        </select>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" id="btn-update" class=" btn btn-primary">Tải lên </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+{{--    <div class="modal fade" tabindex="-1" id="edit_modal" style="display: none;" aria-hidden="true">--}}
+{{--        <div class="modal-dialog">--}}
+{{--            <div class="modal-content">--}}
+{{--                <div class="modal-header">--}}
+{{--                    <h5 class="modal-title">Sửa Môn học</h5>--}}
+{{--                    <!--begin::Close-->--}}
+{{--                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">--}}
+{{--                        <span class="svg-icon svg-icon-2x"></span>--}}
+{{--                    </div>--}}
+{{--                    <!--end::Close-->--}}
+{{--                </div>--}}
+{{--                <form id="form-update"  >--}}
+{{--                    @csrf--}}
+{{--                    <input type="hidden" name="id_update" id="id_update">--}}
+{{--                    <div class="form-group m-10">--}}
+{{--                        <label for="" class="form-label">Tên Môn học</label>--}}
+{{--                        <input type="text" name="namebasis" id="nameUpdate" class=" form-control"--}}
+{{--                               placeholder="Nhập tên Môn học">--}}
+{{--                    </div>--}}
+{{--                    <div class="form-group m-10">--}}
+{{--                        <select class="form-select" name="status" id="status_update">--}}
+{{--                            <option selected value="">Trạng thái</option>--}}
+{{--                            <option value="1">Kích hoạt</option>--}}
+{{--                            <option value="0">Chưa kích hoạt</option>--}}
+{{--                        </select>--}}
+{{--                    </div>--}}
+{{--                    <div class="modal-footer">--}}
+{{--                        <button type="button" id="btn-update" class=" btn btn-primary">Tải lên </button>--}}
+{{--                    </div>--}}
+{{--                </form>--}}
+{{--            </div>--}}
+{{--        </div>--}}
+{{--    </div>--}}
 @endsection
 @section('page-script')
     <script>
@@ -236,12 +250,32 @@
                 position: 'right top'
             })
         }
-
+        function wanrning(message) {
+            new Notify({
+                status: 'warning',
+                title: 'Đang chạy',
+                text: `${message}`,
+                effect: 'fade',
+                speed: 300,
+                customClass: null,
+                customIcon: null,
+                showIcon: true,
+                showCloseButton: true,
+                autoclose: true,
+                autotimeout: 3000,
+                gap: 20,
+                distance: 20,
+                type: 1,
+                position: 'right top'
+            })
+        }
         const table = document.querySelectorAll('#table-data tbody tr');
         let STT = parseInt(table[table.length - 1].childNodes[1].innerText) + 1;
         let btnDelete = document.querySelectorAll('.btn-delete');
         let btnEdit = document.querySelectorAll('.btn-edit');
-        let btnUpdate = document.querySelector('#btn-update');
+        // let btnUpdate = document.querySelector('#btn-update');
+        let cks = document.querySelectorAll('.form-check-input');
+
         const _token = "{{ csrf_token() }}";
         const start_time =
             '{{ request()->has('start_time') ? \Carbon\Carbon::parse(request('start_time'))->format('m/d/Y h:i:s A') : \Carbon\Carbon::now()->format('m/d/Y h:i:s A') }}'
@@ -249,64 +283,44 @@
             '{{ request()->has('end_time') ? \Carbon\Carbon::parse(request('end_time'))->format('m/d/Y h:i:s A') : \Carbon\Carbon::now()->format('m/d/Y h:i:s A') }}'
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" ></script>
-    <script src="{{ asset('assets/js/system/question/index.js') }}"></script>
-    <script src="{{ asset('assets/js/system/subject/subject.js') }}"></script>
+{{--    <script src="{{ asset('assets/js/system/question/index.js') }}"></script>--}}
+    <script src="{{ asset('assets/js/system/semeter/subject.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{{--    <button  class="btn btn-info" onclick="location.href='admin/subject/exam/${response.data.id}'"   type="button">--}}
+{{--        Chi tiết--}}
+{{--    </button>--}}
+{{--    <button  class="btn-edit btn btn-primary"  data-id="${response.data.id}" type="button">--}}
+{{--        Chỉnh sửa--}}
+{{--    </button>--}}
     {{--    Thêm --}}
     <script>
         $('#upload-basis').click(function (e){
             e.preventDefault();
             var url = $('#form-submit').attr("action");
-            var name = $('#namebasis').val();
-            var status = $('#status_add').val();
+            var subject_id = $('#subject_id').val();
+            const id_semeter = $('#id_semeter').val();
             var dataAll = {
                 '_token' : _token,
-                'namebasis' : name,
-                'status' : status,
+                'subject_id' : subject_id,
+                'id_semeter' : id_semeter,
                 'start_time' : start_time,
                 'end_time' : end_time
             }
+
             $.ajax({
                 type:'POST',
                 url: url,
                 data: dataAll,
                 success: (response) => {
                     console.log(response)
-                    $('#form-submit')[0].reset();
+                    // $('#form-submit')[0].reset();
                     notify(response.message);
-                    var newRow = `          <tr>
-                                <td>
-                                    ${response.data.namebasis}
-                    </td>
-                    <td>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" data-id="${response.data.id}" type="checkbox" ${response.data.status == 1 ? 'checked' : ''} role="switch" id="flexSwitchCheckDefault">
-                                    </div>
-                                </td>
-                                <td>${ response.data.start_time.replace(/\//g, '-').replace("PM", "")}</td>
-                                <td>${response.data.end_time.replace(/\//g, '-').replace("PM", "")}</td>
-                                <td>
-                                  <button  class="btn btn-info" onclick="location.href='admin/subject/exam/${response.data.id}'"   type="button">
-                                        Chi tiết
-                                    </button>
-
-                                    <button  class="btn-edit btn btn-primary"  data-id="${response.data.id}" type="button">
-                                        Chỉnh sửa
-                                    </button>
-
-                                    <button  class="btn-delete btn btn-danger" data-id="${response.data.id}">
-                                        Xóa
-                                    </button>
-                                </td>
-                            </tr>
-                    `;
-
-                    $('#table-data tbody').append(newRow);
-                    btnEdit = document.querySelectorAll('.btn-edit');
-                    update(btnEdit)
-                    btnDelete = document.querySelectorAll('.btn-delete');
-                    dele(btnDelete)
                     $('#kt_modal_1').modal('hide');
+                    wanrning('Đữ liệu mới đang được tải vui lòng đợi...');
+                    setTimeout(function(){
+                        notify('Tải hoàn tất ');
+                        window.location.reload();
+                    }, 1000);
                 },
                 error: function(response){
                     // console.log(response.responseText)
@@ -323,86 +337,86 @@
         })
     </script>
     {{--    Sửa --}}
-    <script>
-        update(btnEdit)
-        function update(btns){
-            for (const btnupdate of btns) {
-                btnupdate.addEventListener('click',() => {
-                    const id = btnupdate.getAttribute("data-id");
+{{--    <script>--}}
+{{--        update(btnEdit)--}}
+{{--        function update(btns){--}}
+{{--            for (const btnupdate of btns) {--}}
+{{--                btnupdate.addEventListener('click',() => {--}}
+{{--                    const id = btnupdate.getAttribute("data-id");--}}
 
-                    $.ajax({
-                        url: `/admin/subject/edit/${id}`,
-                        type: 'GET',
-                        success: function(response) {
-                            console.log(response);
-                            notify('Tải dữ liệu thành công !')
-                            $('#nameUpdate').val(response.data.name);
-                            $('#status_update').val(response.data.status);
-                            $('#id_update').val(response.data.id)
-                            // Gán các giá trị dữ liệu lấy được vào các trường tương ứng trong modal
-                            $('#edit_modal').modal('show');
-                        },
-                        error: function(response) {
-                            console.log(response);
-                            // Xử lý lỗi
-                        }
-                    });
-                })
-            }
-        }
-        onupdate(btnUpdate)
-        function onupdate(btn){
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                var nameupdate = $('#nameUpdate').val();
-                var status = $('#status_update').val();
-                var id = $('#id_update').val();
-                var dataAll = {
-                    '_token' : _token,
-                    'namebasis' : nameupdate,
-                    'status' : status,
-                    'start_time' : start_time,
-                    'end_time' : end_time
-                }
-                $.ajax({
-                    type:'PUT',
-                    url: `admin/subject/update/${id}`,
-                    data: dataAll,
-                    success: (response) => {
-                        // console.log(response)
-                        $('#form-submit')[0].reset();
-                        notify(response.message);
-                        const idup =  `data-id='${response.data.id}'`;
-                        // console.log(idup);
-                        var buttons = document.querySelector('button.btn-edit['+idup+']');
-                        const elembtn = buttons.parentNode.parentNode.childNodes ;
-                        console.log(elembtn)
-                        elembtn[1].innerText = response.data.namebasis;
-                        const output = response.data.status == 1 ? true : false;
-                        elembtn[3].childNodes[1].childNodes[1].checked= output
-                        elembtn[5].innerText = response.data.start_time.replace(/\//g, '-').replace(" PM", "");
-                        elembtn[7].innerText = response.data.end_time.replace(/\//g, '-').replace(" PM", "");
+{{--                    $.ajax({--}}
+{{--                        url: `/admin/subject/edit/${id}`,--}}
+{{--                        type: 'GET',--}}
+{{--                        success: function(response) {--}}
+{{--                            console.log(response);--}}
+{{--                            notify('Tải dữ liệu thành công !')--}}
+{{--                            $('#nameUpdate').val(response.data.name);--}}
+{{--                            $('#status_update').val(response.data.status);--}}
+{{--                            $('#id_update').val(response.data.id)--}}
+{{--                            // Gán các giá trị dữ liệu lấy được vào các trường tương ứng trong modal--}}
+{{--                            $('#edit_modal').modal('show');--}}
+{{--                        },--}}
+{{--                        error: function(response) {--}}
+{{--                            console.log(response);--}}
+{{--                            // Xử lý lỗi--}}
+{{--                        }--}}
+{{--                    });--}}
+{{--                })--}}
+{{--            }--}}
+{{--        }--}}
+{{--        onupdate(btnUpdate)--}}
+{{--        function onupdate(btn){--}}
+{{--            btn.addEventListener('click', (e) => {--}}
+{{--                e.preventDefault();--}}
+{{--                var nameupdate = $('#nameUpdate').val();--}}
+{{--                var status = $('#status_update').val();--}}
+{{--                var id = $('#id_update').val();--}}
+{{--                var dataAll = {--}}
+{{--                    '_token' : _token,--}}
+{{--                    'namebasis' : nameupdate,--}}
+{{--                    'status' : status,--}}
+{{--                    'start_time' : start_time,--}}
+{{--                    'end_time' : end_time--}}
+{{--                }--}}
+{{--                $.ajax({--}}
+{{--                    type:'PUT',--}}
+{{--                    url: `admin/subject/update/${id}`,--}}
+{{--                    data: dataAll,--}}
+{{--                    success: (response) => {--}}
+{{--                        // console.log(response)--}}
+{{--                        $('#form-submit')[0].reset();--}}
+{{--                        notify(response.message);--}}
+{{--                        const idup =  `data-id='${response.data.id}'`;--}}
+{{--                        // console.log(idup);--}}
+{{--                        var buttons = document.querySelector('button.btn-edit['+idup+']');--}}
+{{--                        const elembtn = buttons.parentNode.parentNode.childNodes ;--}}
+{{--                        console.log(elembtn)--}}
+{{--                        elembtn[1].innerText = response.data.namebasis;--}}
+{{--                        const output = response.data.status == 1 ? true : false;--}}
+{{--                        elembtn[3].childNodes[1].childNodes[1].checked= output--}}
+{{--                        elembtn[5].innerText = response.data.start_time.replace(/\//g, '-').replace(" PM", "");--}}
+{{--                        elembtn[7].innerText = response.data.end_time.replace(/\//g, '-').replace(" PM", "");--}}
 
-                        btnEdit = document.querySelectorAll('.btn-edit');
-                        update(btnEdit)
-                        btnDelete = document.querySelectorAll('.btn-delete');
-                        dele(btnDelete)
-                        $('#edit_modal').modal('hide');
-                    },
-                    error: function(response){
-                        // console.log(response.responseText)
-                        errors(response.responseText);
-                        // $('#ajax-form').find(".print-error-msg").find("ul").html('');
-                        // $('#ajax-form').find(".print-error-msg").css('display','block');
-                        // $.each( response.responseJSON.errors, function( key, value ) {
-                        //     $('#ajax-form').find(".print-error-msg").find("ul").append('<li>'+value+'</li>');
-                        // });
+{{--                        btnEdit = document.querySelectorAll('.btn-edit');--}}
+{{--                        update(btnEdit)--}}
+{{--                        btnDelete = document.querySelectorAll('.btn-delete');--}}
+{{--                        dele(btnDelete)--}}
+{{--                        $('#edit_modal').modal('hide');--}}
+{{--                    },--}}
+{{--                    error: function(response){--}}
+{{--                        // console.log(response.responseText)--}}
+{{--                        errors(response.responseText);--}}
+{{--                        // $('#ajax-form').find(".print-error-msg").find("ul").html('');--}}
+{{--                        // $('#ajax-form').find(".print-error-msg").css('display','block');--}}
+{{--                        // $.each( response.responseJSON.errors, function( key, value ) {--}}
+{{--                        //     $('#ajax-form').find(".print-error-msg").find("ul").append('<li>'+value+'</li>');--}}
+{{--                        // });--}}
 
-                    }
-                });
-            })
-        }
-    </script>
+{{--                    }--}}
+{{--                });--}}
+{{--            })--}}
+{{--        }--}}
+{{--    </script>--}}
     {{--    Xóa --}}
     <script>
         dele(btnDelete);
@@ -410,6 +424,7 @@
             for (const btnDeleteElement of btns) {
                 btnDeleteElement.addEventListener("click",() => {
                     const id = btnDeleteElement.getAttribute("data-id");
+                    const id_semeter = btnDeleteElement.getAttribute("data-semeter");
                     console.log(id)
                     Swal.fire({
                         title: 'Are you sure?',
@@ -426,7 +441,7 @@
                             }
                             $.ajax({
                                 type:'DELETE',
-                                url: `admin/subject/delete/${id}`,
+                                url: `admin/semeter/subject/delete/${id}/${id_semeter}`,
                                 data: data,
                                 success: (response) => {
                                     console.log(response)
@@ -442,6 +457,10 @@
                                     setTimeout(function() {
                                         elm.remove()
                                     }, 2000);
+                                    wanrning('Đữ liệu mới đang được tải vui lòng đợi...');
+                                    setTimeout(function(){
+                                        window.location.reload();
+                                    }, 1000);
                                 },
                                 error: function(response){
                                     // console.log(response.responseText)
@@ -463,6 +482,7 @@
 
     </script>
 
-{{--    Cập nhật trang thái nhanh--}}
+    {{--    Cập nhật trang thái nhanh--}}
 
 @endsection
+

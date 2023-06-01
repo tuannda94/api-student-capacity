@@ -5,10 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class semeter extends Model
+class modelroles extends Model
 {
     use HasFactory;
-    protected $table='semester';
-
-
+    protected $table ='model_has_roles';
 }

@@ -6,46 +6,39 @@ use App\Http\Controllers\Controller;
 use App\Services\Traits\TResponse;
 use App\Services\Traits\TUploadImage;
 use Illuminate\Http\Request;
-use App\Services\Modules\MSemeter\Semeter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-class SemeterController extends Controller
+use App\Services\Modules\poetry\poetry;
+use App\Services\Modules\MSemeter\Semeter;
+class PoetryController extends Controller
 {
     use TUploadImage, TResponse;
     public function __construct(
+        private poetry $poetry,
         private Semeter $semeter
     )
     {
     }
 
     public function index(){
-        $data = $this->semeter->GetSemeter();
-        return view('pages.semeter.index',['setemer' => $data]);
+        $data = $this->poetry->ListPoetry();
+        $semeter = $this->semeter->ListSemeter();
+        return view('pages.poetry.index',['poetry' => $data,'semeter' => $semeter]);
     }
-    public function edit($id){
-        try{
-            $subject = $this->semeter->getItemSemeter($id);
-            return response()->json([
-                'message' => "Thành công",
-                'data' => $subject,
-            ],200);
-        }catch (\Throwable $th){
-            return response( ['message' => "Thêm thất bại"],404);
-        }
-    }
+
     public function create(Request $request){
         $validator =  Validator::make(
             $request->all(),
             [
-                'namebasis' => 'required|min:3|unique:subject,name',
+                'semeter_id' => 'required',
+                'subject_id' => 'required',
                 'status' => 'required',
-                'start_time_semeter' => 'nullable',
+                'start_time_semeter' => 'nullable|date',
                 'end_time_semeter' => 'nullable|date|after:start_time_semeter'
             ],
             [
-                'namebasis.unique' => 'Trường dữ liệu đã tồn tại',
-                'namebasis.required' => 'Không để trống tên Môn !',
-                'namebasis.min' => 'Tối thiếu 3 ký tự',
+                'semeter_id.required' => 'Vui lòng chọn tên kỳ học !',
+                'subject_id.required' => 'Vui lòng chọn môn học !',
                 'status.required' => 'Vui lòng chọn trạng thái',
                 'start_time_semeter.nullable' => 'Vui lòng chọn thời gian bắt đầu',
                 'end_time_semeter.nullable' => 'Vui lòng chọn thời gian kết thúc',
@@ -55,7 +48,7 @@ class SemeterController extends Controller
 
         if($validator->fails() == 1){
             $errors = $validator->errors();
-            $fields = ['namebasis', 'status','start_time_semeter','end_time_semeter'];
+            $fields = ['semeter_id', 'subject_id','status', 'start_time_semeter','end_time_semeter'];
             foreach ($fields as $field) {
                 $fieldErrors = $errors->get($field);
 
@@ -68,7 +61,8 @@ class SemeterController extends Controller
 
         }
         $data = [
-            'name' => $request->namebasis,
+            'id_semeter' => $request->semeter_id,
+            'id_subject' => $request->subject_id,
             'status' => $request->status,
             'start_time' => $request->start_time_semeter,
             'end_time' => $request->end_time_semeter,
@@ -76,25 +70,62 @@ class SemeterController extends Controller
             'updated_at' => now()
         ];
 
-        DB::table('semester')->insert($data);
+        DB::table('poetry')->insert($data);
         $id = DB::getPdo()->lastInsertId();
-        $data = $request->all();
+        $data = array_merge($data,$this->poetry->getItem($id)) ;
+
+//        $data = $request->all();
         $data['id'] = $id;
         return response( ['message' => "Thêm thành công",'data' =>$data],200);
     }
+
+    public function now_status(Request $request,$id){
+        $poetry = $this->poetry->getItempoetry($id);
+        if (!$poetry) {
+            return response()->json(['message' => 'Không tìm thấy'], 404);
+        }
+        $poetry->status = $request->status;
+        $poetry->save();
+        $data = $request->all();
+        $data['id'] = $id;
+        return response( ['message' => "Cập nhật trạng thái thành công",'data' =>$data],200);
+    }
+
+    public function delete($id){
+        try {
+            $this->poetry->getItempoetry($id)->delete();
+            return response( ['message' => "Xóa Thành công"],200);
+        } catch (\Throwable $th) {
+            return response( ['message' => 'Xóa thất bại'],404);
+        }
+    }
+
+    public function edit($id){
+        try{
+            $poetry = $this->poetry->getItempoetry($id);
+            return response()->json([
+                'message' => "Thành công",
+                'data' => $poetry,
+            ],200);
+        }catch (\Throwable $th){
+            return response( ['message' => "Thêm thất bại"],404);
+        }
+    }
+
     public function update(Request $request,$id){
         $validator =  Validator::make(
             $request->all(),
             [
-                'namebasis' => 'required|min:3',
-                'status' => 'required',
+                'semeter_id_update' => 'required',
+                'subject_id_update' => 'required',
+                'status_update' => 'required',
                 'start_time_semeter' => 'nullable|date',
                 'end_time_semeter' => 'nullable|date|after:start_time_semeter'
             ],
             [
-                'namebasis.required' => 'Không để trống tên cơ sở !',
-                'namebasis.min' => 'Tối thiếu 3 ký tự',
-                'status.required' => 'Không để trống mã cơ sở',
+                'semeter_id_update.required' => 'Vui lòng chọn tên kỳ học !',
+                'subject_id_update.required' => 'Vui lòng chọn môn học !',
+                'status_update.required' => 'Vui lòng chọn trạng thái',
                 'start_time_semeter.nullable' => 'Vui lòng chọn thời gian bắt đầu',
                 'end_time_semeter.nullable' => 'Vui lòng chọn thời gian kết thúc',
                 'end_time_semeter.after' => 'Thời gian kết thúc phải lớn hơn thời gian bắt đầu',
@@ -102,7 +133,7 @@ class SemeterController extends Controller
         );
         if($validator->fails() == 1){
             $errors = $validator->errors();
-            $fields = ['namebasis', 'status','start_time_semeter','end_time_semeter'];
+            $fields = ['semeter_id', 'subject_id','status', 'start_time_semeter','end_time_semeter'];
             foreach ($fields as $field) {
                 $fieldErrors = $errors->get($field);
 
@@ -114,42 +145,24 @@ class SemeterController extends Controller
             }
 
         }
-        $semeter = $this->semeter->getItemSemeter($id);
-        if (!$semeter) {
+        $poetry = $this->poetry->getItempoetry($id);
+        if (!$poetry) {
             return response()->json(['message' => 'Không tìm thấy'], 404);
         }
-        $semeter->name = $request->namebasis;
-        $semeter->status = $request->status;
-        $semeter->start_time = $request->start_time_semeter;
-        $semeter->end_time = $request->end_time_semeter;
-        $semeter->created_at = $request->start_time;
-        $semeter->updated_at = $request->end_time;
+        $poetry->id_semeter = $request->semeter_id_update;
+        $poetry->id_subject	 =  $request->subject_id_update;
+        $poetry->status = $request->status_update;
+        $poetry->start_time = $request->start_time_semeter;
+        $poetry->end_time = $request->end_time_semeter;
+        $poetry->updated_at = now();
 
-        $semeter->save();
+        $poetry->save();
         $data = $request->all();
+        $data['id'] = $id;
         $data['end_time_semeter'] =  $this->formatdate($data['end_time_semeter']);
         $data['start_time_semeter'] =   $this->formatdate($data['start_time_semeter']);
-        $data['id'] = $id;
+        $data =array_merge($data,$this->poetry->getItem($id))   ;
         return response( ['message' => "Cập nhật thành công",'data' => $data],200);
-    }
-    public function now_status(Request $request,$id){
-        $campus = $this->semeter->getItemSemeter($id);
-        if (!$campus) {
-            return response()->json(['message' => 'Không tìm thấy'], 404);
-        }
-        $campus->status = $request->status;
-        $campus->save();
-        $data = $request->all();
-        $data['id'] = $id;
-        return response( ['message' => "Cập nhật trạng thái thành công",'data' =>$data],200);
-    }
-    public function delete($id){
-        try {
-            $this->semeter->getItemSemeter($id)->delete();
-            return response( ['message' => "Xóa Thành công"],200);
-        } catch (\Throwable $th) {
-            return response( ['message' => "Xóa Thất bại"],404);
-        }
     }
 
     function formatdate($dateformat){
@@ -158,4 +171,5 @@ class SemeterController extends Controller
         return date('d-m-Y', $timestamp);
 
     }
+
 }

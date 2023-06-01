@@ -1,6 +1,6 @@
 @extends('layouts.main')
-@section('title', 'Quản lý kỳ học')
-@section('page-title', 'Quản lý kỳ học')
+@section('title', 'Quản lý Kỳ học')
+@section('page-title', 'Quản lý Kỳ học')
 @section('content')
     <!-- CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-notify@0.5.5/dist/simple-notify.min.css" />
@@ -37,7 +37,7 @@
                     <table id="table-data" class="table table-row-bordered table-row-gray-300 gy-7  table-hover ">
                         <thead>
                         <tr>
-                            <th scope="col">Tên cơ sở
+                            <th scope="col">Tên học kỳ
                                 <span role="button" data-key="name" data-bs-toggle="tooltip" title="" class=" svg-icon svg-icon-primary  svg-icon-2x format-database" data-bs-original-title="Lọc theo tên đánh giá năng lực">
                                 <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo2/dist/../src/media/svg/icons/Navigation/Up-down.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 14px !important ; height: 14px !important" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
                                     <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -51,7 +51,7 @@
                                     <!--end::Svg Icon-->
                             </span>
                             </th>
-                            <th scope="col">Mã Cơ sở </th>
+                            <th scope="col">Trạng thái</th>
                             <th scope="col">Thời gian bắt đầu
                                 <span role="button" data-key="date_start" data-bs-toggle="tooltip" title="" class=" svg-icon svg-icon-primary  svg-icon-2x format-database" data-bs-original-title="Lọc theo thời gian bắt đầu ">
                                 <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo2/dist/../src/media/svg/icons/Navigation/Up-down.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 14px !important ; height: 14px !important" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
@@ -84,16 +84,23 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($campus as $key => $value)
+                        @foreach($setemer as $key => $value)
                             <tr>
                                 <td>
                                     {{ $value->name }}
                                 </td>
-                                <td>{{ $value->code }}</td>
-
-                                <td>{{ $value->created_at == null ? 'Chưa có thời gian bắt đầu' :  $value->created_at 	 }}</td>
-                                <td>{{ $value->updated_at == null ? 'Chưa có thời gian kết thúc' : $value->updated_at }}</td>
                                 <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" data-id="{{ $value->id }}" type="checkbox" {{ $value->status == 1 ? 'checked' : '' }} role="switch" id="flexSwitchCheckDefault">
+                                    </div>
+                                </td>
+                                <td>{{ $value->start_time == null ? 'Chưa có thời gian bắt đầu' :    date('d-m-Y', strtotime($value->start_time)) 	 }}</td>
+                                <td>{{ $value->end_time == null ? 'Chưa có thời gian kết thúc' :   date('d-m-Y', strtotime($value->end_time)) }}</td>
+                                <td>
+                                    <button  class="btn btn-info" onclick="location.href='{{ route('admin.semeter.subject.index',$value->id) }}'"   type="button">
+                                        Chi tiết
+                                    </button>
+
                                     <button  class="btn-edit btn btn-primary"  data-id="{{ $value->id }}" type="button">
                                         Chỉnh sửa
                                     </button>
@@ -108,7 +115,7 @@
                     </table>
                     <nav>
                         <ul class="pagination">
-                            {{ $campus->links() }}
+                            {{ $setemer->links() }}
                         </ul>
                     </nav>
 
@@ -124,7 +131,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Thêm cơ sở</h5>
+                    <h5 class="modal-title">Thêm mới kỳ học</h5>
 
                     <!--begin::Close-->
                     <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
@@ -132,18 +139,31 @@
                     </div>
                     <!--end::Close-->
                 </div>
-                <form id="form-submit" action="{{ route('admin.basis.store') }}" >
+                <form id="form-submit" action="{{ route('admin.semeter.create') }}" >
                     @csrf
                     <div class="form-group m-10">
-                        <label for="" class="form-label">Tên Cơ sở</label>
-                        <input type="text" name="namebasis" id="namebasis" value="{{ old('namebasis') }}" class=" form-control"
-                               placeholder="Nhập tên cơ sở...">
+                        <label for="" class="form-label">Tên kỳ học</label>
+                        <input type="text" name="namebasis" id="namebasis" class=" form-control"
+                               placeholder="Nhập tên kỳ học">
                     </div>
                     <div class="form-group m-10">
-                        <label for="" class="form-label">Mã Cơ sở</label>
-                        <input type="text" name="code" id="codeBasis" value="{{ old('codeBasis') }}" class=" form-control"
-                               placeholder="Nhập mã cở sở ...">
+                        <select class="form-select" name="status" id="status_add">
+                            <option selected value="">Trạng thái</option>
+                            <option value="1">Kích hoạt</option>
+                            <option value="0">Chưa kích hoạt</option>
+                        </select>
                     </div>
+                    <div class="form-group m-10">
+                        <label for="" class="form-label">Thời gian bắt đầu</label>
+                        <input type="date" name="start_time" id="start_time" class=" form-control"
+                               >
+                    </div>
+                    <div class="form-group m-10">
+                        <label for="" class="form-label">Thời gian kết thúc</label>
+                        <input type="date" name="end_time" id="end_time" class=" form-control"
+                               >
+                    </div>
+
                     <div class="modal-footer">
                         <button type="button" id="upload-basis" class=" btn btn-primary">Tải lên </button>
                     </div>
@@ -156,7 +176,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Sửa cơ sở</h5>
+                    <h5 class="modal-title">Sửa Kỳ học</h5>
                     <!--begin::Close-->
                     <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
                         <span class="svg-icon svg-icon-2x"></span>
@@ -167,14 +187,26 @@
                     @csrf
                     <input type="hidden" name="id_update" id="id_update">
                     <div class="form-group m-10">
-                        <label for="" class="form-label">Tên Cơ sở</label>
+                        <label for="" class="form-label">Tên Kỳ học</label>
                         <input type="text" name="namebasis" id="nameUpdate" class=" form-control"
-                               placeholder="Nhập tên cơ sở...">
+                               placeholder="Nhập tên Môn học">
                     </div>
                     <div class="form-group m-10">
-                        <label for="" class="form-label">Mã Cơ sở</label>
-                        <input type="text" name="code" id="codeUpdate" value="{{ old('codeBasis') }}" class=" form-control"
-                               placeholder="Nhập mã cở sở ...">
+                        <select class="form-select" name="status" id="status_update">
+                            <option selected value="">Trạng thái</option>
+                            <option value="1">Kích hoạt</option>
+                            <option value="0">Chưa kích hoạt</option>
+                        </select>
+                    </div>
+                    <div class="form-group m-10">
+                        <label for="" class="form-label">Thời gian bắt đầu</label>
+                        <input type="date" name="start_time" id="start_time_update" class=" form-control"
+                        >
+                    </div>
+                    <div class="form-group m-10">
+                        <label for="" class="form-label">Thời gian kết thúc</label>
+                        <input type="date" name="end_time" id="end_time_update" class=" form-control"
+                        >
                     </div>
                     <div class="modal-footer">
                         <button type="button" id="btn-update" class=" btn btn-primary">Tải lên </button>
@@ -186,6 +218,7 @@
 @endsection
 @section('page-script')
     <script>
+
         function notify(message) {
             new Notify({
                 status: 'success',
@@ -205,6 +238,7 @@
                 position: 'right top'
             })
         }
+
         function errors(message) {
             new Notify({
                 status: 'error',
@@ -224,7 +258,17 @@
                 position: 'right top'
             })
         }
+        function formatDate(DateValue){
 
+            var date = new Date(DateValue);
+
+            var day = date.getDate();
+            var month = date.getMonth() + 1; // Ghi chú: Tháng bắt đầu từ 0 (0 = tháng 1)
+            var year = date.getFullYear();
+
+            const formattedDate = day + "-" + month + "-" + year;
+            return formattedDate;
+        }
         const table = document.querySelectorAll('#table-data tbody tr');
         let STT = parseInt(table[table.length - 1].childNodes[1].innerText) + 1;
         let btnDelete = document.querySelectorAll('.btn-delete');
@@ -237,19 +281,24 @@
             '{{ request()->has('end_time') ? \Carbon\Carbon::parse(request('end_time'))->format('m/d/Y h:i:s A') : \Carbon\Carbon::now()->format('m/d/Y h:i:s A') }}'
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" ></script>
-    <script src="{{ asset('assets/js/system/question/index.js') }}"></script>
+    <script src="{{ asset('assets/js/system/semeter/semeter.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
     {{--    Thêm --}}
     <script>
         $('#upload-basis').click(function (e){
             e.preventDefault();
             var url = $('#form-submit').attr("action");
             var name = $('#namebasis').val();
-            var code = $('#codeBasis').val();
+            var status = $('#status_add').val();
+            var start_time_semeter = $('#start_time').val();
+            var end_time_semeter = $('#end_time').val();
             var dataAll = {
                 '_token' : _token,
                 'namebasis' : name,
-                'code' : code,
+                'status' : status,
+                'start_time_semeter' : start_time_semeter,
+                'end_time_semeter' : end_time_semeter,
                 'start_time' : start_time,
                 'end_time' : end_time
             }
@@ -261,26 +310,31 @@
                     console.log(response)
                     $('#form-submit')[0].reset();
                     notify(response.message);
-                    var newRow = `
-                    <tr>
-                            <td>
+                    var newRow = `          <tr>
+                                <td>
                                     ${response.data.namebasis}
                     </td>
-                    <td>${response.data.code}</td>
+                    <td>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" data-id="${response.data.id}" type="checkbox" ${response.data.status == 1 ? 'checked' : ''} role="switch" id="flexSwitchCheckDefault">
+                                    </div>
+                                </td>
+                                <td>${  formatDate(start_time_semeter) }</td>
+                                <td>${ formatDate(end_time_semeter)}</td>
+                                <td>
+                                  <button  class="btn btn-info" onclick="location.href='admin/subject/exam/${response.data.id}'"   type="button">
+                                        Chi tiết
+                                    </button>
 
-                            <td>${ response.data.start_time.replace(/\//g, '-').replace(" PM", "")}</td>
-                            <td>${response.data.end_time.replace(/\//g, '-').replace(" PM", "")}</td>
-                            <td>
-                                    <button  class="btn-edit btn btn-primary" data-id="${response.data.id}">
+                                    <button  class="btn-edit btn btn-primary"  data-id="${response.data.id}" type="button">
                                         Chỉnh sửa
                                     </button>
 
                                     <button  class="btn-delete btn btn-danger" data-id="${response.data.id}">
                                         Xóa
                                     </button>
-                            </td>
-
-                        </tr>
+                                </td>
+                            </tr>
                     `;
 
                     $('#table-data tbody').append(newRow);
@@ -313,14 +367,18 @@
                     const id = btnupdate.getAttribute("data-id");
 
                     $.ajax({
-                        url: `/admin/basis/edit/${id}`,
+                        url: `/admin/semeter/edit/${id}`,
                         type: 'GET',
                         success: function(response) {
                             console.log(response);
                             notify('Tải dữ liệu thành công !')
                             $('#nameUpdate').val(response.data.name);
-                            $('#codeUpdate').val(response.data.code);
+                            $('#status_update').val(response.data.status);
                             $('#id_update').val(response.data.id)
+                            const date_start = moment(response.data.start_time ).format("YYYY-MM-DD");
+                            $('#start_time_update').val(date_start)
+                            const date_end = moment(response.data.end_time).format("YYYY-MM-DD");
+                            $('#end_time_update').val(date_end)
                             // Gán các giá trị dữ liệu lấy được vào các trường tương ứng trong modal
                             $('#edit_modal').modal('show');
                         },
@@ -337,18 +395,22 @@
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 var nameupdate = $('#nameUpdate').val();
-                var codeupdate = $('#codeUpdate').val();
+                var status = $('#status_update').val();
                 var id = $('#id_update').val();
+                const date_start = $('#start_time_update').val();
+                const date_end = $('#end_time_update').val();
                 var dataAll = {
                     '_token' : _token,
                     'namebasis' : nameupdate,
-                    'code' : codeupdate,
+                    'status' : status,
+                    'start_time_semeter' : date_start,
+                    'end_time_semeter' : date_end,
                     'start_time' : start_time,
                     'end_time' : end_time
                 }
                 $.ajax({
                     type:'PUT',
-                    url: `admin/basis/update/${id}`,
+                    url: `admin/semeter/update/${id}`,
                     data: dataAll,
                     success: (response) => {
                         console.log(response)
@@ -360,9 +422,10 @@
                         const elembtn = buttons.parentNode.parentNode.childNodes ;
                         console.log(elembtn)
                         elembtn[1].innerText = response.data.namebasis;
-                        elembtn[3].innerText = response.data.code;
-                        elembtn[5].innerText = response.data.start_time.replace(/\//g, '-').replace(" PM", "");
-                        elembtn[7].innerText = response.data.end_time.replace(/\//g, '-').replace(" PM", "");
+                        const output = response.data.status == 1 ? true : false;
+                        elembtn[3].childNodes[1].childNodes[1].checked= output
+                        elembtn[5].innerText =  response.data.start_time_semeter;
+                        elembtn[7].innerText =  response.data.end_time_semeter;
 
                         btnEdit = document.querySelectorAll('.btn-edit');
                         update(btnEdit)
@@ -407,7 +470,7 @@
                             }
                             $.ajax({
                                 type:'DELETE',
-                                url: `admin/basis/delete/${id}`,
+                                url: `admin/semeter/delete/${id}`,
                                 data: data,
                                 success: (response) => {
                                     console.log(response)
@@ -443,4 +506,7 @@
         }
 
     </script>
+
+    {{--    Cập nhật trang thái nhanh--}}
+
 @endsection

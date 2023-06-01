@@ -9,6 +9,7 @@ use App\Services\Modules\MSubjects\Subject;
 use App\Services\Modules\MMajor\MMajorInterface;
 use App\Services\Modules\MSkill\MSkillInterface;
 use App\Services\Modules\MTeam\MTeamInterface;
+use App\Services\Modules\poetry\poetry;
 use App\Services\Traits\TResponse;
 use App\Services\Traits\TStatus;
 use App\Services\Traits\TTeamContest;
@@ -24,6 +25,7 @@ class subjectController extends Controller
         private MContestInterface     $contest,
         private MMajorInterface       $majorRepo,
         private Subject  $subject,
+        private poetry $poetry,
 
         // private Major $major,
         private MTeamInterface        $teamRepo,
@@ -35,7 +37,41 @@ class subjectController extends Controller
     )
     {
     }
+    public function setemer($id){
+        $this->checkTypeContest();
+        if (!($data = $this->subject->getItemSubjectSetemer($id))) return abort(404);
+        if (!($listSubject = $this->subject->List($id))) return abort(404);
 
+        return view('pages.semeter.subject.index', [
+            'subjects' => $data,
+            'listSubject' => $listSubject,
+            'id_semeter' => $id
+        ]);
+    }
+    public function getsemeter($id){
+        $this->checkTypeContest();
+        if (!($data = $this->subject->getItemSubjectSetemerReponse($id))) return abort(404);
+        if (!($listSubject = $this->subject->List())) return abort(404);
+        return response()->json(['data' => $data],200);
+//        return view('pages.semeter.subject.index', [
+//            'subjects' => $data,
+//            'listSubject' => $listSubject,
+//            'id_semeter' => $id
+//        ]);
+    }
+
+    public function getsemeterEdit($id,$id_poety){
+        if (!($ouput = $this->subject->getItemSubjectSetemerReponse($id))) return abort(404);
+        $poetry = $this->poetry->getItempoetry($id_poety);
+        $data['subject'] = $ouput;
+        $data['poetry'] =  $poetry;
+        return response()->json(['data' => $data],200);
+//        return view('pages.semeter.subject.index', [
+//            'subjects' => $data,
+//            'listSubject' => $listSubject,
+//            'id_semeter' => $id
+//        ]);
+    }
     public function edit($id){
         try{
             $subject = $this->subject->getItemSubject($id);
@@ -86,6 +122,41 @@ class subjectController extends Controller
         DB::table('subject')->insert($data);
         $id = DB::getPdo()->lastInsertId();
         $data = $request->all();
+        $data['id'] = $id;
+        return response( ['message' => "Thêm thành công",'data' =>$data],200);
+    }
+    public function create_semeter(Request $request){
+        $validator =  Validator::make(
+            $request->all(),
+            [
+                'subject_id' => 'required',
+                'semeter_id' => 'required',
+            ],
+            [
+                'subject_id.required' => 'Vui lòng chọn môn học !',
+                'semeter_id.required' => 'Vui lòng chọn kỳ học !',
+            ]
+        );
+
+        if($validator->fails() == 1){
+            $errors = $validator->errors();
+            $fields = ['subject_id' ];
+            foreach ($fields as $field) {
+                $fieldErrors = $errors->get($field);
+
+                if ($fieldErrors) {
+                    foreach ($fieldErrors as $error) {
+                        return response($error,404);
+                    }
+                }
+            }
+
+        }
+
+
+        $data = $this->subject->getItemSubject($request->subject_id);
+        $this->subject->createSubjectSemater($request->subject_id,$request->id_semeter);
+
         return response( ['message' => "Thêm thành công",'data' =>$data],200);
     }
     public function update(Request $request,$id){
@@ -149,7 +220,17 @@ class subjectController extends Controller
         $data['id'] = $id;
         return response( ['message' => "Cập nhật trạng thái thành công",'data' =>$data],200);
     }
-
+    public function now_status_semeter($id,Request $request){
+        try {
+//            return response( ['message' => $id],404);
+            $this->subject->updateStatusSemeter($id,$request->status);
+               $data = $request->all();
+               $data['id'] = $id;
+               return response( ['message' => "Cập nhật trạng thái thành công",'data' =>$data],200);
+        } catch (\Throwable $th) {
+            return response( ['message' => $th],404);
+        }
+    }
     public function delete($id){
         try {
             $this->subject->getItemSubject($id)->delete();
@@ -157,6 +238,16 @@ class subjectController extends Controller
         } catch (\Throwable $th) {
             return response( ['message' => "Xóa Thất bại"],404);
         }
+    }
+
+    public function delete_semeter($id_subject,$id_semeter){
+        try {
+            $this->subject->removeSubjectSemater($id_subject,$id_semeter);
+            return response( ['message' => "Xóa Thành công"],200);
+        } catch (\Throwable $th) {
+            return response( ['message' => "Xóa Thất bại vui lòng liên hệ bộ phận kỹ thuật"],404);
+        }
+
     }
 
     private function checkTypeContest()
