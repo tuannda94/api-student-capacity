@@ -49,9 +49,10 @@ class subjectController extends Controller
         ]);
     }
     public function getsemeter($id){
+
         $this->checkTypeContest();
         if (!($data = $this->subject->getItemSubjectSetemerReponse($id))) return abort(404);
-        if (!($listSubject = $this->subject->List())) return abort(404);
+//        if (!($listSubject = $this->subject->List())) return abort(404);
         return response()->json(['data' => $data],200);
 //        return view('pages.semeter.subject.index', [
 //            'subjects' => $data,

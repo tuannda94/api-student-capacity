@@ -21,6 +21,7 @@ class PoetryController extends Controller
     }
 
     public function index(){
+
         $data = $this->poetry->ListPoetry();
         $semeter = $this->semeter->ListSemeter();
         return view('pages.poetry.index',['poetry' => $data,'semeter' => $semeter]);
@@ -67,7 +68,7 @@ class PoetryController extends Controller
             'start_time' => $request->start_time_semeter,
             'end_time' => $request->end_time_semeter,
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => null
         ];
 
         DB::table('poetry')->insert($data);
@@ -85,6 +86,7 @@ class PoetryController extends Controller
             return response()->json(['message' => 'Không tìm thấy'], 404);
         }
         $poetry->status = $request->status;
+        $poetry->updated_at = now();
         $poetry->save();
         $data = $request->all();
         $data['id'] = $id;

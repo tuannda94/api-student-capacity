@@ -56,7 +56,7 @@ class studentPoetryController extends Controller
         }
         $data = null;
         foreach ($request->emailStudent as $value){
-            $data[] = $this->PoetryStudent->findUser($value);
+            $data[] = $this->PoetryStudent->findUser($value,$request->id_poetry);
         }
         $errors = 0;
         $data = array_filter($data, function ($item) use (&$errors) {
@@ -74,7 +74,7 @@ class studentPoetryController extends Controller
                 'id_student' => $object->id,
                 'status' =>  $request->status,
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => null
             ];
             DB::table('student_poetry')->insert($dataInsert);
             $success++;
@@ -88,6 +88,7 @@ class studentPoetryController extends Controller
             return response()->json(['message' => 'Không tìm thấy'], 404);
         }
         $studentPoetry->status = $request->status;
+        $studentPoetry->updated_at = now();
         $studentPoetry->save();
         $data = $request->all();
         $data['id'] = $id;

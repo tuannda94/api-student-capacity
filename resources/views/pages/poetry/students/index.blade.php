@@ -2,11 +2,42 @@
 @section('title', 'Quản lý ca thi' )
 @section('page-title', 'Quản lý ca thi số ' .$id)
 @section('content')
+    <style>
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .tag {
+            display: flex;
+            align-items: center;
+            background-color: #f2f2f2;
+            border-radius: 5px;
+            padding: 5px;
+            margin: 2px;
+        }
+
+        .tag-label {
+            margin-right: 5px;
+        }
+
+        .tag-close {
+            cursor: pointer;
+        }
+
+        .tag-input {
+            height: 30px;
+            padding: 5px;
+        }
+    </style>
     <!-- CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-notify@0.5.5/dist/simple-notify.min.css" />
     <!-- JS -->
     <script src="https://cdn.jsdelivr.net/npm/simple-notify@0.5.5/dist/simple-notify.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
     <div class="post d-flex flex-column-fluid" id="kt_post">
         <!--begin::Container-->
         <div id="kt_content_container" class="container-xxl">
@@ -148,9 +179,10 @@
                     <input type="hidden" id="id_poetry" value="{{ $id }}">
                     <div class="form-group m-10">
                         <label for="" class="form-label">Nhập Email</label>
-                        <input type="email" id="emailStudent" class="form-control"
-                               data-role="taginput"
-                        >
+{{--                        <input type="email" id="emailStudent" class="form-control">--}}
+                        <div class="tag-container">
+                            <input type="text" id="emailStudent" class="form-control" placeholder="Nhâp email" onkeydown="handleKeyDown(event)">
+                        </div>
 
                     </div>
                     <div class="form-group m-10">
@@ -162,6 +194,7 @@
                     </div>
 
                     <div class="modal-footer">
+                        <button  type="button" onclick="getData()" class=" btn btn-primary">Lấy dữ liệu</button>
                         <button type="button" id="upload-basis" class=" btn btn-primary">Thêm </button>
                     </div>
                 </form>
@@ -252,15 +285,51 @@
     <script src="{{ asset('assets/js/system/poetry/student.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
     <script>
-        var input = document.querySelector('#emailStudent');
-        var emailStudent = new Tagify(input);
+        var emailList = [];
+        function handleKeyDown(event) {
+            if (event.key === "Enter" || event.keyCode === 13) {
+                event.preventDefault();
+                var tagInput = document.getElementById("emailStudent");
+                var tagString = tagInput.value.trim();
+                if (tagString !== "") {
+                    var emailArray = tagString.split(" ").filter(function(email) {
+                        return email !== "";
+                    });
+                    emailArray.forEach(function(email) {
+                        addTag(email);
+                        emailList.push(email);
+                    });
+                }
+                tagInput.value = "";
+            }
+        }
+
+        function addTag(tagName) {
+            var tagContainer = document.getElementsByClassName("tag-container")[0];
+            var tag = document.createElement("div");
+            tag.className = "tag";
+            tag.innerHTML = '<span class="tag-label">' + tagName + '</span><span class="tag-close" onclick="removeTag(this)">&#10006;</span>';
+            tagContainer.appendChild(tag);
+        }
+
+        function removeTag(tagClose) {
+            var tag = tagClose.parentNode;
+            var tagContainer = tag.parentNode;
+            tagContainer.removeChild(tag);
+            var index = emailList.indexOf(tagName);
+            if (index !== -1) {
+                emailList.splice(index, 1);
+            }
+        }
+        function getData() {
+            console.log(emailList);
+        }
+
         $('#upload-basis').click(function (e){
             e.preventDefault();
             var url = $('#form-submit').attr("action");
-            const valueEamil = emailStudent.value.map(tag => tag.value);
+            const valueEamil = emailList;
             var id_poetry = $('#id_poetry').val();
             var status = $('#status').val();
             var dataAll = {
@@ -276,10 +345,12 @@
                 success: (response) => {
                     console.log(response)
                     $('#form-submit')[0].reset();
+                    emailList = [];
                     notify(response.message);
+                    $('#kt_modal_1').modal('hide');
                     setTimeout(function (){
                         window.location.reload();
-                    },5000);
+                    },2000);
                 },
                 error: function(response){
                     // console.log(response.responseText)
@@ -335,6 +406,7 @@
                                     setTimeout(function() {
                                         elm.remove()
                                     }, 2000);
+
                                 },
                                 error: function(response){
                                     // console.log(response.responseText)

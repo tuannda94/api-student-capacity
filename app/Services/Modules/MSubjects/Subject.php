@@ -109,6 +109,7 @@ class Subject
             try {
                 $semetersubject = semeter_subject::find($idSemeterSubject);
                 $semetersubject->status = $status;
+                $semetersubject->updated_at	 = now();
                 $semetersubject->save();
             } catch (\Exception $e) {
                 return $e;

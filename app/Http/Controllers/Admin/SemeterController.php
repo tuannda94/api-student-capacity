@@ -37,13 +37,13 @@ class SemeterController extends Controller
         $validator =  Validator::make(
             $request->all(),
             [
-                'namebasis' => 'required|min:3|unique:subject,name',
+                'namebasis' => 'required|min:3|unique:semester,name',
                 'status' => 'required',
                 'start_time_semeter' => 'nullable',
                 'end_time_semeter' => 'nullable|date|after:start_time_semeter'
             ],
             [
-                'namebasis.unique' => 'Trường dữ liệu đã tồn tại',
+                'namebasis.unique' => 'Tên kỳ học đã tồn tại',
                 'namebasis.required' => 'Không để trống tên Môn !',
                 'namebasis.min' => 'Tối thiếu 3 ký tự',
                 'status.required' => 'Vui lòng chọn trạng thái',
@@ -73,7 +73,7 @@ class SemeterController extends Controller
             'start_time' => $request->start_time_semeter,
             'end_time' => $request->end_time_semeter,
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => NULL
         ];
 
         DB::table('semester')->insert($data);
@@ -122,7 +122,6 @@ class SemeterController extends Controller
         $semeter->status = $request->status;
         $semeter->start_time = $request->start_time_semeter;
         $semeter->end_time = $request->end_time_semeter;
-        $semeter->created_at = $request->start_time;
         $semeter->updated_at = $request->end_time;
 
         $semeter->save();
@@ -138,6 +137,7 @@ class SemeterController extends Controller
             return response()->json(['message' => 'Không tìm thấy'], 404);
         }
         $campus->status = $request->status;
+        $campus->updated_at = now();
         $campus->save();
         $data = $request->all();
         $data['id'] = $id;

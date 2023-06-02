@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\CampusController;
 use App\Http\Controllers\Admin\SemeterController;
 use App\Http\Controllers\Admin\PoetryController;
 use App\Http\Controllers\Admin\studentPoetryController;
+use App\Http\Controllers\Admin\playtopicController;
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::prefix('dashboard')->group(function () {
     Route::get('api-cuoc-thi', [DashboardController::class, 'chartCompetity'])->name('dashboard.chart-competity');
@@ -214,6 +215,9 @@ Route::prefix('poetry')->group(function () {
         Route::post('/form-add-student', [studentPoetryController::class, 'create'])->name('admin.poetry.manage.create');
         Route::put('now-status/{id}', [studentPoetryController::class, 'now_status'])->name('admin.poetry.un.status');
         Route::delete('delete/{id}', [studentPoetryController::class, 'delete'])->name('admin.poetry.delete');
+    });
+    Route::prefix('playTopic')->group(function(){
+        Route::get('/{id_peotry}', [playtopicController::class, 'index'])->name('admin.poetry.playtopic.index');
     });
 });
 // Middleware phân quyền ban giám khảo chấm thi , khi nào gộp code sẽ chỉnh sửa lại route để phân quyền route

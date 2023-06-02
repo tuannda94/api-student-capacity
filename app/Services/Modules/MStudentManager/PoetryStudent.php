@@ -52,14 +52,14 @@ class PoetryStudent implements MPoetryStudentsInterface
             }
         }
 
-        public function findUser($email){
+        public function findUser($email,$poetryStd){
             try {
                 $users = User::where('email', $email)->first();
                 $role = modelroles::where('model_id',$users->id)->first();
                 if($role->role_id != 3){
                     return 'Người dùng '.$email.' Không phải Sinh viên không thể thêm vào lớp';
                 }
-                $checkStudent = $this->model::where('id_student',$users->id)->get();
+                $checkStudent = $this->model::where('id_student',$users->id)->where('id_poetry',$poetryStd)->get();
                 if(count($checkStudent) >= 1 ){
                     return 'Người dùng đã tồn tại';
                 }
