@@ -114,7 +114,7 @@
                                     <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true" style="">
                                         <!--begin::Menu item-->
                                         <div class="menu-item px-3">
-                                            <button  class="menu-link px-3 border border-0 bg-transparent btn-exam" onclick="location.href='{{ route('admin.poetry.playtopic.index',$value->id) }}'"  type="button">
+                                            <button  class="menu-link px-3 border border-0 bg-transparent btn-exam" onclick="location.href='{{ route('admin.poetry.playtopic.index',['id_peotry'=>$value->id,'id_subject' => $value->subject->id ]) }}'"  type="button">
                                                 Phát đề
                                             </button>
                                         </div>

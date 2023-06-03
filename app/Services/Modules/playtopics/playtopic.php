@@ -14,7 +14,7 @@ class playtopic
 
     public function getList($id_poetry){
         try {
-            return $this->modelPlayTopic->where('id_poetry','=',$id_poetry)->get();
+            return $this->modelPlayTopic->where('id_poetry','=',$id_poetry)->paginate(10);
         }catch(\Exception $e){
             return $e;
         }
