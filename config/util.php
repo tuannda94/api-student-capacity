@@ -75,7 +75,8 @@ return [
             "ANSWER" => 2,
             "IS_CORRECT" => 3,
             "RANK" => 4,
-            "SKILL" => 5
+            "SKILL" => 5,
+            'IMAGE_CODE' => 0,
         ],
         "IS_CORRECT" => "Đáp án đúng"
     ],

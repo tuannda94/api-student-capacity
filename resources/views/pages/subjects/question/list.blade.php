@@ -224,6 +224,7 @@
                         @forelse ($questions as $key => $question)
                             @php
                                 $token = uniqid(15);
+                                $images = $question->images->toArray();
                             @endphp
                             <tr>
 
@@ -234,7 +235,7 @@
                                                 <h6 class="panel-title">
                                                     <div role="button" data-toggle="collapse" data-parent="#accordion"
                                                         aria-expanded="true" aria-controls="collapse{{ $token }}">
-                                                        {!! $question->content !!}
+                                                        {!! renderQuesAndAns($question->content, $images) !!}
                                                     </div>
                                                 </h6>
                                             </div>
@@ -243,10 +244,15 @@
                                                 <div class="panel-body">
                                                     <ul class="list-group list-group-flush">
                                                         @if (count($question->answers) > 0)
+                                                            <li
+                                                                class="list-group-item fw-bold">
+                                                                Đáp án
+                                                            </li>
                                                             @foreach ($question->answers as $answer)
                                                                 <li
                                                                     class="list-group-item {{ $answer->is_correct == config('util.ANSWER_TRUE') ? 'active' : '' }}">
-                                                                    {{ $answer->content }}</li>
+                                                                    {!! renderQuesAndAns($answer->content, $images) !!}
+                                                                </li>
                                                             @endforeach
                                                         @endif
 

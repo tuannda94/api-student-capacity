@@ -10,6 +10,8 @@ use App\Models\Answer;
 use App\Models\Exam;
 use App\Models\Question;
 use App\Models\Skill;
+use App\Services\Modules\MAnswer\MAnswerInterface;
+use App\Services\Modules\MExam\MExamInterface;
 use App\Services\Modules\MQuestion\MQuestionInterface;
 use App\Services\Modules\MSkill\MSkillInterface;
 use App\Services\Traits\TStatus;
@@ -19,22 +21,27 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class QuestionController extends Controller
 {
     use TStatus;
+
     protected $skillModel;
     protected $questionModel;
     protected $answerModel;
     protected $examModel;
+
     public function __construct(
-        Skill $skill,
-        Question $question,
-        Answer $answer,
-        Exam $exam,
-        private MSkillInterface $skillRepo,
+        Skill                      $skill,
+        Question                   $question,
+        Answer                     $answer,
+        Exam                       $exam,
+        private MSkillInterface    $skillRepo,
         private MQuestionInterface $questionRepo
-    ) {
+    )
+    {
         $this->skillModel = $skill;
         $this->questionModel = $question;
         $this->answerModel = $answer;
@@ -85,12 +92,14 @@ class QuestionController extends Controller
             ->when(request()->has('type'), function ($q) {
                 $q->where('type', request('type'));
             })->whereHas('questions', function ($q) use ($id) {
-                $q->where('exam_id',$id );
+                $q->where('exam_id', $id);
             });
         $data->with(['skills', 'answers']);
         return $data;
     }
-    public function indexSubject($id){
+
+    public function indexSubject($id)
+    {
         $skills = $this->skillModel::all();
         if (!($questions = $this->getQuestion($id)->paginate(request('limit') ?? 10))) return abort(404);
         return view('pages.subjects.question.list', [
@@ -167,8 +176,8 @@ class QuestionController extends Controller
                 'status.numeric' => 'Sai định dạng !',
                 'rank.required' => 'Chưa nhập trường này !',
                 'rank.numeric' => 'Sai định dạng !',
-                'skill.required' =>  'Chưa nhập trường này !',
-                'skill.*.required' =>  'Chưa nhập trường này !',
+                'skill.required' => 'Chưa nhập trường này !',
+                'skill.*.required' => 'Chưa nhập trường này !',
             ]
         );
         if ($validator->fails() || !isset($request->answers)) {
@@ -183,12 +192,12 @@ class QuestionController extends Controller
         try {
             $question = $this->questionModel::create([
                 'content' => $request->content,
-                'type' =>  $request->type,
-                'status' =>  $request->status,
-                'rank' =>  $request->rank,
+                'type' => $request->type,
+                'status' => $request->status,
+                'rank' => $request->rank,
             ]);
             $question->skills()->syncWithoutDetaching($request->skill);
-            foreach ($request->answers as  $value) {
+            foreach ($request->answers as $value) {
                 if ($value['content'] != null) {
                     $this->answerModel::create([
                         'content' => $value['content'],
@@ -256,8 +265,8 @@ class QuestionController extends Controller
                 'status.numeric' => 'Sai định dạng !',
                 'rank.required' => 'Chưa nhập trường này !',
                 'rank.numeric' => 'Sai định dạng !',
-                'skill.required' =>  'Chưa nhập trường này !',
-                'skill.*.required' =>  'Chưa nhập trường này !',
+                'skill.required' => 'Chưa nhập trường này !',
+                'skill.*.required' => 'Chưa nhập trường này !',
             ]
         );
 
@@ -274,17 +283,17 @@ class QuestionController extends Controller
             $question = $this->questionModel::find($id);
             $question->update([
                 'content' => $request->content,
-                'type' =>  $request->type,
-                'status' =>  $request->status,
-                'rank' =>  $request->rank,
+                'type' => $request->type,
+                'status' => $request->status,
+                'rank' => $request->rank,
             ]);
             $question->skills()->sync($request->skill);
-            foreach ($request->answers as  $value) {
+            foreach ($request->answers as $value) {
                 if (isset($value['answer_id'])) {
                     $this->answerModel::find($value['answer_id'])->forceDelete();
                 }
             }
-            foreach ($request->answers as  $value) {
+            foreach ($request->answers as $value) {
                 if ($value['content'] != null) {
                     $this->answerModel::create([
                         'content' => $value['content'],
@@ -307,13 +316,13 @@ class QuestionController extends Controller
         return Redirect::route('admin.question.index');
     }
 
-    public function destroysubject($id,$id_exam)
+    public function destroysubject($id, $id_exam)
     {
         $this->questionModel::find($id)->delete();
-        $exams =$this->examModel->find($id_exam);
-        $exams->total_questions	= $exams->total_questions-1;
+        $exams = $this->examModel->find($id_exam);
+        $exams->total_questions = $exams->total_questions - 1;
         $exams->save();
-        return redirect()->route('admin.subject.question.index',$id_exam);
+        return redirect()->route('admin.subject.question.index', $id_exam);
     }
 
     public function getModelDataStatus($id)
@@ -342,6 +351,7 @@ class QuestionController extends Controller
             'skills' => $skills,
         ]);
     }
+
     public function delete($id)
     {
         try {
@@ -352,7 +362,8 @@ class QuestionController extends Controller
         }
     }
 
-    public function deletesubject($id){
+    public function deletesubject($id)
+    {
         try {
             $this->questionModel::withTrashed()->where('id', $id)->forceDelete();
             return redirect()->back();
@@ -360,6 +371,7 @@ class QuestionController extends Controller
             return abort(404);
         }
     }
+
     public function restoreDelete($id)
     {
         try {
@@ -369,6 +381,7 @@ class QuestionController extends Controller
             return abort(404);
         }
     }
+
     public function save_questions(Request $request)
     {
         try {
@@ -407,6 +420,7 @@ class QuestionController extends Controller
             ]);
         }
     }
+
     public function import(ImportQuestion $request)
     {
         try {
@@ -428,7 +442,10 @@ class QuestionController extends Controller
     public function importAndRunExam(ImportQuestion $request, $exam_id)
     {
         try {
-            Excel::import(new QuestionsImport($exam_id), $request->ex_file);
+            $this->readExcel($request->ex_file, $exam_id);
+//            $import = new QuestionsImport($exam_id);
+//            Excel::import($import, $request->ex_file);
+//            dd();
             return response()->json([
                 "status" => true,
                 "payload" => "Thành công "
@@ -443,13 +460,225 @@ class QuestionController extends Controller
         }
     }
 
+    public function readExcel($file, $exam_id)
+    {
+        $spreadsheet = IOFactory::load($file);
+        $sheetCount = $spreadsheet->getSheetCount();
+
+        // Lấy ra sheet chứa câu hỏi
+        $questionsSheet = $spreadsheet->getSheet(0);
+        $questionsArr = $questionsSheet->toArray();
+
+        // Lấy ra sheet chứa ảnh
+        $imagesSheet = null;
+        if ($sheetCount > 1) {
+            $imagesSheet = $spreadsheet->getSheet(1);
+        }
+
+        $data = [];
+        $count = 0;
+        $imgCodeToQuestionId = [];
+        foreach ($questionsArr as $key => $row) {
+            if ($key == 0) continue;
+            $line = $key + 1;
+
+            if (
+                $row[config('util.EXCEL_QESTIONS')['KEY_COLUMNS']['TYPE']] != null
+                || trim($row[config('util.EXCEL_QESTIONS')['KEY_COLUMNS']['TYPE']]) != ""
+            ) {
+
+                $count = $count + 1;
+                if ($count > 1) {
+                    $data[] = $arr;
+                }
+                $arr = [];
+                $arr['imgCode'] = [];
+                $arr['questions']['content'] = $this->catchError($row[config('util.EXCEL_QESTIONS')['KEY_COLUMNS']['QUESTION']], "Thiếu câu hỏi dòng $line");
+                $arr['imgCode'] = $this->getImgCode($arr['questions']['content'], $arr['imgCode']);
+                $arr['questions']['type'] = $row[config('util.EXCEL_QESTIONS')['KEY_COLUMNS']['TYPE']] == config("util.EXCEL_QESTIONS")["TYPE"] ? 0 : 1;
+                $rank = $this->catchError($row[config('util.EXCEL_QESTIONS')['KEY_COLUMNS']['RANK']], "Thiếu mức độ dòng $line");
+                $arr['questions']['rank'] = (($rank == config("util.EXCEL_QESTIONS")["RANKS"][0]) ? 0 : (($rank == config("util.EXCEL_QESTIONS")["RANKS"][1]) ? 1 : 2));
+                $arr['skill'] = [];
+                if (isset($row[config("util.EXCEL_QESTIONS")['KEY_COLUMNS']['SKILL']]))
+                    $arr['skill'] = explode(",", $row[config("util.EXCEL_QESTIONS")['KEY_COLUMNS']['SKILL']] ?? "");
+
+                $dataA = [
+                    "content" => $this->catchError($row[config('util.EXCEL_QESTIONS')['KEY_COLUMNS']['ANSWER']], "Thiếu câu trả lời dòng $line"),
+                    "is_correct" => $row[config('util.EXCEL_QESTIONS')['KEY_COLUMNS']["IS_CORRECT"]] == config("util.EXCEL_QESTIONS")["IS_CORRECT"] ? 1 : 0,
+                ];
+                $arr['imgCode'] = $this->getImgCode($dataA['content'], $arr['imgCode']);
+                $arr['answers'] = [];
+                array_push($arr['answers'], $dataA);
+            } else {
+                if (($row[config('util.EXCEL_QESTIONS')['KEY_COLUMNS']['ANSWER']] == null || trim($row[config('util.EXCEL_QESTIONS')['KEY_COLUMNS']['ANSWER']]) == "")) continue;
+                $dataA = [
+                    "content" => $row[config('util.EXCEL_QESTIONS')['KEY_COLUMNS']['ANSWER']],
+                    "is_correct" => $row[config('util.EXCEL_QESTIONS')['KEY_COLUMNS']["IS_CORRECT"]] == config("util.EXCEL_QESTIONS")["IS_CORRECT"] ? 1 : 0,
+                ];
+                $arr['imgCode'] = $this->getImgCode($dataA['content'], $arr['imgCode']);
+                array_push($arr['answers'], $dataA);
+            }
+        }
+        $data[] = $arr;
+
+
+        // Lấy ra các đối tượng Drawing trong sheet
+        if ($imagesSheet) {
+
+            // Chuyển sheet thành một mảng dữ liệu
+            $sheetData = $imagesSheet->toArray();
+
+            $imgCodeArr = array_reduce($data, function ($acc, $ques) {
+                $acc = array_merge($acc, array_map(function ($imgCode) {
+                    return trim($imgCode, '[]');
+                }, $ques['imgCode']));
+                return $acc;
+            }, []);
+
+            $drawings = $imagesSheet->getDrawingCollection();
+            $results = [];
+            $imgArr = [];
+            $imgMemArr = [];
+
+            // Duyệt qua các đối tượng Drawing
+            foreach ($drawings as $index => $drawing) {
+                // Kiểm tra xem đối tượng Drawing có phải là MemoryDrawing hay không
+                $code = $sheetData[$index + 1][0];
+                if ($drawing instanceof \PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing) {
+                    // Lấy ảnh từ phương thức getImageResource
+                    $image = $drawing->getImageResource();
+                    // Xác định định dạng của ảnh dựa vào phương thức getMimeType
+                    switch ($drawing->getMimeType()) {
+                        case \PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing::MIMETYPE_PNG:
+                            $format = "png";
+                            break;
+                        case \PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing::MIMETYPE_GIF:
+                            $format = "gif";
+                            break;
+                        case \PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing::MIMETYPE_JPEG:
+                            $format = "jpg";
+                            break;
+                    }
+                    // Tạo một tên file cho ảnh
+                    $filename = "image_question" . md5(time()) . '_' . uniqid() . "." . $format;
+                    $path = "images/questions/" . $filename;
+                    $imgMemArr[] = [
+                        'path' => $path,
+                        'image' => $image,
+                    ];
+                } else {
+                    // Lấy ảnh từ phương thức getPath
+                    $path = $drawing->getPath();
+                    // Đọc nội dung của ảnh bằng cách sử dụng fopen và fread
+                    $file = fopen($path, "r");
+                    $content = "";
+                    while (!feof($file)) {
+                        $content .= fread($file, 1024);
+                    }
+                    // Lấy định dạng của ảnh từ phương thức getExtension
+                    $format = $drawing->getExtension();
+                    // Tạo một tên file cho ảnh
+                    $filename = "image_question" . md5(time()) . '_' . uniqid() . "." . $format;
+                    $path = "images/questions/" . $filename;
+                    $imgArr[] = [
+                        'path' => $path,
+                        'content' => $content
+                    ];
+                }
+                $results[$code] = $path;
+            }
+        }
+
+        if ($imagesSheet && !empty($results)) {
+            // Nếu số ảnh trong file excel < số mã ảnh thì báo lỗi
+            $imgCodeDiff = array_diff($imgCodeArr, array_keys($results));
+            if ($imgCodeDiff) {
+                $this->catchError(null, "Thiếu ảnh ở các mã " . implode(', ', $imgCodeDiff));
+            }
+        }
+
+        foreach ($data as $arr) {
+            $this->storeQuestionAnswer($arr, $exam_id, $imgCodeToQuestionId);
+        }
+
+        // Lấy dữ liệu để insert vào bảng question_images
+        if (!empty($imgCodeToQuestionId)) {
+            $imageQuestionArr = [];
+            foreach ($imgCodeToQuestionId as $imgCode => $questionId) {
+                $path = $results[$imgCode];
+                $imageQuestionArr[] = [
+                    'path' => $path,
+                    'img_code' => $imgCode,
+                    'question_id' => $questionId,
+                ];
+            }
+        }
+
+        if ($imagesSheet && !empty($imageQuestionArr)) {
+            // Thêm bản ghi vào bảng
+            DB::table('question_images')->insert($imageQuestionArr);
+
+            // Lưu ảnh
+            if (!empty($imgArr)) {
+                foreach ($imgArr as $item) {
+                    file_put_contents($item['path'], $item['content']);
+                }
+            }
+
+            // Lưu ảnh
+            if (!empty($imgMemArr)) {
+                foreach ($imgMemArr as $item) {
+                    imagepng($item['image'], $item['path']);
+                }
+            }
+        }
+
+        // Cập nhật số câu hỏi cho đề thi
+        $exams = Exam::query()->find($exam_id);
+        $exams->total_questions += $count;
+        $exams->save();
+    }
+
+
+    public function catchError($data, $message)
+    {
+        if (($data == null || trim($data) == "")) {
+            throw new \Exception($message);
+        }
+        return $data;
+    }
+
+    public function storeQuestionAnswer($data, $exam_id, &$imgCodeToQuestionId)
+    {
+        DB::transaction(function () use ($data, $exam_id, &$imgCodeToQuestionId) {
+            $question = app(MQuestionInterface::class)->createQuestionsAndAttchSkill($data['questions'], $data['skill']);
+            if (!$question) throw new \Exception("Error create question ");
+            if ($exam_id) app(MExamInterface::class)->attachQuestion($exam_id, $question->id);
+            app(MAnswerInterface::class)->createAnswerByIdQuestion($data['answers'], $question->id);
+            foreach ($data['imgCode'] as $imgCode) {
+                $imgCode = trim($imgCode, '[]');
+                $imgCodeToQuestionId[$imgCode] = $question->id;
+            }
+        });
+    }
+
+    public function getImgCode($text, $arr = [])
+    {
+        $regImgCode = '/\[anh\d\]/';
+        preg_match_all($regImgCode, $text, $imgCode);
+        if (!empty($imgCode[0])) {
+            $arr = array_merge($arr, $imgCode[0]);
+        }
+        return $arr;
+    }
+
     public function exportQe()
     {
         $point = [
             [1, 2, 3],
             [2, 5, 9]
         ];
-        $data = (object) array(
+        $data = (object)array(
             'points' => $point,
         );
         $export = new QuestionsExport([$data]);
