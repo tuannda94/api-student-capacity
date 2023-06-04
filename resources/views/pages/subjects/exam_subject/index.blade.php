@@ -311,6 +311,7 @@
     </script>
     <script src="assets/js/system/formatlist/formatlis.js"></script>
     <script src="assets/js/system/exam/exam.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js"></script>
 
     <script>
         const btnQuestion = document.querySelectorAll('.btn-question');
@@ -321,5 +322,42 @@
             })
         }
     </script>
-
+    <script src="assets/js/system/capacity/main.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.up-file').on("change", function() {
+                $('.show-name').html($(this)[0].files[0].name);
+            })
+            $('.form-submit').ajaxForm({
+                beforeSend: function() {
+                    $(".error_ex_file").html("");
+                    $(".upload-file").html("Đang tải dữ liệu ..")
+                    $(".progress").show();
+                    var percentage = '0';
+                },
+                uploadProgress: function(event, position, total, percentComplete) {
+                    var percentage = percentComplete;
+                    $('.progress .progress-bar').css("width", percentage + '%', function() {
+                        return $(this).attr("aria-valuenow", percentage) + "%";
+                    })
+                },
+                success: function() {
+                    $(".progress").hide();
+                    $(".upload-file").html("Tải lên")
+                    toastr.success("Tải lên thành công !");
+                    $('.up-file').val('');
+                    // window.location.reload();
+                },
+                error: function(xhr, status, error) {
+                    $(".upload-file").html("Tải lên")
+                    $('.progress .progress-bar').css("width", 0 + '%', function() {
+                        return $(this).attr("aria-valuenow", 0) + "%";
+                    })
+                    $(".progress").hide();
+                    var err = JSON.parse(xhr.responseText);
+                    if (err.errors) $(".error_ex_file").html(err.errors.ex_file);
+                }
+            });
+        })
+    </script>
 @endsection

@@ -56,4 +56,9 @@ class Question extends Model
     {
         return $this->hasMany(ResultCapacityDetail::class, 'question_id');
     }
+
+    public function images()
+    {
+        return $this->hasMany(QuestionImage::class, 'question_id');
+    }
 }
