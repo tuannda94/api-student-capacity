@@ -110,4 +110,10 @@ class Exam implements MExamInterface
             ->whereNull('room_token')
             ->get();
     }
+
+    public function getListExam($idCampus,$idsubject){
+        return $this->model::where('subject_id', $idsubject)
+            ->where('campus_id',$idCampus)
+            ->get();
+    }
 }

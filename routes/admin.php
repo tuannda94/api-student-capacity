@@ -16,6 +16,10 @@ use App\Http\Controllers\Admin\PrintExcelController;
 use App\Http\Controllers\Admin\SupportController;
 use App\Http\Controllers\Admin\subjectController;
 use App\Http\Controllers\Admin\CampusController;
+use App\Http\Controllers\Admin\SemeterController;
+use App\Http\Controllers\Admin\PoetryController;
+use App\Http\Controllers\Admin\studentPoetryController;
+use App\Http\Controllers\Admin\playtopicController;
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::prefix('dashboard')->group(function () {
     Route::get('api-cuoc-thi', [DashboardController::class, 'chartCompetity'])->name('dashboard.chart-competity');
@@ -175,6 +179,48 @@ Route::prefix('contests')->group(function () {
         Route::get('contest-soft-delete', [ContestController::class, 'softDelete'])->name('admin.contest.soft.delete');
         Route::get('contest-soft-delete/{id}/backup', [ContestController::class, 'backUpContest'])->name('admin.contest.soft.backup');
         Route::get('contest-soft-delete/{id}/delete', [ContestController::class, 'deleteContest'])->name('admin.contest.soft.destroy');
+    });
+});
+Route::prefix('semeter')->group(function () {
+    Route::get('', [SemeterController::class, 'index'])->name('admin.semeter.index');
+    Route::post('form-add-subject', [SemeterController::class, 'create'])->name('admin.semeter.create');
+    Route::get('edit/{id}', [SemeterController::class, 'edit'])->name('admin.semeter.edit');
+    Route::put('update/{id}', [SemeterController::class, 'update'])->name('admin.semeter.update');
+    Route::delete('delete/{id}', [SemeterController::class, 'delete'])->name('admin.semeter.delete');
+    Route::put('now-status/{id}', [SemeterController::class, 'now_status'])->name('admin.semeter.un.status');
+    Route::prefix('subject')->group(function () {
+        Route::get('/{id}', [subjectController::class, 'setemer'])->name('admin.semeter.subject.index');
+        Route::group([
+            'middleware' => 'role_admin'
+        ], function () {
+            Route::post('add-subject', [subjectController::class, 'create_semeter'])->name('admin.semeter.subject.create');
+            Route::put('now-status/{id}', [subjectController::class, 'now_status_semeter'])->name('admin.semeter.subject.un.status');
+            Route::delete('delete/{id}/{id_semeter}', [subjectController::class, 'delete_semeter'])->name('admin.basis.delete');
+        });
+    });
+});
+
+//Ca học =>done
+Route::prefix('poetry')->group(function () {
+    Route::get('', [PoetryController::class, 'index'])->name('admin.poetry.index');
+    Route::post('form-add-poetry', [PoetryController::class, 'create'])->name('admin.poetry.create');
+    Route::put('now-status/{id}', [PoetryController::class, 'now_status'])->name('admin.poetry.un.status');
+    Route::delete('delete/{id}', [PoetryController::class, 'delete'])->name('admin.poetry.delete');
+    Route::get('edit/{id}/{idpoety}', [subjectController::class, 'getsemeterEdit'])->name('admin.poetry.edit');
+    Route::put('update/{id}', [PoetryController::class, 'update'])->name('admin.poetry.update');
+//    call lai route bên hoc ky
+    Route::get('getsubject/{id}', [subjectController::class, 'getsemeter'])->name('admin.poetry.subject.index');
+    Route::prefix('manage')->group(function () {
+        Route::get('/{id}', [studentPoetryController::class, 'index'])->name('admin.poetry.manage.index');
+        Route::post('/form-add-student', [studentPoetryController::class, 'create'])->name('admin.poetry.manage.create');
+        Route::put('now-status/{id}', [studentPoetryController::class, 'now_status'])->name('admin.poetry.un.status');
+        Route::delete('delete/{id}', [studentPoetryController::class, 'delete'])->name('admin.poetry.delete');
+    });
+    Route::prefix('playTopic')->group(function(){
+        Route::get('/{id_peotry}/{id_subject}', [playtopicController::class, 'index'])->name('admin.poetry.playtopic.index');
+        Route::get('getExam/{id_campus}/{id_subject}', [playtopicController::class, 'listExam']);
+        Route::post('addTopics', [playtopicController::class, 'AddTopic'])->name('admin.poetry.playtopic.create');
+        Route::post('addTopicsReload', [playtopicController::class, 'AddTopicReload'])->name('admin.poetry.playtopic.create.reload');
     });
 });
 // Middleware phân quyền ban giám khảo chấm thi , khi nào gộp code sẽ chỉnh sửa lại route để phân quyền route

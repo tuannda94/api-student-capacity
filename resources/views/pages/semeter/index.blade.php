@@ -1,6 +1,6 @@
 @extends('layouts.main')
-@section('title', 'Quản lý Môn học')
-@section('page-title', 'Quản lý Môn học')
+@section('title', 'Quản lý Kỳ học')
+@section('page-title', 'Quản lý Kỳ học')
 @section('content')
     <!-- CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-notify@0.5.5/dist/simple-notify.min.css" />
@@ -16,7 +16,7 @@
                     <div class=" col-lg-6">
 
                         <h1>
-                            Danh sách môn học
+                            Danh sách kỳ học
                         </h1>
                     </div>
                     <div class=" col-lg-6">
@@ -24,7 +24,7 @@
                             <label data-bs-toggle="modal" data-bs-target="#kt_modal_1" type="button"
                                    class="btn btn-light-primary me-3" id="kt_file_manager_new_folder">
 
-                                <!--end::Svg Icon-->Thêm Môn học
+                                <!--end::Svg Icon-->Thêm kỳ học
                             </label>
                         </div>
                     </div>
@@ -37,7 +37,7 @@
                     <table id="table-data" class="table table-row-bordered table-row-gray-300 gy-7  table-hover ">
                         <thead>
                         <tr>
-                            <th scope="col">Tên Môn học
+                            <th scope="col">Tên học kỳ
                                 <span role="button" data-key="name" data-bs-toggle="tooltip" title="" class=" svg-icon svg-icon-primary  svg-icon-2x format-database" data-bs-original-title="Lọc theo tên đánh giá năng lực">
                                 <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo2/dist/../src/media/svg/icons/Navigation/Up-down.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 14px !important ; height: 14px !important" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
                                     <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -84,7 +84,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($subjects as $key => $value)
+                        @foreach($setemer as $key => $value)
                             <tr>
                                 <td>
                                     {{ $value->name }}
@@ -94,10 +94,10 @@
                                         <input class="form-check-input" data-id="{{ $value->id }}" type="checkbox" {{ $value->status == 1 ? 'checked' : '' }} role="switch" id="flexSwitchCheckDefault">
                                     </div>
                                 </td>
-                                <td>{{ $value->created_at == null ? 'Chưa có thời gian bắt đầu' :  $value->created_at 	 }}</td>
-                                <td>{{ $value->updated_at == null ? 'Chưa có thời gian kết thúc' : $value->updated_at }}</td>
+                                <td>{{ $value->start_time == null ? 'Chưa có thời gian bắt đầu' :    date('d-m-Y', strtotime($value->start_time)) 	 }}</td>
+                                <td>{{ $value->end_time == null ? 'Chưa có thời gian kết thúc' :   date('d-m-Y', strtotime($value->end_time)) }}</td>
                                 <td>
-                                    <button  class="btn btn-info" onclick="location.href='{{ route('admin.exam.index',$value->id) }}'"   type="button">
+                                    <button  class="btn btn-info" onclick="location.href='{{ route('admin.semeter.subject.index',$value->id) }}'"   type="button">
                                         Chi tiết
                                     </button>
 
@@ -115,7 +115,7 @@
                     </table>
                     <nav>
                         <ul class="pagination">
-                            {{ $subjects->links() }}
+                            {{ $setemer->links() }}
                         </ul>
                     </nav>
 
@@ -131,7 +131,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Thêm Môn học</h5>
+                    <h5 class="modal-title">Thêm mới kỳ học</h5>
 
                     <!--begin::Close-->
                     <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
@@ -139,20 +139,31 @@
                     </div>
                     <!--end::Close-->
                 </div>
-                <form id="form-submit" action="{{ route('admin.subject.create') }}" >
+                <form id="form-submit" action="{{ route('admin.semeter.create') }}" >
                     @csrf
                     <div class="form-group m-10">
-                        <label for="" class="form-label">Tên môn học</label>
+                        <label for="" class="form-label">Tên kỳ học</label>
                         <input type="text" name="namebasis" id="namebasis" class=" form-control"
-                               placeholder="Nhập tên môn học...">
+                               placeholder="Nhập tên kỳ học">
                     </div>
                     <div class="form-group m-10">
-                    <select class="form-select" name="status" id="status_add">
-                        <option selected value="">Trạng thái</option>
-                        <option value="1">Kích hoạt</option>
-                        <option value="0">Chưa kích hoạt</option>
-                    </select>
+                        <select class="form-select" name="status" id="status_add">
+                            <option selected value="">Trạng thái</option>
+                            <option value="1">Kích hoạt</option>
+                            <option value="0">Chưa kích hoạt</option>
+                        </select>
                     </div>
+                    <div class="form-group m-10">
+                        <label for="" class="form-label">Thời gian bắt đầu</label>
+                        <input type="date" name="start_time" id="start_time" class=" form-control"
+                               >
+                    </div>
+                    <div class="form-group m-10">
+                        <label for="" class="form-label">Thời gian kết thúc</label>
+                        <input type="date" name="end_time" id="end_time" class=" form-control"
+                               >
+                    </div>
+
                     <div class="modal-footer">
                         <button type="button" id="upload-basis" class=" btn btn-primary">Tải lên </button>
                     </div>
@@ -165,7 +176,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Sửa Môn học</h5>
+                    <h5 class="modal-title">Sửa Kỳ học</h5>
                     <!--begin::Close-->
                     <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
                         <span class="svg-icon svg-icon-2x"></span>
@@ -176,7 +187,7 @@
                     @csrf
                     <input type="hidden" name="id_update" id="id_update">
                     <div class="form-group m-10">
-                        <label for="" class="form-label">Tên Môn học</label>
+                        <label for="" class="form-label">Tên Kỳ học</label>
                         <input type="text" name="namebasis" id="nameUpdate" class=" form-control"
                                placeholder="Nhập tên Môn học">
                     </div>
@@ -186,6 +197,16 @@
                             <option value="1">Kích hoạt</option>
                             <option value="0">Chưa kích hoạt</option>
                         </select>
+                    </div>
+                    <div class="form-group m-10">
+                        <label for="" class="form-label">Thời gian bắt đầu</label>
+                        <input type="date" name="start_time" id="start_time_update" class=" form-control"
+                        >
+                    </div>
+                    <div class="form-group m-10">
+                        <label for="" class="form-label">Thời gian kết thúc</label>
+                        <input type="date" name="end_time" id="end_time_update" class=" form-control"
+                        >
                     </div>
                     <div class="modal-footer">
                         <button type="button" id="btn-update" class=" btn btn-primary">Tải lên </button>
@@ -217,6 +238,7 @@
                 position: 'right top'
             })
         }
+
         function errors(message) {
             new Notify({
                 status: 'error',
@@ -236,7 +258,17 @@
                 position: 'right top'
             })
         }
+        function formatDate(DateValue){
 
+            var date = new Date(DateValue);
+
+            var day = date.getDate();
+            var month = date.getMonth() + 1; // Ghi chú: Tháng bắt đầu từ 0 (0 = tháng 1)
+            var year = date.getFullYear();
+
+            const formattedDate = day + "-" + month + "-" + year;
+            return formattedDate;
+        }
         const table = document.querySelectorAll('#table-data tbody tr');
         let STT = parseInt(table[table.length - 1].childNodes[1].innerText) + 1;
         let btnDelete = document.querySelectorAll('.btn-delete');
@@ -249,9 +281,9 @@
             '{{ request()->has('end_time') ? \Carbon\Carbon::parse(request('end_time'))->format('m/d/Y h:i:s A') : \Carbon\Carbon::now()->format('m/d/Y h:i:s A') }}'
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" ></script>
-    <script src="{{ asset('assets/js/system/question/index.js') }}"></script>
-    <script src="{{ asset('assets/js/system/subject/subject.js') }}"></script>
+    <script src="{{ asset('assets/js/system/semeter/semeter.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
     {{--    Thêm --}}
     <script>
         $('#upload-basis').click(function (e){
@@ -259,10 +291,14 @@
             var url = $('#form-submit').attr("action");
             var name = $('#namebasis').val();
             var status = $('#status_add').val();
+            var start_time_semeter = $('#start_time').val();
+            var end_time_semeter = $('#end_time').val();
             var dataAll = {
                 '_token' : _token,
                 'namebasis' : name,
                 'status' : status,
+                'start_time_semeter' : start_time_semeter,
+                'end_time_semeter' : end_time_semeter,
                 'start_time' : start_time,
                 'end_time' : end_time
             }
@@ -283,8 +319,8 @@
                             <input class="form-check-input" data-id="${response.data.id}" type="checkbox" ${response.data.status == 1 ? 'checked' : ''} role="switch" id="flexSwitchCheckDefault">
                                     </div>
                                 </td>
-                                <td>${ response.data.start_time.replace(/\//g, '-').replace("PM", "")}</td>
-                                <td>${response.data.end_time.replace(/\//g, '-').replace("PM", "")}</td>
+                                <td>${  formatDate(start_time_semeter) }</td>
+                                <td>${ formatDate(end_time_semeter)}</td>
                                 <td>
                                   <button  class="btn btn-info" onclick="location.href='admin/subject/exam/${response.data.id}'"   type="button">
                                         Chi tiết
@@ -331,7 +367,7 @@
                     const id = btnupdate.getAttribute("data-id");
 
                     $.ajax({
-                        url: `/admin/subject/edit/${id}`,
+                        url: `/admin/semeter/edit/${id}`,
                         type: 'GET',
                         success: function(response) {
                             console.log(response);
@@ -339,6 +375,10 @@
                             $('#nameUpdate').val(response.data.name);
                             $('#status_update').val(response.data.status);
                             $('#id_update').val(response.data.id)
+                            const date_start = moment(response.data.start_time ).format("YYYY-MM-DD");
+                            $('#start_time_update').val(date_start)
+                            const date_end = moment(response.data.end_time).format("YYYY-MM-DD");
+                            $('#end_time_update').val(date_end)
                             // Gán các giá trị dữ liệu lấy được vào các trường tương ứng trong modal
                             $('#edit_modal').modal('show');
                         },
@@ -357,19 +397,23 @@
                 var nameupdate = $('#nameUpdate').val();
                 var status = $('#status_update').val();
                 var id = $('#id_update').val();
+                const date_start = $('#start_time_update').val();
+                const date_end = $('#end_time_update').val();
                 var dataAll = {
                     '_token' : _token,
                     'namebasis' : nameupdate,
                     'status' : status,
+                    'start_time_semeter' : date_start,
+                    'end_time_semeter' : date_end,
                     'start_time' : start_time,
                     'end_time' : end_time
                 }
                 $.ajax({
                     type:'PUT',
-                    url: `admin/subject/update/${id}`,
+                    url: `admin/semeter/update/${id}`,
                     data: dataAll,
                     success: (response) => {
-                        // console.log(response)
+                        console.log(response)
                         $('#form-submit')[0].reset();
                         notify(response.message);
                         const idup =  `data-id='${response.data.id}'`;
@@ -380,8 +424,8 @@
                         elembtn[1].innerText = response.data.namebasis;
                         const output = response.data.status == 1 ? true : false;
                         elembtn[3].childNodes[1].childNodes[1].checked= output
-                        elembtn[5].innerText = response.data.start_time.replace(/\//g, '-').replace(" PM", "");
-                        elembtn[7].innerText = response.data.end_time.replace(/\//g, '-').replace(" PM", "");
+                        elembtn[5].innerText =  response.data.start_time_semeter;
+                        elembtn[7].innerText =  response.data.end_time_semeter;
 
                         btnEdit = document.querySelectorAll('.btn-edit');
                         update(btnEdit)
@@ -426,7 +470,7 @@
                             }
                             $.ajax({
                                 type:'DELETE',
-                                url: `admin/subject/delete/${id}`,
+                                url: `admin/semeter/delete/${id}`,
                                 data: data,
                                 success: (response) => {
                                     console.log(response)
@@ -463,6 +507,6 @@
 
     </script>
 
-{{--    Cập nhật trang thái nhanh--}}
+    {{--    Cập nhật trang thái nhanh--}}
 
 @endsection

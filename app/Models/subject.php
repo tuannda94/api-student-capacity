@@ -9,4 +9,10 @@ class subject extends Model
 {
     use HasFactory;
     protected $table = "subject";
+    public function semester_subject()
+    {
+        return $this->belongsToMany(semeter::class, 'semester_subject', 'id_subject', 'id_semeter');
+    }
+
+
 }
