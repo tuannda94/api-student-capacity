@@ -41,6 +41,15 @@ class Subject
             return false;
         }
     }
+    public function ListSubjectApi()
+    {
+        try {
+            return $this->getListSb()
+                ->paginate(5);
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
 
     public function getItemSubject($id)
     {

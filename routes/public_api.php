@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\RankUserController;
 use App\Http\Controllers\Admin\ResultController;
 use App\Http\Controllers\Admin\RoundController;
 use App\Http\Controllers\Admin\SliderController;
+use App\Http\Controllers\Admin\subjectController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,10 @@ Route::prefix('capacity')->group(function () {
     Route::get('{id}', [AdminContestController::class, 'apiShowCapacity'])->name('capacity.api.show');
     Route::get('user-top/{id}', [AdminContestController::class, 'userTopCapacity']);
     Route::get('{id}/related', [AdminContestController::class, 'apiContestRelated'])->name('capacity.api.related');
+});
+
+Route::prefix('subject')->group(function () {
+    Route::get('', [subjectController::class, 'apiIndex'])->name('round.api.list.subject');
 });
 
 Route::prefix('rounds')->group(function () {

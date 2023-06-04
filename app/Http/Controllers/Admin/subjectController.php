@@ -37,6 +37,12 @@ class subjectController extends Controller
     )
     {
     }
+
+    public function apiIndex()
+    {
+        if (!($data = $this->subject->ListSubjectApi()))  return $this->responseApi(false);
+        return $this->responseApi(true, $data);
+    }
     public function setemer($id){
         $this->checkTypeContest();
         if (!($data = $this->subject->getItemSubjectSetemer($id))) return abort(404);
@@ -204,7 +210,6 @@ class subjectController extends Controller
     public function index(){
         $this->checkTypeContest();
         if (!($data = $this->subject->ListSubject())) return abort(404);
-
         return view('pages.subjects.index', [
             'subjects' => $data
         ]);
