@@ -15,7 +15,6 @@ if (!function_exists('renderQuesAndAns')) {
                 $img = $imageCodeArr[$key];
                 $text = str_replace($item, "<div class='p-2'><img class='w-75' src='{$img['path']}' /></div>", $text);
             }
-            return $text;
         }
         return $text;
     }
