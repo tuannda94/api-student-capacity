@@ -1,11 +1,10 @@
 @extends('layouts.main')
-@section('title', 'Quản lý Đề thi')
-@section('page-title', 'Quản lý Đề thi')
+@section('page-title', 'Quản lý Đề thi ' . $name)
 @section('content')
     <div class="row mb-4">
         <div class="col-lg-10">
             <ol class="breadcrumb text-muted fs-6 fw-bold">
-                <li class="breadcrumb-item px-3 text-muted">Danh sách đề thi</li>
+                <li class="breadcrumb-item px-3 text-muted">Danh sách đề thi {{ $name }}</li>
             </ol>
         </div>
 
