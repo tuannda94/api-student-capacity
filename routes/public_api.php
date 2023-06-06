@@ -4,10 +4,12 @@ use App\Events\ChatSupportEvent;
 use App\Http\Controllers\Admin\CampusController;
 use App\Http\Controllers\Admin\ContestController as AdminContestController;
 use App\Http\Controllers\Admin\ExamController;
+use App\Http\Controllers\Admin\PoetryController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\RankUserController;
 use App\Http\Controllers\Admin\ResultController;
 use App\Http\Controllers\Admin\RoundController;
+use App\Http\Controllers\Admin\SemeterController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\subjectController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -24,6 +26,14 @@ Route::prefix('capacity')->group(function () {
 
 Route::prefix('subject')->group(function () {
     Route::get('', [subjectController::class, 'apiIndex'])->name('round.api.list.subject');
+});
+
+Route::prefix('semeter')->group(function () {
+    Route::get('', [SemeterController::class, 'indexApi'])->name('admin.semeterApi.index');
+    Route::prefix('poetry')->group(function () {
+        Route::get('/{id}', [PoetryController::class, 'indexApi'])->name('admin.poetry.index');
+    });
+
 });
 
 Route::prefix('rounds')->group(function () {

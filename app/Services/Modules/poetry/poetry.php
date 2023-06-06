@@ -10,9 +10,27 @@ class poetry implements MPoetryInterface
     {
     }
 
-    public function ListPoetry(){
+    public function ListPoetry($id){
         try {
-            return $this->modelPoetry->paginate(10);
+            return $this->modelPoetry->where('id_semeter',$id)->paginate(10);
+        }catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    public function ListPoetryApi($id){
+        try {
+            $records = $this->modelPoetry->where('id_semeter',$id)->get();
+            $data = [];
+            foreach ($records as $value){
+                $data[] = [
+                    "name_semeter" => $value->semeter->name,
+                    "name_subject" => $value->subject->name,
+                    "name_class" => $value->classsubject->name,
+                    "name_examtion" => $value->examination->name,
+                ];
+            }
+            return $data;
         }catch (\Exception $e) {
             return false;
         }
@@ -21,7 +39,7 @@ class poetry implements MPoetryInterface
     public function getItem($id){
         try {
             $poetry = $this->modelPoetry::find($id);
-            $data = ['name_semeter' => $poetry->semeter->name,'name_subject' =>  $poetry->subject->name];
+            $data = ['name_semeter' => $poetry->semeter->name,'name_subject' =>  $poetry->subject->name,'nameClass' => $poetry->classsubject->name,'nameExamtion' =>  $poetry->examination->name,'start_time1' => $poetry->start_time,'end_time2' => $poetry->end_time ];
             return $data;
         }catch (\Exception $e) {
             return false;
