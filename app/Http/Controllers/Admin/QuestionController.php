@@ -19,10 +19,12 @@ use App\Services\Modules\MExam\MExamInterface;
 use App\Services\Modules\MQuestion\MQuestionInterface;
 use App\Services\Modules\MSkill\MSkillInterface;
 use App\Services\Traits\TStatus;
+use App\Services\Traits\TUploadImage;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -31,6 +33,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 class QuestionController extends Controller
 {
     use TStatus;
+    use TUploadImage;
 
     protected $skillModel;
     protected $questionModel;
@@ -558,7 +561,6 @@ class QuestionController extends Controller
         }
         $data[] = $arr;
 
-
         // Lấy ra các đối tượng Drawing trong sheet
         if ($imagesSheet) {
 
@@ -598,9 +600,9 @@ class QuestionController extends Controller
                     }
                     // Tạo một tên file cho ảnh
                     $filename = "image_question" . md5(time()) . '_' . uniqid() . "." . $format;
-                    $path = "images/questions/" . $filename;
-                    $imgMemArr[] = [
-                        'path' => $path,
+//                    $path = "questions/" . $filename;
+                    $imgMemArr[$code] = [
+                        'path' => $filename,
                         'image' => $image,
                     ];
                 } else {
@@ -616,9 +618,9 @@ class QuestionController extends Controller
                     $format = $drawing->getExtension();
                     // Tạo một tên file cho ảnh
                     $filename = "image_question" . md5(time()) . '_' . uniqid() . "." . $format;
-                    $path = "images/questions/" . $filename;
-                    $imgArr[] = [
-                        'path' => $path,
+//                    $path = "" . $filename;
+                    $imgArr[$code] = [
+                        'path' => $filename,
                         'content' => $content
                     ];
                 }
@@ -643,7 +645,7 @@ class QuestionController extends Controller
             $imageQuestionArr = [];
             foreach ($imgCodeToQuestionId as $imgCode => $questionId) {
                 $path = $results[$imgCode];
-                $imageQuestionArr[] = [
+                $imageQuestionArr[$imgCode] = [
                     'path' => $path,
                     'img_code' => $imgCode,
                     'question_id' => $questionId,
@@ -653,21 +655,29 @@ class QuestionController extends Controller
 
         if ($imagesSheet && !empty($imageQuestionArr)) {
             // Thêm bản ghi vào bảng
-            DB::table('question_images')->insert($imageQuestionArr);
 
             // Lưu ảnh
             if (!empty($imgArr)) {
-                foreach ($imgArr as $item) {
-                    file_put_contents($item['path'], $item['content']);
+                foreach ($imgArr as $imgCode => $item) {
+                    if (!empty($imageQuestionArr[$imgCode])) {
+                        $imageQuestionArr[$imgCode]['path'] = $this->uploadFile(file: 'abc', fileName: $item['path'], content: $item['content']);
+                    }
                 }
             }
 
             // Lưu ảnh
             if (!empty($imgMemArr)) {
                 foreach ($imgMemArr as $item) {
-                    imagepng($item['image'], $item['path']);
+                    if (!empty($imageQuestionArr[$imgCode])) {
+                        $tempPath = sys_get_temp_dir() . $item['path'];
+                        imagepng($item['image'], $tempPath);
+                        $content = file_get_contents($tempPath);
+                        $imageQuestionArr[$imgCode]['path'] = $this->uploadFile(file: 'abc', fileName: $item['path'], content: $content);
+                        unlink($tempPath);
+                    }
                 }
             }
+            DB::table('question_images')->insert($imageQuestionArr);
         }
 
         // Cập nhật số câu hỏi cho đề thi
@@ -748,6 +758,7 @@ class QuestionController extends Controller
         if (($data == null || trim($data) == "")) {
             throw new \Exception($message);
         }
+//        return is_string($data) ? utf8_encode($data) : $data;
         return $data;
     }
 
