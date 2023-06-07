@@ -27,9 +27,14 @@ class playtopicController extends Controller
 
     public function index($id,$id_subject){
         $playtopic = $this->playtopicModel->getList($id);
-        $total = $playtopic[0]->total;
+        $total = $playtopic == "" ? 0 : $playtopic[0]->total ;
         $campusList = $this->Campus->getList()->get();
         return view('pages.poetry.playtopic.index',['playtopics' => $playtopic,'campusList' => $campusList,'id_subject' => $id_subject,'id_poetry' => $id,'total'=>$total]);
+    }
+
+    public function indexApi($id_user,$id_poetry,$id_campus,$id_subject){
+        if (!($data = $this->playtopicModel->getExamApi($id_user,$id_poetry,$id_campus,$id_subject)))  return $this->responseApi(true,['data' => null]);
+        return $this->responseApi(true, $data);
     }
 
     public function listExam($idCampus,$idSubject){

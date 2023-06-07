@@ -4,6 +4,7 @@ use App\Events\ChatSupportEvent;
 use App\Http\Controllers\Admin\CampusController;
 use App\Http\Controllers\Admin\ContestController as AdminContestController;
 use App\Http\Controllers\Admin\ExamController;
+use App\Http\Controllers\Admin\playtopicController;
 use App\Http\Controllers\Admin\PoetryController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\RankUserController;
@@ -32,6 +33,10 @@ Route::prefix('semeter')->group(function () {
     Route::get('', [SemeterController::class, 'indexApi'])->name('admin.semeterApi.index');
     Route::prefix('poetry')->group(function () {
         Route::get('/{id}', [PoetryController::class, 'indexApi'])->name('admin.poetry.index');
+    });
+
+    Route::prefix('playtopic')->group(function () {
+        Route::get('/{id_user}/{id_poetry}/{id_campus}/{id_subject}', [playtopicController::class, 'indexApi'])->name('admin.poetryAPI.index');
     });
 
 });

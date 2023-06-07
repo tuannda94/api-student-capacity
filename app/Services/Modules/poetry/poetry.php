@@ -21,13 +21,17 @@ class poetry implements MPoetryInterface
     public function ListPoetryApi($id){
         try {
             $records = $this->modelPoetry->where('id_semeter',$id)->get();
-            $data = [];
+            $data['name_item'] =$records[0]->semeter->name;
             foreach ($records as $value){
-                $data[] = [
+                $data['data'][] = [
+                    "id" => $value->id,
+                    "id_subject" => $value->id_subject,
                     "name_semeter" => $value->semeter->name,
                     "name_subject" => $value->subject->name,
                     "name_class" => $value->classsubject->name,
                     "name_examtion" => $value->examination->name,
+                    "start_time" => $value->start_time,
+                    "end_time" => $value->end_time,
                 ];
             }
             return $data;
