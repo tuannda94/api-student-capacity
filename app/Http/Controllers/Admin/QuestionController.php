@@ -10,6 +10,10 @@ use App\Models\Answer;
 use App\Models\Exam;
 use App\Models\Question;
 use App\Models\Skill;
+use App\Models\subject;
+use App\Models\ClassModel;
+use App\Models\poetry;
+use App\Models\semeter_subject;
 use App\Services\Modules\MAnswer\MAnswerInterface;
 use App\Services\Modules\MExam\MExamInterface;
 use App\Services\Modules\MQuestion\MQuestionInterface;
@@ -35,6 +39,10 @@ class QuestionController extends Controller
     protected $questionModel;
     protected $answerModel;
     protected $examModel;
+    protected $subjectModel;
+    protected $classModel;
+    protected $poetry;
+    protected $semeter_subject;
 
     public function __construct(
         Skill                      $skill,
@@ -42,13 +50,21 @@ class QuestionController extends Controller
         Answer                     $answer,
         Exam                       $exam,
         private MSkillInterface    $skillRepo,
-        private MQuestionInterface $questionRepo
+        private MQuestionInterface $questionRepo,
+        subject                     $subject,
+        ClassModel $class,
+        poetry $poetry,
+        semeter_subject $semeter_subject
     )
     {
         $this->skillModel = $skill;
         $this->questionModel = $question;
         $this->answerModel = $answer;
         $this->examModel = $exam;
+        $this->subjectModel = $subject;
+        $this->classModel = $class;
+        $this->poetry = $poetry;
+        $this->semeter_subject = $semeter_subject;
     }
 
     /**
@@ -462,7 +478,28 @@ class QuestionController extends Controller
             ], 400);
         }
     }
+    public function importAndRunSemeter(ImportQuestion $request, $semeter_id)
+    {
+        try {
+            $this->readExClass($request->ex_file, $semeter_id);
+//            $import = new QuestionsImport($exam_id);
+//            Excel::import($import, $request->ex_file);
+//            dd();
+//            return response()->json([
+//                "status" => true,
+//                "payload" => "Thành công "
+//            ]);
+            return redirect()->route('admin.poetry.index',$semeter_id);
 
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "errors" => [
+                    "ex_file" => $th->getMessage()
+                ]
+            ], 400);
+        }
+    }
     public function readExcel($file, $exam_id)
     {
         $spreadsheet = IOFactory::load($file);
@@ -649,7 +686,73 @@ class QuestionController extends Controller
         $exams->save();
     }
 
+    public function readExClass($file, $id_semeter)
+    {
+        $spreadsheet = IOFactory::load($file);
+        $sheetCount = $spreadsheet->getSheetCount();
+        // Lấy ra sheet chứa câu hỏi
+        $questionsSheet = $spreadsheet->getSheet(0);
+        $infoSubject= $questionsSheet->toArray();
+        unset($infoSubject[0]);
+        $infoSubject = array_values($infoSubject);
+        $arrItem = [];
+        foreach ($infoSubject as $value){
+            $subjectFind = $this->subjectModel->where('code_subject',$value[4])->first();
+            $id_subject = $subjectFind != null ? $subjectFind->id : null;
+            if($subjectFind == null){
+                $id_subject = DB::table('subject')->insertGetId(
+                    [
+                        'name' => $value[3],
+                        'status' => 1,
+                        'created_at' => now(),
+                        'updated_at' => NULL,
+                        'code_subject' =>  $value[4]
+                    ]
+                );
 
+            }
+            $Classfind = $this->classModel->where('name',$value[5])->first();
+            $idClass = $Classfind != null ? $Classfind->id : null;
+            if($Classfind == null){
+                $idClass = DB::table('class')->insertGetId(
+                    [
+                        'name' => $value[5],
+                        'code_class' => NULL,
+                        'created_at' => now(),
+                        'updated_at' => NULL
+                    ]
+                );
+            }
+            $semeterSubjectFind =    $this->semeter_subject->where('id_semeter',$id_semeter)->where('id_subject',$id_subject)->first();
+            if($semeterSubjectFind == null){
+               DB::table('semester_subject')->insert(
+                    [
+                        'id_semeter' =>$id_semeter,
+                        'id_subject' => $id_subject,
+                        'status' => now(),
+                        'created_at' => Carbon::now(),
+                        'updated_at' => NULL,
+                        'deleted_at' => NULL
+                    ]
+                );
+            }
+            $time = $this->timeNow($value[1]);
+            $arrItem[] = [
+                'id_semeter' => $id_semeter,
+                'id_subject' => $id_subject,
+                'id_class' => $idClass,
+                'id_examination' => $value[2],
+                'status' => 1,
+                'start_time' => $time,
+                'end_time' => $time,
+                'created_at' => Carbon::now(),
+                'updated_at' => null
+            ];
+        }
+//        dd($arrItem);
+        DB::table('poetry')->insert($arrItem);
+
+    }
     public function catchError($data, $message)
     {
         if (($data == null || trim($data) == "")) {
@@ -702,5 +805,13 @@ class QuestionController extends Controller
     {
         $data = $this->questionRepo->getQuestionSkill();
         return $this->responseApi(true, $data);
+    }
+
+    public function timeNow($timeFormat){
+        $dateString = $timeFormat;
+        $date = Carbon::createFromFormat('d/m/Y', $dateString);
+        $formattedDate = $date->format('Y-m-d');
+        $currentDateTime = Carbon::now();
+        return  $formattedDate . ' ' . $currentDateTime->format('H:i:s');
     }
 }

@@ -202,7 +202,7 @@ Route::prefix('semeter')->group(function () {
 
 //Ca học =>done
 Route::prefix('poetry')->group(function () {
-    Route::get('', [PoetryController::class, 'index'])->name('admin.poetry.index');
+    Route::get('/{id}', [PoetryController::class, 'index'])->name('admin.poetry.index');
     Route::post('form-add-poetry', [PoetryController::class, 'create'])->name('admin.poetry.create');
     Route::put('now-status/{id}', [PoetryController::class, 'now_status'])->name('admin.poetry.un.status');
     Route::delete('delete/{id}', [PoetryController::class, 'delete'])->name('admin.poetry.delete');
@@ -263,6 +263,9 @@ Route::group([
     Route::get('dowload-frm-excel', function () {
         return response()->download(public_path('assets/media/excel/excel_download.xlsx'));
     })->name("admin.download.execel.pass");
+    Route::get('dowload-frm-excel-poetry', function () {
+        return response()->download(public_path('assets/media/excel/Poetry-dowload.xlsx'));
+    })->name("admin.download.execel.poetry");
     Route::post('upload-image', [CkeditorController::class, 'updoadFile'])->name('admin.ckeditor.upfile');
     Route::prefix('questions')->group(function () {
         Route::get('', [QuestionController::class, 'index'])->name('admin.question.index');
@@ -279,6 +282,7 @@ Route::group([
 
         Route::post('import', [QuestionController::class, 'import'])->name('admin.question.excel.import');
         Route::post('import/{exam}', [QuestionController::class, 'importAndRunExam'])->name('admin.question.excel.import.exam');
+        Route::post('importEx/{semeter}', [QuestionController::class, 'importAndRunSemeter'])->name('admin.semeter.excel.import');
         Route::get('export', [QuestionController::class, 'exportQe'])->name('admin.question.excel.export');
 
 

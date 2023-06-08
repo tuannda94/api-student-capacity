@@ -1,6 +1,5 @@
 @extends('layouts.main')
-@section('title', 'Quản lý ca thi')
-@section('page-title', 'Quản lý ca thi')
+@section('page-title', 'Quản lý ca thi kỳ ' .$name)
 @section('content')
     <!-- CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-notify@0.5.5/dist/simple-notify.min.css" />
@@ -16,16 +15,63 @@
                     <div class=" col-lg-6">
 
                         <h1>
-                            Danh sách ca thi
+                            Danh sách ca thi {{ $name }}
                         </h1>
                     </div>
                     <div class=" col-lg-6">
                         <div class=" d-flex flex-row-reverse bd-highlight">
+                            <div>
+                                <a class=" btn btn-primary me-2" target="_blank" href="{{ route('admin.download.execel.poetry') }}">
+                            <span class="svg-icon svg-icon-x svg-icon-primary   ">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                     fill="none">
+                                    <path opacity="0.3"
+                                          d="M20 15H4C2.9 15 2 14.1 2 13V7C2 6.4 2.4 6 3 6H21C21.6 6 22 6.4 22 7V13C22 14.1 21.1 15 20 15ZM13 12H11C10.5 12 10 12.4 10 13V16C10 16.5 10.4 17 11 17H13C13.6 17 14 16.6 14 16V13C14 12.4 13.6 12 13 12Z"
+                                          fill="black"></path>
+                                    <path
+                                        d="M14 6V5H10V6H8V5C8 3.9 8.9 3 10 3H14C15.1 3 16 3.9 16 5V6H14ZM20 15H14V16C14 16.6 13.5 17 13 17H11C10.5 17 10 16.6 10 16V15H4C3.6 15 3.3 14.9 3 14.7V18C3 19.1 3.9 20 5 20H19C20.1 20 21 19.1 21 18V14.7C20.7 14.9 20.4 15 20 15Z"
+                                        fill="black"></path>
+                                </svg>
+                            </span>
+                                    Tải
+                                    xuống mẫu</a>
+                            </div>
                             <label data-bs-toggle="modal" data-bs-target="#kt_modal_1" type="button"
                                    class="btn btn-light-primary me-3" id="kt_file_manager_new_folder">
 
                                 <!--end::Svg Icon-->Thêm ca thi
                             </label>
+                            <button
+                                style="background: #ccc;
+                                                                                                                    padding: 1vh 1vh 1vh 2vh;
+                                                                                                                    border-radius: 20px;"
+                                data-bs-toggle="modal"
+                                data-bs-target="#kt_modal_exc_poetry"
+                                type="button"
+                                class="btn   me-3"
+                                id="kt_file_manager_new_folder">
+                                                                                            <span
+                                                                                                class="svg-icon svg-icon-2">
+                                                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                                     width="24"
+                                                                                                     height="24"
+                                                                                                     viewBox="0 0 24 24"
+                                                                                                     fill="none">
+                                                                                                    <path opacity="0.3"
+                                                                                                          d="M10 4H21C21.6 4 22 4.4 22 5V7H10V4Z"
+                                                                                                          fill="black">
+                                                                                                    </path>
+                                                                                                    <path
+                                                                                                        d="M10.4 3.60001L12 6H21C21.6 6 22 6.4 22 7V19C22 19.6 21.6 20 21 20H3C2.4 20 2 19.6 2 19V4C2 3.4 2.4 3 3 3H9.2C9.7 3 10.2 3.20001 10.4 3.60001ZM16 12H13V9C13 8.4 12.6 8 12 8C11.4 8 11 8.4 11 9V12H8C7.4 12 7 12.4 7 13C7 13.6 7.4 14 8 14H11V17C11 17.6 11.4 18 12 18C12.6 18 13 17.6 13 17V14H16C16.6 14 17 13.6 17 13C17 12.4 16.6 12 16 12Z"
+                                                                                                        fill="black">
+                                                                                                    </path>
+                                                                                                    <path opacity="0.3"
+                                                                                                          d="M11 14H8C7.4 14 7 13.6 7 13C7 12.4 7.4 12 8 12H11V14ZM16 12H13V14H16C16.6 14 17 13.6 17 13C17 12.4 16.6 12 16 12Z"
+                                                                                                          fill="black">
+                                                                                                    </path>
+                                                                                                </svg>
+                                                                                            </span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -37,7 +83,7 @@
                     <table id="table-data" class="table table-row-bordered table-row-gray-300 gy-7  table-hover ">
                         <thead>
                         <tr>
-                            <th scope="col">Tên học kỳ
+                            <th scope="col">Tên đợt thi
                                 <span role="button" data-key="name" data-bs-toggle="tooltip" title="" class=" svg-icon svg-icon-primary  svg-icon-2x format-database" data-bs-original-title="Lọc theo tên đánh giá năng lực">
                                 <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo2/dist/../src/media/svg/icons/Navigation/Up-down.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 14px !important ; height: 14px !important" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
                                     <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -51,7 +97,9 @@
                                     <!--end::Svg Icon-->
                             </span>
                             </th>
-                            <th scope="col">Môn học</th>
+                            <th scope="col">Môn thi</th>
+                            <th scope="col">Lớp thi</th>
+                            <th scope="col">Ca thi</th>
                             <th scope="col">Trạng thái</th>
                             <th scope="col">Thời gian bắt đầu
                                 <span role="button" data-key="date_start" data-bs-toggle="tooltip" title="" class=" svg-icon svg-icon-primary  svg-icon-2x format-database" data-bs-original-title="Lọc theo thời gian bắt đầu ">
@@ -95,12 +143,18 @@
                                     {{ $value->subject->name }}
                                 </td>
                                 <td>
+                                   {{ $value->classsubject->name }}
+                                </td>
+                                <td>
+                                    {{ $value->examination->name }}
+                                </td>
+                                <td>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" data-id="{{ $value->id }}" type="checkbox" {{ $value->status == 1 ? 'checked' : '' }} role="switch" id="flexSwitchCheckDefault">
                                     </div>
                                 </td>
-                                <td>{{ $value->start_time == null ? 'Chưa có thời gian bắt đầu' :    date('d-m-Y', strtotime($value->start_time)) 	 }}</td>
-                                <td>{{ $value->end_time == null ? 'Chưa có thời gian kết thúc' :   date('d-m-Y', strtotime($value->end_time)) }}</td>
+                                <td>{{ $value->start_time == null ? 'Chưa có thời gian bắt đầu' : $value->start_time	 }}</td>
+                                <td>{{ $value->end_time == null ? 'Chưa có thời gian kết thúc' :   $value->end_time }}</td>
                                 <td class="text-end">
                                     <button  class="btn btn-light btn-active-light-primary btn-sm" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
                                         <!--begin::Svg Icon | path: icons/duotune/arrows/arr072.svg-->
@@ -161,6 +215,66 @@
         </div>
         <!--end::Container-->
     </div>
+    <div class="modal fade" tabindex="-1"
+         id="kt_modal_exc_poetry">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Tải lên
+                        excel
+                    </h5>
+
+                    <!--begin::Close-->
+                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2"
+                         data-bs-dismiss="modal" aria-label="Close">
+                        <span class="svg-icon svg-icon-2x"></span>
+                        Thoát
+                    </div>
+                    <!--end::Close-->
+                </div>
+                <form class="form-submit"
+                      action="{{ route('admin.semeter.excel.import', ['semeter' => $id_poetry]) }}"
+                      method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body text-center">
+                        <div class="HDSD">
+                        </div>
+                        <label for="up-file{{ $id_poetry }}"
+                               class="">
+                            <i data-bs-toggle="tooltip"
+                               title="Click để upload file"
+                               style="font-size: 100px;"
+                               role="button"
+                               class="bi bi-cloud-plus-fill"></i>
+                        </label>
+                        <input style="display: none" type="file"
+                               name="ex_file" class="up-file"
+                               id="up-file{{ $id_poetry }}">
+                        <div style="display: none"
+                             class="progress show-p mt-3 h-25px w-100">
+                            <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated"
+                                 role="progressbar" style="width: 0%"
+                                 aria-valuenow="0" aria-valuemin="0"
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                        <p class="show-name">
+                        </p>
+                        <p class="text-danger error_ex_file">
+                        </p>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit"
+                                class="upload-file btn btn-primary">Tải
+                            lên
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     {{--    form add--}}
     <div class="modal fade" tabindex="-1" id="kt_modal_1" style="display: none;" aria-hidden="true">
         <div class="modal-dialog">
@@ -176,17 +290,37 @@
                 </div>
                 <form id="form-submit" action="{{ route('admin.poetry.create') }}" >
                     @csrf
+                    <input type="hidden" id="semeter_id" value="{{ $id_poetry }}">
+{{--                    <div class="form-group m-10">--}}
+{{--                        <select class="form-select" name="semeter" id="semeter_id">--}}
+{{--                            <option selected value="">--Chọn kỳ học--</option>--}}
+{{--                            @foreach($semeter as $value)--}}
+{{--                                <option value="{{ $value->id }}">{{ $value->name }}</option>--}}
+{{--                            @endforeach--}}
+{{--                        </select>--}}
+{{--                    </div>--}}
                     <div class="form-group m-10">
-                        <select class="form-select" name="semeter" id="semeter_id">
-                            <option selected value="">--Chọn kỳ học--</option>
-                            @foreach($semeter as $value)
-                                <option value="{{ $value->id }}">{{ $value->name }}</option>
+                        <select class="form-select" name="subject" id="subject_id">
+                            <option selected value="">--Chọn môn học--</option>
+                            @foreach($listSubject as $subject)
+                                <option value="{{ $subject->id }}">{{ $subject->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="form-group m-10">
-                        <select class="form-select" name="subject" id="subject_id" style="display:none;">
-
+                        <select class="form-select" name="subject" id="examination_id">
+                            <option selected value="">--Chọn ca thi--</option>
+                            @foreach($listExamination as $exam)
+                                <option value="{{ $exam->id }}">{{ $exam->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group m-10">
+                        <select class="form-select" name="subject" id="class_id">
+                            <option selected value="">--Chọn lớp thi--</option>
+                            @foreach($listClass as $exam)
+                                <option value="{{ $exam->id }}">{{ $exam->name }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="form-group m-10">
@@ -219,7 +353,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Sửa Kỳ học</h5>
+                    <h5 class="modal-title">Sửa ca thi </h5>
                     <!--begin::Close-->
                     <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
                         <span class="svg-icon svg-icon-2x"></span>
@@ -229,18 +363,37 @@
                 <form id="form-update"  >
                     @csrf
                     <input type="hidden" name="id_update" id="id_update">
-                    <div class="form-group m-10">
-                        <label for="" class="form-label">Kỳ học</label>
-                    <select class="form-select" name="semeter" id="semeter_id_update">
-                        <option selected value="">--Chọn kỳ học--</option>
-                        @foreach($semeter as $value)
-                            <option value="{{ $value->id }}">{{ $value->name }}</option>
-                        @endforeach
-                    </select>
-                    </div>
+                    <input type="hidden" id="semeter_id_update" value="{{ $id_poetry }}">
+{{--                    <div class="form-group m-10">--}}
+{{--                        <label for="" class="form-label">Kỳ học</label>--}}
+{{--                    <select class="form-select" name="semeter" id="semeter_id_update">--}}
+{{--                        <option selected value="">--Chọn kỳ học--</option>--}}
+{{--                        @foreach($semeter as $value)--}}
+{{--                            <option value="{{ $value->id }}">{{ $value->name }}</option>--}}
+{{--                        @endforeach--}}
+{{--                    </select>--}}
+{{--                    </div>--}}
                     <div class="form-group m-10">
                         <select class="form-select" name="subject" id="subject_id_update" >
-
+                            @foreach($listSubject as $subject)
+                                <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group m-10">
+                        <select class="form-select" name="subject" id="examination_id_update">
+                            <option selected value="">--Chọn ca thi--</option>
+                            @foreach($listExamination as $exam)
+                                <option value="{{ $exam->id }}">{{ $exam->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group m-10">
+                        <select class="form-select" name="subject" id="class_id_update">
+                            <option selected value="">--Chọn lớp thi--</option>
+                            @foreach($listClass as $exam)
+                                <option value="{{ $exam->id }}">{{ $exam->name }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="form-group m-10">
@@ -356,6 +509,8 @@
             var url = $('#form-submit').attr("action");
             var semeter_id = $('#semeter_id').val();
             var subject_id = $('#subject_id').val();
+            var examination_id = $('#examination_id').val();
+            var class_id = $('#class_id').val();
             var status = $('#status_add').val();
             var start_time_semeter = $('#start_time').val();
             var end_time_semeter = $('#end_time').val();
@@ -363,6 +518,8 @@
                 '_token' : _token,
                 'semeter_id' : semeter_id,
                 'subject_id' : subject_id,
+                'examination_id' : examination_id,
+                'class_id' : class_id,
                 'status' : status,
                 'start_time_semeter' : start_time_semeter,
                 'end_time_semeter' : end_time_semeter,
@@ -464,18 +621,22 @@
                             console.log(response);
                             notify('Tải dữ liệu thành công !')
                             $('#semeter_id_update').val(response.data.poetry.id_semeter);
-                            const selectSubject = document.getElementById("subject_id_update");
-                            let html = "";
-                            const btnEnvent = document.getElementById("semeter_id_update");
-                            if(response.data.subject.length > 0){
-                                html = response.data.subject.map((value)=>{
-                                    return `<option value="${value.id}" ${response.data.poetry.id_subject == value.id ? 'selected' : ''} >${value.name}</option>`
-                                }).join(' ')
-                            }else {
-                                html = '<option value="">Không có data</option>';
-                            }
-                            selectSubject.innerHTML = html
-                            eventSubject(btnEnvent,selectSubject)
+                            $('#subject_id_update').val(response.data.poetry.id_subject);
+                            $('#examination_id_update').val(response.data.poetry.id_examination);
+                            $('#class_id_update').val(response.data.poetry.id_class);
+                            console.log(response.data.poetry.id_subject);
+                            // const selectSubject = document.getElementById("subject_id_update");
+                            // let html = "";
+                            // const btnEnvent = document.getElementById("semeter_id_update");
+                            // if(response.data.subject.length > 0){
+                            //     html = response.data.subject.map((value)=>{
+                            //         return `<option value="${value.id}" ${response.data.poetry.id_subject == value.id ? 'selected' : ''} >${value.name}</option>`
+                            //     }).join(' ')
+                            // }else {
+                            //     html = '<option value="">Không có data</option>';
+                            // }
+                            // selectSubject.innerHTML = html
+                            // eventSubject(btnEnvent,selectSubject)
                             // $('#subject_id_update').val(response.data.id_subject);
 
                             $('#status_update').val(response.data.poetry.status);
@@ -501,6 +662,8 @@
                 e.preventDefault();
                 var semeter_id_update = $('#semeter_id_update').val();
                 var subject_id_update = $('#subject_id_update').val();
+                var examination_id_update = $('#examination_id_update').val();
+                var class_id_update = $('#class_id_update').val();
                 var status_update = $('#status_update').val();
                 var id = $('#id_update').val();
 
@@ -510,6 +673,8 @@
                     '_token' : _token,
                     'semeter_id_update' : semeter_id_update,
                     'subject_id_update' : subject_id_update,
+                    'examination_id_update' : examination_id_update,
+                    'class_id_update' : class_id_update,
                     'status_update' : status_update,
                     'start_time_semeter' : date_start,
                     'end_time_semeter' : date_end
@@ -529,11 +694,13 @@
                         // console.log(elembtn)
                         elembtn[1].innerText = response.data.name_semeter;
                         elembtn[3].innerText = response.data.name_subject;
+                        elembtn[5].innerText = response.data.nameClass;
+                        elembtn[7].innerText = response.data.nameExamtion;
                         const output = response.data.status_update == 1 ? true : false;
                         // console.log(elembtn[5].childNodes[1].childNodes[1]);
-                        elembtn[5].childNodes[1].childNodes[1].checked= output
-                        elembtn[7].innerText =  response.data.start_time_semeter;
-                        elembtn[9].innerText =  response.data.end_time_semeter;
+                        elembtn[9].childNodes[1].childNodes[1].checked= output
+                        elembtn[11].innerText =  response.data.start_time1;
+                        elembtn[13].innerText =  response.data.end_time2;
 
                         btnEdit = document.querySelectorAll('.btn-edit');
                         update(btnEdit)

@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use App\Services\Modules\MCampus\Campus;
+use App\Models\subject;
 
 class ExamController extends Controller
 {
@@ -30,7 +31,8 @@ class ExamController extends Controller
         private MRoundInterface $repoRound,
         private Round           $round,
         private Question        $question,
-        private DB              $db
+        private DB              $db,
+        private subject $subject
     )
     {
     }
@@ -91,11 +93,13 @@ class ExamController extends Controller
     {
         $exams = $this->exam::where('subject_id', $id_subject)->orderByDesc('id')->get()->load('round');
 //        dd($exams[1]->campus->name);
+        $nameSubject = $this->subject::find($id_subject)->name;
         return view(
             'pages.subjects.exam_subject.index',
             [
                 'exams' => $exams,
-                'id' => $id_subject
+                'id' => $id_subject,
+                'name' => $nameSubject
             ]
         );
     }
