@@ -320,7 +320,10 @@ class TakeExamController extends Controller
                 return $q->with([
                     'answers' => function ($q) {
                         return $q->select(['id', 'content', 'question_id']);
-                    }
+                    },
+                    'images' => function ($q) {
+                        return $q->select(['id', 'path', 'img_code', 'question_id']);
+                    },
                 ]);
             }]);
             $dB::commit();
