@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Services\Modules\playtopics\playtopic;
 use App\Services\Modules\MCampus\Campus;
 use App\Services\Modules\MExam\Exam;
+use App\Models\Exam as ModelExam;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -20,20 +21,60 @@ class playtopicController extends Controller
         private playtopic $playtopicModel,
         private Campus $Campus,
         private Exam $exam,
-        private PoetryStudent $PoetryStudent
+        private PoetryStudent $PoetryStudent,
+        private ModelExam $modelExam
     )
     {
     }
 
     public function index($id,$id_subject){
         $playtopic = $this->playtopicModel->getList($id);
-        $total = $playtopic == "" ? 0 : $playtopic[0]->total ;
+        $total = count($playtopic) == 0 ? 0 : $playtopic[0]->total ;
         $campusList = $this->Campus->getList()->get();
         return view('pages.poetry.playtopic.index',['playtopics' => $playtopic,'campusList' => $campusList,'id_subject' => $id_subject,'id_poetry' => $id,'total'=>$total]);
     }
 
+    public function show($id){
+//        return $id;
+        $round = $this->exam->getItemApi($id);
+//        return $round;
+        if (is_null($round)) {
+            return $this->responseApi(false, 'Không tồn tại trong hệ thống !');
+        }
+//        {
+//            $round->with(['contest' => function ($q) {
+//                return $q->with(['rounds' => function ($q) {
+//                    $q->orderBy('start_time', 'asc');
+//                    $q->setEagerLoads([]);
+//                    return $q;
+//                }]);
+//            }, 'type_exam', 'judges', 'teams' => function ($q) {
+//                return $q->with('members');
+//            }]);
+        return $this->responseApi(
+                true,$round);
+//            return $this->responseApi(
+//                true,
+//                $round
+//                    ->get()
+//                    ->map(function ($col, $key) {
+//                        if ($key > 0) return;
+//                        $col = $col->toArray();
+//                        $user = [];
+//                        foreach ($col['judges'] as $judge) {
+//                            array_push($user, $judge['user']);
+//                        }
+//                        $arrResult = array_merge($col, [
+//                            'judges' => $user
+//                        ]);
+//                        return $arrResult;
+//                    })[0]
+//            );
+//        }
+    }
+
     public function indexApi($id_user,$id_poetry,$id_campus,$id_subject){
-        if (!($data = $this->playtopicModel->getExamApi($id_user,$id_poetry,$id_campus,$id_subject)))  return $this->responseApi(true,['data' => null]);
+        if (!($data = $this->playtopicModel->getExamApi($id_user,$id_poetry,$id_campus,$id_subject)))  return $this->responseApi(false);
         return $this->responseApi(true, $data);
     }
 
@@ -76,13 +117,13 @@ class playtopicController extends Controller
 
         if (!($liststudent = $this->PoetryStudent->GetStudents($request->id_poetry))) return abort(404);
 
-        if(count($liststudent) ==0){
+        if(count($liststudent) == 0){
             return response('Không có học sinh trong ca thi này',404);
         }
 
         foreach ($liststudent as $object){
             $dataInsert = [
-                'id_user' => $object->id,
+                'id_user' => $object->id_student,
                 'id_exam' => $request->exam_id,
                 'id_poetry' =>  $request->id_poetry,
                 'id_campus' =>  $request->campuses_id,
@@ -137,7 +178,7 @@ class playtopicController extends Controller
         }
         foreach ($liststudent as $object){
             $dataInsert = [
-                'id_user' => $object->id,
+                'id_user' => $object->id_student,
                 'id_exam' => $request->exam_id,
                 'id_poetry' =>  $request->id_poetry,
                 'id_campus' =>  $request->campuses_id,

@@ -26,7 +26,7 @@ class playtopic
                 ->where('id_poetry','=',$id_poetry)
                 ->where('id_campus','=',$id_campus)
                 ->where('id_subject','=',$id_subject)->first();
-            $data = [];
+            $records['name_campus'] = $records->campusName;
 //            foreach ($records as $value){
 //                $data[] = [
 //                    ""

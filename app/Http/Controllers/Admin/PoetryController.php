@@ -29,8 +29,6 @@ class PoetryController extends Controller
     }
 
     public function index($id){
-//        $data = $this->poetry->ListPoetryApi($id);
-//        dd($data);
         $data = $this->poetry->ListPoetry($id);
         $semeter = $this->semeter->ListSemeter();
         $name = $this->semeter->getName($id);
@@ -42,6 +40,11 @@ class PoetryController extends Controller
 
     public function indexApi($id){
         if (!($data = $this->poetry->ListPoetryApi($id)))  return $this->responseApi(false);
+        return $this->responseApi(true, $data);
+    }
+
+    public function oneindexApi($id_poetry){
+        if (!($data = $this->poetry->onePoetryApi($id_poetry)))  return $this->responseApi(false);
         return $this->responseApi(true, $data);
     }
 

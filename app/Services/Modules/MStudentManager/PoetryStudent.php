@@ -19,7 +19,7 @@ class PoetryStudent implements MPoetryStudentsInterface
         public function GetStudents($id_poetry)
         {
             try {
-                $data = $this->model::where('id_poetry',$id_poetry)->paginate(5);
+                $data = $this->model::where('id_poetry',$id_poetry)->paginate(10);
 //                $namePoetry = $this->model::with('poetry')
 //                    ->whereHas('poetry', function ($query) use ($id_poetry) {
 //                        $query->where('id', $id_poetry);

@@ -39,7 +39,14 @@ class poetry implements MPoetryInterface
             return false;
         }
     }
-
+    public function onePoetryApi($id_poetry){
+        try {
+            $records = $this->modelPoetry::select('start_time', 'end_time')->find($id_poetry);
+            return $records;
+        }catch (\Exception $e) {
+            return false;
+        }
+    }
     public function getItem($id){
         try {
             $poetry = $this->modelPoetry::find($id);
