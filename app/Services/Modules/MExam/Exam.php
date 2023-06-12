@@ -37,7 +37,16 @@ class Exam implements MExamInterface
     {
         return $this->model::find($id);
     }
-
+    public function getItemApi($id){
+        try {
+            $records = $this->model::find($id);
+//            $data = [] ;
+                $records['name_subject'] = $records->subject->name;
+            return $records;
+        }catch (\Exception $e){
+            return $e;
+        }
+    }
     public function whereGet($param = [], $with = [])
     {
         return $this->model::hasRequest($param)->with($with)->get();

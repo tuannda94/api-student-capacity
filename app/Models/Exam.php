@@ -38,6 +38,11 @@ class Exam extends Model
         return $this->hasOne(Campus::class, 'id', 'campus_id');
     }
 
+    public function subject()
+    {
+        return $this->hasOne(subject::class, 'id', 'subject_id');
+    }
+
     public function questions()
     {
         return $this->belongsToMany(Question::class, 'exam_questions', 'exam_id', 'question_id');

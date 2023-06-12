@@ -32,6 +32,7 @@ class ExamController extends Controller
         private Round           $round,
         private Question        $question,
         private DB              $db,
+        private MExamInterface  $examModel,
         private subject $subject
     )
     {
@@ -91,15 +92,19 @@ class ExamController extends Controller
 
     public function index($id_subject)
     {
-        $exams = $this->exam::where('subject_id', $id_subject)->orderByDesc('id')->get()->load('round');
+//        $exams = $this->examModel->find(11);
+//        $exam = $this->examModel->whereGet(['id' => 18])->pluck('id');
+////        $exam = $this->examModel->whereGet(['id' => 18])->pluck('id');
+//        dd($exam);
+        $exams = $this->exam::where('subject_id', $id_subject)->orderByDesc('id')->get();
 //        dd($exams[1]->campus->name);
-        $nameSubject = $this->subject::find($id_subject)->name;
+        $nameSubject = $this->subject::find($id_subject);
         return view(
             'pages.subjects.exam_subject.index',
             [
                 'exams' => $exams,
                 'id' => $id_subject,
-                'name' => $nameSubject
+                'name' => $nameSubject,
             ]
         );
     }
@@ -232,6 +237,7 @@ class ExamController extends Controller
 
         $round = $this->round::findOrFail($id_round);
         $exam = $this->exam::whereId($id)->where('round_id', $id_round)->first();
+
         if (is_null($exam)) return abort(404);
         return view(
             'pages.round.detail.exam.form-edit',

@@ -4,6 +4,7 @@ use App\Events\ChatSupportEvent;
 use App\Http\Controllers\Admin\CampusController;
 use App\Http\Controllers\Admin\ContestController as AdminContestController;
 use App\Http\Controllers\Admin\ExamController;
+use App\Http\Controllers\Admin\playtopicController;
 use App\Http\Controllers\Admin\PoetryController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\RankUserController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\subjectController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\TakeExamController as AdminTakeExamController;
 
 Route::get('users', [AdminUserController::class, 'index']); // danh sách user
 
@@ -32,6 +34,19 @@ Route::prefix('semeter')->group(function () {
     Route::get('', [SemeterController::class, 'indexApi'])->name('admin.semeterApi.index');
     Route::prefix('poetry')->group(function () {
         Route::get('/{id}', [PoetryController::class, 'indexApi'])->name('admin.poetry.index');
+        Route::get('oneItem/{id_poetry}', [PoetryController::class, 'oneindexApi'])->name('admin.poetry.index');
+    });
+
+    Route::prefix('playtopic')->group(function () {
+        Route::get('/{id_user}/{id_poetry}/{id_campus}/{id_subject}', [playtopicController::class, 'indexApi'])->name('admin.poetryAPI.index');
+    });
+
+    Route::prefix('exams')->group(function () {
+        Route::get('/{id}', [playtopicController::class, 'show'])->name('admin.poetryAPI.index');
+    });
+
+    Route::prefix('check/exams')->group(function () {
+        Route::get('/{id_user}/{id_exam}', [AdminTakeExamController::class, 'checkTakeExam'])->name('admin.poetryAPI.index');
     });
 
 });

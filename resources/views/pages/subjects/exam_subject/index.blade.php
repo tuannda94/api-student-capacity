@@ -1,10 +1,10 @@
 @extends('layouts.main')
-@section('page-title', 'Quản lý Đề thi ' . $name)
+@section('page-title', 'Quản lý Đề thi ' . $name->name)
 @section('content')
     <div class="row mb-4">
         <div class="col-lg-10">
             <ol class="breadcrumb text-muted fs-6 fw-bold">
-                <li class="breadcrumb-item px-3 text-muted">Danh sách đề thi {{ $name }}</li>
+                <li class="breadcrumb-item px-3 text-muted">Danh sách đề thi {{ $name->name }}</li>
             </ol>
         </div>
 
@@ -165,7 +165,7 @@
                                            </button>
                                            <button
                                                data-href=""
-                                               data-date_time="{{ $exam->round->start_time }}"
+                                               data-date_time="{{ $name->created_at  }}"
                                                class="edit_exam btn btn-primary btn-sm">
                                                Chỉnh sửa đề
                                            </button>

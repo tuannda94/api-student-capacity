@@ -39,64 +39,7 @@ class TakeExamController extends Controller
     {
     }
 
-    public function takeExamStudent(Request $request)
-    {
-        $checkUserTeam = false;
-        $team_id = 0;
-        $user_id = auth('sanctum')->user()->id;
-        $validate = Validator::make(
-            $request->all(),
-            [
-                'round_id' => 'required',
-            ],
-            [
-                'round_id.required' => 'Chưa nhập trường này !',
-            ]
-        );
-        if ($validate->fails()) return $this->responseApi(true, $validate->errors());
-        $round = $this->round->find($request->round_id, ['teams']);
-        DB::beginTransaction();
-        try {
-            foreach ($round->teams as $team) {
-                if ($team->users) {
-                    foreach ($team->users as $user) {
-                        if ($user->id == $user_id) {
-                            $checkUserTeam = true;
-                            $team_id = $team->id;
-                        }
-                    }
-                }
-            }
-            if ($checkUserTeam == false)
-                return $this->responseApi(true, ['error' => 'Bạn không thuộc đội thi nào trong cuộc thi !!']);
-            $teamRound = $this->roundTeam->where(['team_id' => $team_id, 'round_id' => $request->round_id])->first();
-            if (is_null($teamRound)) return $this->responseApi(true, ['error' => 'Đội thi của bạn đang chờ phê duyệt !!']);
-            $takeExamCheck = $this->takeExam->findBy(['round_team_id' => $teamRound->id], ['exam']);
-            if (is_null($takeExamCheck)) {
-                if (count($this->exam->whereGet(['round_id' => $request->round_id, 'type' => 0])) == 0)
-                    return $this->responseApi(true, ['error' => "Đề thi chưa cập nhập !!"]);
-                $exams = $this->exam->whereGet(['round_id' => $request->round_id, 'type' => 0])->random()->id;
-                if (is_null($exams))
-                    return $this->responseApi(true, ['error' => "Đề thi chưa cập nhập !!"]);
-                $takeExamModel = $this->takeExam->create([
-                    'exam_id' => $exams,
-                    'round_team_id' => $teamRound->id,
-                    'status' => config('util.TAKE_EXAM_STATUS_UNFINISHED'),
-                ]);
-                DB::commit();
-                $takeExam = $this->takeExam->find($takeExamModel->id);
-                return $this->responseApi(true, $takeExam, [
-                    'exam' => $takeExam->exam->external_url,
-                    'status_take_exam' => $takeExam->status
-                ]);
-            }
-            return $this->responseApi(true, $takeExamCheck);
-        } catch (\Throwable $th) {
-            // dd($th);
-            DB::rollBack();
-            return $this->responseApi(false, 'Lỗi hệ thống !!');
-        }
-    }
+
 
     /**
      *
@@ -129,6 +72,10 @@ class TakeExamController extends Controller
      *     @OA\Response(response="404", description="{ status: false , message : 'Not found' }")
      * )
      */
+    public function checkTakeExam(Request $request){
+        $resultCapacity = $this->resultCapacity->findByUserExam($request->id_user, $request->id_exam);
+        return $this->responseApi(true,$resultCapacity);
+    }
     public function takeExamStudentSubmit(Request $request, DB $dB)
     {
         $validate = Validator::make(
@@ -338,7 +285,48 @@ class TakeExamController extends Controller
             return $this->responseApi(false, 'Lỗi hệ thống !!');
         }
     }
-
+    public function takeExamStudent(Request $request, DB $dB)
+    {
+        $user_id = auth('sanctum')->user()->id;
+        $dB::beginTransaction();
+        try {
+            $exam = $this->exam->whereGet(['id' => $request->id])->pluck('id');
+            if (is_null($exam)) return $this->responseApi(false, 'Lỗi truy cập hệ thống !!');
+            $resultCapacity = $this->resultCapacity->whereInExamUser($exam, $user_id);
+            if ($resultCapacity) {
+                $exam = $this->exam->find($resultCapacity->exam_id);
+            } else {
+                $exam = $this->exam->where(['id' => $request->id])->inRandomOrder()->first();
+                $resultCapacityNew = $this->resultCapacity->create([
+                    'scores' => 0,
+                    'status' => config('util.STATUS_RESULT_CAPACITY_DOING'),
+                    'exam_id' => $exam->id,
+                    'user_id' => $user_id,
+                    'type' => $exam->type
+                ]);
+            }
+            $exam->load(['questions' => function ($q) {
+                return $q->with([
+                    'answers' => function ($q) {
+                        return $q->select(['id', 'content', 'question_id']);
+                    },
+                    'images' => function ($q) {
+                        return $q->select(['id', 'path', 'img_code', 'question_id']);
+                    },
+                ]);
+            }]);
+            $dB::commit();
+            if ($resultCapacity) {
+                return $this->responseApi(true, $exam, ['exam_at' => $resultCapacity->created_at]);
+            } else {
+                return $this->responseApi(true, $exam, ['exam_at' => $resultCapacityNew->created_at]);
+            }
+        } catch (\Throwable $th) {
+            $dB::rollBack();
+//            dd($th);
+            return $this->responseApi(false, 'Lỗi hệ thống !!');
+        }
+    }
     /**
      *
      * @OA\Post(

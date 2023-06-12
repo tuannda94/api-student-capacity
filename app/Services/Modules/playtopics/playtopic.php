@@ -19,4 +19,22 @@ class playtopic
             return $e;
         }
     }
+
+    public function getExamApi($id_user,$id_poetry,$id_campus,$id_subject){
+        try {
+            $records = $this->modelPlayTopic->where('id_user','=',$id_user)
+                ->where('id_poetry','=',$id_poetry)
+                ->where('id_campus','=',$id_campus)
+                ->where('id_subject','=',$id_subject)->first();
+            $records['name_campus'] = $records->campusName;
+//            foreach ($records as $value){
+//                $data[] = [
+//                    ""
+//                ]
+//            }
+            return $records;
+        }catch(\Exception $e){
+            return $e;
+        }
+    }
 }

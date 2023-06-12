@@ -199,7 +199,10 @@ Route::prefix('semeter')->group(function () {
         });
     });
 });
-
+Route::prefix('accountStudent')->group(function () {
+    Route::get('', [UserController::class, 'listStudent'])->name('manage.student.list');
+    Route::get('viewpoint/{id_user}', [UserController::class, 'Listpoint'])->name('manage.student.view');
+});
 //Ca học =>done
 Route::prefix('poetry')->group(function () {
     Route::get('/{id}', [PoetryController::class, 'index'])->name('admin.poetry.index');

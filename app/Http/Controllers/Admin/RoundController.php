@@ -17,6 +17,7 @@ use App\Models\RoundTeam;
 use App\Models\TakeExam;
 use App\Models\Team;
 use App\Models\TypeExam;
+use App\Models\Exam;
 use App\Services\Modules\MContest\MContestInterface;
 use App\Services\Modules\MRound\MRoundInterface;
 use App\Services\Modules\MRoundTeam\MRoundTeamInterface;
@@ -46,7 +47,8 @@ class RoundController extends Controller
         private Team                $team,
         private MTeamInterface      $teamRepo,
         private DB                  $db,
-        private MContestInterface   $mContestInterfacet
+        private MContestInterface   $mContestInterfacet,
+        private Exam $Exam
     )
     {
     }
