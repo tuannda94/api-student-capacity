@@ -20,6 +20,7 @@
                         </h1>
                     </div>
                     <div class=" col-lg-6">
+                        @if(count($playtopics) > 0)
                         <div class=" d-flex flex-row-reverse bd-highlight">
                             <label data-bs-toggle="modal" data-bs-target="#kt_modal_1" type="button"
                                    class="btn btn-light-primary me-3" id="kt_file_manager_new_folder">
@@ -27,6 +28,7 @@
                                 <!--end::Svg Icon-->Phát đề thi
                             </label>
                         </div>
+                            @endif
                     </div>
                 </div>
 

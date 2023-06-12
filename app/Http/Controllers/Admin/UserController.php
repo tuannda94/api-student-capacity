@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
+use App\Models\ResultCapacity;
 
 class UserController extends Controller
 {
@@ -28,7 +29,8 @@ class UserController extends Controller
         private MUserInterface $user,
         private MContestInterface $contest,
         private User $modeluser,
-        private Role $role
+        private Role $role,
+        private ResultCapacity $resultCap
     ) {
     }
 
@@ -97,6 +99,25 @@ class UserController extends Controller
         ]);
     }
 
+    public  function Listpoint($id){
+        $point = $this->resultCap->where('id', $id)->get();
+        return view('pages.Students.accountStudent.viewpoint',['point' => $point]);
+    }
+    private function getStudents()
+    {
+        try {
+            $limit = 10;
+            $users = $this->modeluser::status(request('status') ?? null)
+                ->sort(request('sort') == 'asc' ? 'asc' : 'desc', request('sort_by') ?? null, 'users')
+                ->search(request('q') ?? null, ['name', 'email'])
+                ->has_role(request('role') ?? null)
+                ->paginate(request('limit') ?? $limit);
+
+            return $users;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
     private function getUser()
     {
         try {
@@ -155,7 +176,12 @@ class UserController extends Controller
             200
         );
     }
-
+    public function listStudent()
+    {
+        if (!$users = $this->getStudent()) return abort(404);
+        $roles =  $this->role::all();
+        return view('pages.Students.accountStudent.index', ['users' => $users, 'roles' => $roles]);
+    }
     public function listAdmin()
     {
         if (!$users = $this->getUser()) return abort(404);
