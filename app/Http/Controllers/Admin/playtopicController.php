@@ -17,24 +17,27 @@ use Illuminate\Support\Facades\Validator;
 class playtopicController extends Controller
 {
     use TUploadImage, TResponse;
+
     public function __construct(
-        private playtopic $playtopicModel,
-        private Campus $Campus,
-        private Exam $exam,
+        private playtopic     $playtopicModel,
+        private Campus        $Campus,
+        private Exam          $exam,
         private PoetryStudent $PoetryStudent,
-        private ModelExam $modelExam
+        private ModelExam     $modelExam
     )
     {
     }
 
-    public function index($id,$id_subject){
+    public function index($id, $id_subject)
+    {
         $playtopic = $this->playtopicModel->getList($id);
-        $total = count($playtopic) == 0 ? 0 : $playtopic[0]->total ;
+        $total = count($playtopic) == 0 ? 0 : $playtopic[0]->total;
         $campusList = $this->Campus->getList()->get();
-        return view('pages.poetry.playtopic.index',['playtopics' => $playtopic,'campusList' => $campusList,'id_subject' => $id_subject,'id_poetry' => $id,'total'=>$total]);
+        return view('pages.poetry.playtopic.index', ['playtopics' => $playtopic, 'campusList' => $campusList, 'id_subject' => $id_subject, 'id_poetry' => $id, 'total' => $total]);
     }
 
-    public function show($id){
+    public function show($id)
+    {
 //        return $id;
         $round = $this->exam->getItemApi($id);
 //        return $round;
@@ -52,7 +55,7 @@ class playtopicController extends Controller
 //                return $q->with('members');
 //            }]);
         return $this->responseApi(
-                true,$round);
+            true, $round);
 //            return $this->responseApi(
 //                true,
 //                $round
@@ -73,42 +76,47 @@ class playtopicController extends Controller
 //        }
     }
 
-    public function indexApi($id_user,$id_poetry,$id_campus,$id_subject){
-        if (!($data = $this->playtopicModel->getExamApi($id_user,$id_poetry,$id_campus,$id_subject)))  return $this->responseApi(false);
+    public function indexApi($id_user, $id_poetry, $id_campus, $id_subject)
+    {
+        if (!($data = $this->playtopicModel->getExamApi($id_user, $id_poetry, $id_campus, $id_subject))) return $this->responseApi(false);
         return $this->responseApi(true, $data);
     }
 
-    public function listExam($idCampus,$idSubject){
-        $data = $this->exam->getListExam($idCampus,$idSubject);
+    public function listExam($idCampus, $idSubject)
+    {
+        $data = $this->exam->getListExam($idCampus, $idSubject);
 
-        return response()->json(['data' => $data],200);
+        return response()->json(['data' => $data], 200);
 
     }
 
-    public function AddTopic(Request $request){
-        $validator =  Validator::make(
+    public function AddTopic(Request $request)
+    {
+        $validator = Validator::make(
             $request->all(),
             [
                 'campuses_id' => 'required',
+                'mixing' => 'required',
                 'id_subject' => 'required',
                 'exam_id' => 'required'
             ],
             [
+                'mixing.required' => 'Vui lòng chọn chế độ trộn câu hỏi!',
                 'campuses_id.required' => 'Vui lòng chọn cơ sở!',
                 'exam_id.required' => 'Vui lòng chọn đề!',
                 'id_subject.required' => 'Không có data môn học'
             ]
         );
 
-        if($validator->fails() == 1){
+        if ($validator->fails() == 1) {
             $errors = $validator->errors();
-            $fields = ['campuses_id','id_subject','exam_id'];
+            $fields = ['mixing', 'campuses_id', 'id_subject', 'exam_id'];
             foreach ($fields as $field) {
                 $fieldErrors = $errors->get($field);
 
                 if ($fieldErrors) {
                     foreach ($fieldErrors as $error) {
-                        return response($error,404);
+                        return response($error, 404);
                     }
                 }
             }
@@ -117,50 +125,64 @@ class playtopicController extends Controller
 
         if (!($liststudent = $this->PoetryStudent->GetStudents($request->id_poetry))) return abort(404);
 
-        if(count($liststudent) == 0){
-            return response('Không có học sinh trong ca thi này',404);
+        if (count($liststudent) == 0) {
+            return response('Không có học sinh trong ca thi này', 404);
         }
-
-        foreach ($liststudent as $object){
+        $is_mixing = $request->mixing == 1;
+        $questions = DB::table('exam_questions')
+            ->select('question_id')
+            ->where('exam_id', $request->exam_id)
+            ->pluck('question_id')->toArray();
+//        $dataInsertArr = [];
+        foreach ($liststudent as $object) {
+            if ($is_mixing) shuffle($questions);
             $dataInsert = [
                 'id_user' => $object->id_student,
                 'id_exam' => $request->exam_id,
-                'id_poetry' =>  $request->id_poetry,
-                'id_campus' =>  $request->campuses_id,
-                'id_subject' =>  $request->id_subject,
-                'total' =>  1,
+                'id_poetry' => $request->id_poetry,
+                'id_campus' => $request->campuses_id,
+                'id_subject' => $request->id_subject,
+                'total' => 1,
+                'questions_order' => json_encode($questions),
                 'created_at' => now(),
                 'updated_at' => null
             ];
+//            $dataInsertArr[] = $dataInsert;
             DB::table('playtopic')->insert($dataInsert);
         }
-        return response( ['message' => "Thành công ".'<br>Vui lòng chờ 5s để làm mới dữ liệu'],200);
+
+//        DB::table('playtopic')->insert($dataInsertArr);
+        return response(['message' => "Thành công " . '<br>Vui lòng chờ 5s để làm mới dữ liệu'], 200);
     }
 
-    public function AddTopicReload(Request $request){
-        $validator =  Validator::make(
+    public function AddTopicReload(Request $request)
+    {
+
+        $validator = Validator::make(
             $request->all(),
             [
                 'campuses_id' => 'required',
+                'mixing' => 'required',
                 'id_subject' => 'required',
                 'exam_id' => 'required'
             ],
             [
+                'mixing.required' => 'Vui lòng chọn chế độ trộn câu hỏi!',
                 'campuses_id.required' => 'Vui lòng chọn cơ sở!',
                 'exam_id.required' => 'Vui lòng chọn đề!',
                 'id_subject.required' => 'Không có data môn học'
             ]
         );
 
-        if($validator->fails() == 1){
+        if ($validator->fails() == 1) {
             $errors = $validator->errors();
-            $fields = ['campuses_id','id_subject','exam_id'];
+            $fields = ['mixing', 'campuses_id', 'id_subject', 'exam_id'];
             foreach ($fields as $field) {
                 $fieldErrors = $errors->get($field);
 
                 if ($fieldErrors) {
                     foreach ($fieldErrors as $error) {
-                        return response($error,404);
+                        return response($error, 404);
                     }
                 }
             }
@@ -169,26 +191,39 @@ class playtopicController extends Controller
 
         if (!($liststudent = $this->PoetryStudent->GetStudents($request->id_poetry))) return abort(404);
 
-        if(count($liststudent) ==0){
-            return response('Không có học sinh trong ca thi này',404);
+        if (count($liststudent) == 0) {
+            return response('Không có học sinh trong ca thi này', 404);
         }
+
         $playtopic = $this->playtopicModel->getList($request->id_poetry);
-        foreach ($playtopic as $value){
+        foreach ($playtopic as $value) {
             $value->delete();
         }
-        foreach ($liststudent as $object){
+//        DB::table('playtopic')->where('id_poetry', $request->id_poetry)->delete();
+
+        $is_mixing = $request->mixing == 1;
+        $questions = DB::table('exam_questions')
+            ->select('question_id')
+            ->where('exam_id', $request->exam_id)
+            ->pluck('question_id')->toArray();
+//        $dataInsertArr = [];
+        foreach ($liststudent as $object) {
+            if ($is_mixing) shuffle($questions);
             $dataInsert = [
                 'id_user' => $object->id_student,
                 'id_exam' => $request->exam_id,
-                'id_poetry' =>  $request->id_poetry,
-                'id_campus' =>  $request->campuses_id,
-                'id_subject' =>  $request->id_subject,
-                'total' =>  1,
+                'id_poetry' => $request->id_poetry,
+                'id_campus' => $request->campuses_id,
+                'id_subject' => $request->id_subject,
+                'total' => 1,
+                'questions_order' => json_encode($questions),
                 'created_at' => now(),
                 'updated_at' => null
             ];
+//            $dataInsertArr[] = $dataInsert;
             DB::table('playtopic')->insert($dataInsert);
         }
-        return response( ['message' => "Thành công ".'<br>Vui lòng chờ 5s để làm mới dữ liệu'],200);
+//        DB::table('playtopic')->insert($dataInsertArr);
+        return response(['message' => "Thành công " . '<br>Vui lòng chờ 5s để làm mới dữ liệu'], 200);
     }
 }
