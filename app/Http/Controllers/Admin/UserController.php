@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 use App\Models\ResultCapacity;
+use App\Models\playtopic;
 
 class UserController extends Controller
 {
@@ -30,7 +31,8 @@ class UserController extends Controller
         private MContestInterface $contest,
         private User $modeluser,
         private Role $role,
-        private ResultCapacity $resultCap
+        private ResultCapacity $resultCap,
+        private playtopic $playtopic
     ) {
     }
 
@@ -100,8 +102,9 @@ class UserController extends Controller
     }
 
     public  function Listpoint($id){
-        $point = $this->resultCap->where('id', $id)->get();
-        return view('pages.Students.accountStudent.viewpoint',['point' => $point]);
+        $point = $this->playtopic->where('id_user', $id)->get();
+        $user = DB::table('users')->find($id);
+        return view('pages.Students.accountStudent.viewpoint',['point' => $point,'user'=>$user]);
     }
     private function getStudents()
     {

@@ -24,6 +24,11 @@ class playtopic extends Model
         return $this->belongsTo(subject::class, 'id_subject', 'id');
     }
 
+    public function poetryStd()
+    {
+        return $this->belongsTo(poetry::class, 'id_poetry', 'id');
+    }
+
     public function campusName()
     {
         return $this->hasOne(Campus::class, 'id', 'id_campus');

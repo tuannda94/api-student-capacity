@@ -1,6 +1,6 @@
 @extends('layouts.main')
-@section('title', 'Quản lý Môn học')
-@section('page-title', 'Quản lý Môn học')
+@section('title', 'Quản lý sinh viên')
+@section('page-title', 'Quản lý sinh viên')
 @section('content')
     <!-- CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-notify@0.5.5/dist/simple-notify.min.css" />
@@ -16,17 +16,8 @@
                     <div class=" col-lg-6">
 
                         <h1>
-                            Danh sách môn học
+                            Bảng Điểm Sinh Viên {{ $user->name }}
                         </h1>
-                    </div>
-                    <div class=" col-lg-6">
-                        <div class=" d-flex flex-row-reverse bd-highlight">
-                            <label data-bs-toggle="modal" data-bs-target="#kt_modal_1" type="button"
-                                   class="btn btn-light-primary me-3" id="kt_file_manager_new_folder">
-
-                                <!--end::Svg Icon-->Thêm Môn học
-                            </label>
-                        </div>
                     </div>
                 </div>
 
@@ -37,7 +28,7 @@
                     <table id="table-data" class="table table-row-bordered table-row-gray-300 gy-7  table-hover ">
                         <thead>
                         <tr>
-                            <th scope="col">Tên môn học
+                            <th scope="col">Tên đề thi
                                 <span role="button" data-key="name" data-bs-toggle="tooltip" title="" class=" svg-icon svg-icon-primary  svg-icon-2x format-database" data-bs-original-title="Lọc theo tên đánh giá năng lực">
                                 <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo2/dist/../src/media/svg/icons/Navigation/Up-down.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 14px !important ; height: 14px !important" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
                                     <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -51,7 +42,12 @@
                                     <!--end::Svg Icon-->
                             </span>
                             </th>
-                            <th scope="col">Trạng thái</th>
+                            <th scope="col">Học kỳ</th>
+                            <th scope="col">Cơ sở</th>
+                            <th scope="col">Lớp </th>
+                            <th scope="col">Ca thi</th>
+                            <th scope="col">Môn thi</th>
+                            <th scope="col">Điểm</th>
                             <th scope="col">Thời gian bắt đầu
                                 <span role="button" data-key="date_start" data-bs-toggle="tooltip" title="" class=" svg-icon svg-icon-primary  svg-icon-2x format-database" data-bs-original-title="Lọc theo thời gian bắt đầu ">
                                 <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo2/dist/../src/media/svg/icons/Navigation/Up-down.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 14px !important ; height: 14px !important" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
@@ -88,36 +84,58 @@
                             @foreach($point as $key => $value)
                                 <tr>
                                     <td>
-                                        {{ $value->exam[0]->name }}
+                                        {{ $value->examStd->name }}
                                     </td>
                                     <td>
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" data-id-subject-semeter="{{ $value->id_subject_semeter }}" type="checkbox" {{ $value->status == 1 ? 'checked' : '' }} role="switch" id="flexSwitchCheckDefault">
-                                        </div>
+                                        {{ $value->subjectStd->semester_subject->first()->name }}
                                     </td>
-                                    <td>{{ $value->created_at == null ? 'Chưa có thời gian bắt đầu' :  $value->created_at 	 }}</td>
-                                    <td>{{ $value->updated_at == null ? 'Chưa có thời gian kết thúc' : $value->updated_at }}</td>
                                     <td>
-                                                                            <button  class="btn btn-info" onclick="location.href='#'"   type="button">
-                                                                                Chi tiết
-                                                                            </button>
+                                        {{ $value->campusName->name }}
+                                    </td>
+                                    <td>
+                                        {{ $value->poetryStd->classsubject->name }}
+                                    </td>
+                                    <td>
+                                        {{ $value->poetryStd->examination->name }}
+                                    </td>
+                                    <td>
+                                        {{ $value->subjectStd->name }}
+                                    </td>
+                                    @php
+                                        $resultCapacity = $value->userStudent->resultCapacity->where('exam_id',$value->id_exam)->first();
+                                    @endphp
+                                    <td>
+                                        @if($resultCapacity->scores == 0)
+                                            <strong style="color: red;">Chưa làm</strong>
+{{--                                            <img width="50" style="border-radius: 5px" src="https://media1.giphy.com/media/e5flX9ERck2IXGdMXS/giphy.gif" alt="">--}}
+                                        @else
+                                            {{ $resultCapacity->scores  }}
+                                        @endif
 
-                                                                            <button  class="btn-edit btn btn-primary"  data-id="{{ $value->id }}" type="button">
-                                                                                Chỉnh sửa
-                                                                            </button>
+                                    </td>
+                                    <td>{{ $resultCapacity->created_at == null ? 'Chưa có thời gian bắt đầu' :  $resultCapacity->created_at 	 }}</td>
+                                    <td>{{ $resultCapacity->updated_at == null ? 'Chưa có thời gian kết thúc' : $resultCapacity->updated_at }}</td>
+{{--                                    <td>--}}
+{{--                                                                            <button  class="btn btn-info" onclick="location.href='#'"   type="button">--}}
+{{--                                                                                Chi tiết--}}
+{{--                                                                            </button>--}}
+
+{{--                                                                            <button  class="btn-edit btn btn-primary"  data-id="{{ $value->id }}" type="button">--}}
+{{--                                                                                Chỉnh sửa--}}
+{{--                                                                            </button>--}}
 
 {{--                                        <button  class="btn-delete btn btn-danger" data-id="{{ $value->id }}" data-semeter="{{ $id_semeter }}">--}}
 {{--                                            Xóa--}}
 {{--                                        </button>--}}
-                                    </td>
+{{--                                    </td>--}}
                                 </tr>
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="4"> <h1 class="text-center">Không có bản ghi nào</h1></td>
+                                <td colspan="9"> <h1 class="text-center">Sinh viên này hiện chưa học</h1></td>
 
                             </tr>
-                            <tr>   <td colspan="4" class="text-end"> <button onclick="location.href='{{ route('admin.semeter.index') }}'" class="btn btn-danger ">
+                            <tr>   <td colspan="9" class="text-end"> <button onclick="location.href='{{ route('manage.student.list') }}'" class="btn btn-danger ">
                                         Trở về
                                     </button></td></tr>
 
@@ -208,281 +226,5 @@
     {{--            </div>--}}
     {{--        </div>--}}
     {{--    </div>--}}
-@endsection
-@section('page-script')
-    <script>
-
-        function notify(message) {
-            new Notify({
-                status: 'success',
-                title: 'Thành công',
-                text: `${message}`,
-                effect: 'fade',
-                speed: 300,
-                customClass: null,
-                customIcon: null,
-                showIcon: true,
-                showCloseButton: true,
-                autoclose: true,
-                autotimeout: 3000,
-                gap: 20,
-                distance: 20,
-                type: 1,
-                position: 'right top'
-            })
-        }
-        function errors(message) {
-            new Notify({
-                status: 'error',
-                title: 'Lỗi',
-                text: `${message}`,
-                effect: 'fade',
-                speed: 300,
-                customClass: null,
-                customIcon: null,
-                showIcon: true,
-                showCloseButton: true,
-                autoclose: true,
-                autotimeout: 3000,
-                gap: 20,
-                distance: 20,
-                type: 1,
-                position: 'right top'
-            })
-        }
-        function wanrning(message) {
-            new Notify({
-                status: 'warning',
-                title: 'Đang chạy',
-                text: `${message}`,
-                effect: 'fade',
-                speed: 300,
-                customClass: null,
-                customIcon: null,
-                showIcon: true,
-                showCloseButton: true,
-                autoclose: true,
-                autotimeout: 3000,
-                gap: 20,
-                distance: 20,
-                type: 1,
-                position: 'right top'
-            })
-        }
-        const table = document.querySelectorAll('#table-data tbody tr');
-        let STT = parseInt(table[table.length - 1].childNodes[1].innerText) + 1;
-        let btnDelete = document.querySelectorAll('.btn-delete');
-        let btnEdit = document.querySelectorAll('.btn-edit');
-        // let btnUpdate = document.querySelector('#btn-update');
-        let cks = document.querySelectorAll('.form-check-input');
-
-        const _token = "{{ csrf_token() }}";
-        const start_time =
-            '{{ request()->has('start_time') ? \Carbon\Carbon::parse(request('start_time'))->format('m/d/Y h:i:s A') : \Carbon\Carbon::now()->format('m/d/Y h:i:s A') }}'
-        const end_time =
-            '{{ request()->has('end_time') ? \Carbon\Carbon::parse(request('end_time'))->format('m/d/Y h:i:s A') : \Carbon\Carbon::now()->format('m/d/Y h:i:s A') }}'
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" ></script>
-    {{--    <script src="{{ asset('assets/js/system/question/index.js') }}"></script>--}}
-    <script src="{{ asset('assets/js/system/semeter/subject.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    {{--    <button  class="btn btn-info" onclick="location.href='admin/subject/exam/${response.data.id}'"   type="button">--}}
-    {{--        Chi tiết--}}
-    {{--    </button>--}}
-    {{--    <button  class="btn-edit btn btn-primary"  data-id="${response.data.id}" type="button">--}}
-    {{--        Chỉnh sửa--}}
-    {{--    </button>--}}
-    {{--    Thêm --}}
-    <script>
-        $('#upload-basis').click(function (e){
-            e.preventDefault();
-            var url = $('#form-submit').attr("action");
-            var subject_id = $('#subject_id').val();
-            const id_semeter = $('#id_semeter').val();
-            var dataAll = {
-                '_token' : _token,
-                'subject_id' : subject_id,
-                'id_semeter' : id_semeter,
-                'start_time' : start_time,
-                'end_time' : end_time
-            }
-
-            $.ajax({
-                type:'POST',
-                url: url,
-                data: dataAll,
-                success: (response) => {
-                    console.log(response)
-                    // $('#form-submit')[0].reset();
-                    notify(response.message);
-                    $('#kt_modal_1').modal('hide');
-                    wanrning('Đữ liệu mới đang được tải vui lòng đợi...');
-                    setTimeout(function(){
-                        notify('Tải hoàn tất ');
-                        window.location.reload();
-                    }, 1000);
-                },
-                error: function(response){
-                    // console.log(response.responseText)
-                    errors(response.responseText);
-                    // $('#ajax-form').find(".print-error-msg").find("ul").html('');
-                    // $('#ajax-form').find(".print-error-msg").css('display','block');
-                    // $.each( response.responseJSON.errors, function( key, value ) {
-                    //     $('#ajax-form').find(".print-error-msg").find("ul").append('<li>'+value+'</li>');
-                    // });
-
-                }
-            });
-
-        })
-    </script>
-    {{--    Sửa --}}
-    {{--    <script>--}}
-    {{--        update(btnEdit)--}}
-    {{--        function update(btns){--}}
-    {{--            for (const btnupdate of btns) {--}}
-    {{--                btnupdate.addEventListener('click',() => {--}}
-    {{--                    const id = btnupdate.getAttribute("data-id");--}}
-
-    {{--                    $.ajax({--}}
-    {{--                        url: `/admin/subject/edit/${id}`,--}}
-    {{--                        type: 'GET',--}}
-    {{--                        success: function(response) {--}}
-    {{--                            console.log(response);--}}
-    {{--                            notify('Tải dữ liệu thành công !')--}}
-    {{--                            $('#nameUpdate').val(response.data.name);--}}
-    {{--                            $('#status_update').val(response.data.status);--}}
-    {{--                            $('#id_update').val(response.data.id)--}}
-    {{--                            // Gán các giá trị dữ liệu lấy được vào các trường tương ứng trong modal--}}
-    {{--                            $('#edit_modal').modal('show');--}}
-    {{--                        },--}}
-    {{--                        error: function(response) {--}}
-    {{--                            console.log(response);--}}
-    {{--                            // Xử lý lỗi--}}
-    {{--                        }--}}
-    {{--                    });--}}
-    {{--                })--}}
-    {{--            }--}}
-    {{--        }--}}
-    {{--        onupdate(btnUpdate)--}}
-    {{--        function onupdate(btn){--}}
-    {{--            btn.addEventListener('click', (e) => {--}}
-    {{--                e.preventDefault();--}}
-    {{--                var nameupdate = $('#nameUpdate').val();--}}
-    {{--                var status = $('#status_update').val();--}}
-    {{--                var id = $('#id_update').val();--}}
-    {{--                var dataAll = {--}}
-    {{--                    '_token' : _token,--}}
-    {{--                    'namebasis' : nameupdate,--}}
-    {{--                    'status' : status,--}}
-    {{--                    'start_time' : start_time,--}}
-    {{--                    'end_time' : end_time--}}
-    {{--                }--}}
-    {{--                $.ajax({--}}
-    {{--                    type:'PUT',--}}
-    {{--                    url: `admin/subject/update/${id}`,--}}
-    {{--                    data: dataAll,--}}
-    {{--                    success: (response) => {--}}
-    {{--                        // console.log(response)--}}
-    {{--                        $('#form-submit')[0].reset();--}}
-    {{--                        notify(response.message);--}}
-    {{--                        const idup =  `data-id='${response.data.id}'`;--}}
-    {{--                        // console.log(idup);--}}
-    {{--                        var buttons = document.querySelector('button.btn-edit['+idup+']');--}}
-    {{--                        const elembtn = buttons.parentNode.parentNode.childNodes ;--}}
-    {{--                        console.log(elembtn)--}}
-    {{--                        elembtn[1].innerText = response.data.namebasis;--}}
-    {{--                        const output = response.data.status == 1 ? true : false;--}}
-    {{--                        elembtn[3].childNodes[1].childNodes[1].checked= output--}}
-    {{--                        elembtn[5].innerText = response.data.start_time.replace(/\//g, '-').replace(" PM", "");--}}
-    {{--                        elembtn[7].innerText = response.data.end_time.replace(/\//g, '-').replace(" PM", "");--}}
-
-    {{--                        btnEdit = document.querySelectorAll('.btn-edit');--}}
-    {{--                        update(btnEdit)--}}
-    {{--                        btnDelete = document.querySelectorAll('.btn-delete');--}}
-    {{--                        dele(btnDelete)--}}
-    {{--                        $('#edit_modal').modal('hide');--}}
-    {{--                    },--}}
-    {{--                    error: function(response){--}}
-    {{--                        // console.log(response.responseText)--}}
-    {{--                        errors(response.responseText);--}}
-    {{--                        // $('#ajax-form').find(".print-error-msg").find("ul").html('');--}}
-    {{--                        // $('#ajax-form').find(".print-error-msg").css('display','block');--}}
-    {{--                        // $.each( response.responseJSON.errors, function( key, value ) {--}}
-    {{--                        //     $('#ajax-form').find(".print-error-msg").find("ul").append('<li>'+value+'</li>');--}}
-    {{--                        // });--}}
-
-    {{--                    }--}}
-    {{--                });--}}
-    {{--            })--}}
-    {{--        }--}}
-    {{--    </script>--}}
-    {{--    Xóa --}}
-    <script>
-        dele(btnDelete);
-        function dele(btns){
-            for (const btnDeleteElement of btns) {
-                btnDeleteElement.addEventListener("click",() => {
-                    const id = btnDeleteElement.getAttribute("data-id");
-                    const id_semeter = btnDeleteElement.getAttribute("data-semeter");
-                    console.log(id)
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "Bạn có chắc chắn muốn xóa không!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, delete it!'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            var data = {
-                                '_token' : _token
-                            }
-                            $.ajax({
-                                type:'DELETE',
-                                url: `admin/semeter/subject/delete/${id}/${id_semeter}`,
-                                data: data,
-                                success: (response) => {
-                                    console.log(response)
-                                    Swal.fire(
-                                        'Deleted!',
-                                        `${response.message}`,
-                                        'success'
-                                    )
-                                    const elm =  btnDeleteElement.parentNode.parentNode;
-                                    var seconds = 2000/1000;
-                                    elm.style.transition = "opacity "+seconds+"s ease";
-                                    elm.style.opacity = 0;
-                                    setTimeout(function() {
-                                        elm.remove()
-                                    }, 2000);
-                                    wanrning('Đữ liệu mới đang được tải vui lòng đợi...');
-                                    setTimeout(function(){
-                                        window.location.reload();
-                                    }, 1000);
-                                },
-                                error: function(response){
-                                    // console.log(response.responseText)
-                                    errors(response.responseText);
-                                    // $('#ajax-form').find(".print-error-msg").find("ul").html('');
-                                    // $('#ajax-form').find(".print-error-msg").css('display','block');
-                                    // $.each( response.responseJSON.errors, function( key, value ) {
-                                    //     $('#ajax-form').find(".print-error-msg").find("ul").append('<li>'+value+'</li>');
-                                    // });
-
-                                }
-                            });
-
-                        }
-                    })
-                })
-            }
-        }
-
-    </script>
-
-    {{--    Cập nhật trang thái nhanh--}}
-
 @endsection
 
