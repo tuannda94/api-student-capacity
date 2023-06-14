@@ -63,12 +63,14 @@ btnReloadtopic.addEventListener('click',(e)=>{
         if (result.isConfirmed) {
             var url = $('#form-submit').attr("action");
             var campuses_id = $('#campuses').val();
+            var mixing = $('#mixing').val();
             var id_subject = $('#campuses').attr('data-subject');
             var exam_id = $('#exam_id').val();
             var id_poetry = $('#id_poetry').val();
 
             var dataAll = {
                 '_token' : _token,
+                'mixing' : mixing,
                 'campuses_id' : campuses_id,
                 'id_subject' : id_subject,
                 'exam_id' : exam_id,
