@@ -305,8 +305,9 @@ class TakeExamController extends Controller
                     'type' => $exam->type
                 ]);
             }
-            $exam->load(['questions' => function ($q) {
-                return $q->with([
+            $exam->load(['questions' => function ($q){
+                return
+                    $q->with([
                     'answers' => function ($q) {
                         return $q->select(['id', 'content', 'question_id']);
                     },

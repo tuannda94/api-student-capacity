@@ -52,6 +52,11 @@ class User extends Authenticatable
         return new Builder($query);
     }
 
+    public function resultCapacity()
+    {
+        return $this->hasMany(ResultCapacity::class, 'user_id');
+    }
+
     public function teams()
     {
         return $this->belongsToMany(Team::class, 'members', 'user_id', 'team_id')->with('contest');

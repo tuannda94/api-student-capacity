@@ -29,6 +29,8 @@ class PoetryController extends Controller
     }
 
     public function index($id){
+//        $data = $this->oneindexApi(140);
+//        dd($data);
         $data = $this->poetry->ListPoetry($id);
         $semeter = $this->semeter->ListSemeter();
         $name = $this->semeter->getName($id);
@@ -38,8 +40,8 @@ class PoetryController extends Controller
         return view('pages.poetry.index',['poetry' => $data,'semeter' => $semeter,'listSubject' => $ListSubject,'id_poetry' => $id,'name' => $name,'listExamination' => $listExamination,'listClass' => $listClass]);
     }
 
-    public function indexApi($id){
-        if (!($data = $this->poetry->ListPoetryApi($id)))  return $this->responseApi(false);
+    public function indexApi($id,$id_user){
+        if (!($data = $this->poetry->ListPoetryApi($id,$id_user)))  return $this->responseApi(false);
         return $this->responseApi(true, $data);
     }
 

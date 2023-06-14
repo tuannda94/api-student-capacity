@@ -113,11 +113,12 @@
                             {{ $key+1}}
                         </td>
                         <td>
-                            {{ $user->name}}
-                        </td>
-                        <td>
                             {{ $user->mssv != null ? $user->mssv : 'Chưa có mã sinh viên' }}
                         </td>
+                        <td>
+                            {{ $user->name}}
+                        </td>
+
                         <td>
                             {{ $user->email }}
                         </td>

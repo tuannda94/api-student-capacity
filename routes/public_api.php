@@ -33,8 +33,8 @@ Route::prefix('subject')->group(function () {
 Route::prefix('semeter')->group(function () {
     Route::get('', [SemeterController::class, 'indexApi'])->name('admin.semeterApi.index');
     Route::prefix('poetry')->group(function () {
-        Route::get('/{id}', [PoetryController::class, 'indexApi'])->name('admin.poetry.index');
-        Route::get('oneItem/{id_poetry}', [PoetryController::class, 'oneindexApi'])->name('admin.poetry.index');
+        Route::get('/{id}/{id_user}', [PoetryController::class, 'indexApi'])->name('admin.poetry.index');
+        Route::get('oneItem/{id_poetry}', [PoetryController::class, 'oneindexApi']);
     });
 
     Route::prefix('playtopic')->group(function () {

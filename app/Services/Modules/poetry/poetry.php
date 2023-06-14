@@ -18,11 +18,15 @@ class poetry implements MPoetryInterface
         }
     }
 
-    public function ListPoetryApi($id){
+    public function ListPoetryApi($id,$id_user){
         try {
             $records = $this->modelPoetry->where('id_semeter',$id)->get();
             $data['name_item'] =$records[0]->semeter->name;
             foreach ($records as $value){
+                if ($value->playtopic === null) {
+                    continue;
+                }
+
                 $data['data'][] = [
                     "id" => $value->id,
                     "id_subject" => $value->id_subject,

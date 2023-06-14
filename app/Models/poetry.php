@@ -21,6 +21,10 @@ class poetry extends Model
         return $this->hasOne(ClassModel::class,'id','id_class');
     }
 
+    public function playtopic(){
+        return $this->hasOne(playtopic::class,'id_poetry','id');
+    }
+
     public function examination(){
         return $this->hasOne(examination::class,'id','id_examination');
     }
