@@ -19,7 +19,7 @@ use App\Services\Traits\TResponse;
 use App\Services\Traits\TUploadImage;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-
+use App\Models\playtopic;
 class TakeExamController extends Controller
 {
     use TUploadImage, TResponse;
@@ -34,7 +34,7 @@ class TakeExamController extends Controller
         private MResultCapacityInterface       $resultCapacity,
         private Question                       $question,
         private Answer                         $answer,
-        private MResultCapacityDetailInterface $resultCapacityDetail
+        private MResultCapacityDetailInterface $resultCapacityDetail,
     )
     {
     }
@@ -288,6 +288,7 @@ class TakeExamController extends Controller
     public function takeExamStudent(Request $request, DB $dB)
     {
         $user_id = auth('sanctum')->user()->id;
+
         $dB::beginTransaction();
         try {
             $exam = $this->exam->whereGet(['id' => $request->id])->pluck('id');
@@ -305,17 +306,21 @@ class TakeExamController extends Controller
                     'type' => $exam->type
                 ]);
             }
-            $exam->load(['questions' => function ($q){
-                return
+            $string = $exam->playtopic($user_id)->questions_order;
+            $arrayOrder = json_decode($string, true);
+//            $exam->test = $arrayOrder;
+            $exam->load(['questions' => function ($q) use ($arrayOrder)  {
+                $q->orderByRaw("FIELD(questions.id, " . implode(",", $arrayOrder) . ")");
                     $q->with([
                     'answers' => function ($q) {
                         return $q->select(['id', 'content', 'question_id']);
                     },
                     'images' => function ($q) {
                         return $q->select(['id', 'path', 'img_code', 'question_id']);
-                    },
+                    }
                 ]);
             }]);
+
             $dB::commit();
             if ($resultCapacity) {
                 return $this->responseApi(true, $exam, ['exam_at' => $resultCapacity->created_at]);
@@ -325,7 +330,7 @@ class TakeExamController extends Controller
         } catch (\Throwable $th) {
             $dB::rollBack();
 //            dd($th);
-            return $this->responseApi(false, 'Lỗi hệ thống !!');
+            return $this->responseApi(false, "Lỗi hệ thống");
         }
     }
     /**

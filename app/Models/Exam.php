@@ -38,9 +38,11 @@ class Exam extends Model
         return $this->hasOne(Campus::class, 'id', 'campus_id');
     }
 
-    public function playtopic()
+    public function playtopic($id_user)
     {
-        return $this->hasOne(playtopic::class,'exam_id');
+        return Playtopic::where('id_exam', $this->id)
+            ->where('id_user',$id_user)
+            ->first();
     }
 
 
