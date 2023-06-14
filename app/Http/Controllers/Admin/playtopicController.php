@@ -133,10 +133,10 @@ class playtopicController extends Controller
             ->select('question_id')
             ->where('exam_id', $request->exam_id)
             ->pluck('question_id')->toArray();
-//        $dataInsertArr = [];
+        $dataInsertArr = [];
         foreach ($liststudent as $object) {
             if ($is_mixing) shuffle($questions);
-            $dataInsert = [
+            $dataInsertArr[] = [
                 'id_user' => $object->id_student,
                 'id_exam' => $request->exam_id,
                 'id_poetry' => $request->id_poetry,
@@ -148,10 +148,10 @@ class playtopicController extends Controller
                 'updated_at' => null
             ];
 //            $dataInsertArr[] = $dataInsert;
-            DB::table('playtopic')->insert($dataInsert);
+//            DB::table('playtopic')->insert($dataInsert);
         }
 
-//        DB::table('playtopic')->insert($dataInsertArr);
+        DB::table('playtopic')->insert($dataInsertArr);
         return response(['message' => "Thành công " . '<br>Vui lòng chờ 5s để làm mới dữ liệu'], 200);
     }
 
@@ -206,10 +206,10 @@ class playtopicController extends Controller
             ->select('question_id')
             ->where('exam_id', $request->exam_id)
             ->pluck('question_id')->toArray();
-//        $dataInsertArr = [];
+        $dataInsertArr = [];
         foreach ($liststudent as $object) {
             if ($is_mixing) shuffle($questions);
-            $dataInsert = [
+            $dataInsertArr[] = [
                 'id_user' => $object->id_student,
                 'id_exam' => $request->exam_id,
                 'id_poetry' => $request->id_poetry,
@@ -221,9 +221,9 @@ class playtopicController extends Controller
                 'updated_at' => null
             ];
 //            $dataInsertArr[] = $dataInsert;
-            DB::table('playtopic')->insert($dataInsert);
+//            DB::table('playtopic')->insert($dataInsert);
         }
-//        DB::table('playtopic')->insert($dataInsertArr);
+        DB::table('playtopic')->insert($dataInsertArr);
         return response(['message' => "Thành công " . '<br>Vui lòng chờ 5s để làm mới dữ liệu'], 200);
     }
 }
