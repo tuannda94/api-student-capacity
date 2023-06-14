@@ -38,6 +38,12 @@ class Exam extends Model
         return $this->hasOne(Campus::class, 'id', 'campus_id');
     }
 
+    public function playtopic()
+    {
+        return $this->hasOne(playtopic::class,'exam_id');
+    }
+
+
     public function subject()
     {
         return $this->hasOne(subject::class, 'id', 'subject_id');

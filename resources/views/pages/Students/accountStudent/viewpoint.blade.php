@@ -82,6 +82,10 @@
                         <tbody>
                         @if (count($point) > 0)
                             @foreach($point as $key => $value)
+                                @php
+                                    $resultCapacity = $value->userStudent->resultCapacity->where('exam_id',$value->id_exam)->first();
+                                @endphp
+                                @if(isset($resultCapacity->scores) && $resultCapacity->scores  !== null)
                                 <tr>
                                     <td>
                                         {{ $value->examStd->name }}
@@ -101,16 +105,12 @@
                                     <td>
                                         {{ $value->subjectStd->name }}
                                     </td>
-                                    @php
-                                        $resultCapacity = $value->userStudent->resultCapacity->where('exam_id',$value->id_exam)->first();
-                                    @endphp
+
                                     <td>
-                                        @if($resultCapacity->scores == 0)
-                                            <strong style="color: red;">Chưa làm</strong>
-{{--                                            <img width="50" style="border-radius: 5px" src="https://media1.giphy.com/media/e5flX9ERck2IXGdMXS/giphy.gif" alt="">--}}
-                                        @else
+
                                             {{ $resultCapacity->scores  }}
-                                        @endif
+{{--                                            <img width="50" style="border-radius: 5px" src="https://media1.giphy.com/media/e5flX9ERck2IXGdMXS/giphy.gif" alt="">--}}
+
 
                                     </td>
                                     <td>{{ $resultCapacity->created_at == null ? 'Chưa có thời gian bắt đầu' :  $resultCapacity->created_at 	 }}</td>
@@ -129,6 +129,7 @@
 {{--                                        </button>--}}
 {{--                                    </td>--}}
                                 </tr>
+                                @endif
                             @endforeach
                         @else
                             <tr>

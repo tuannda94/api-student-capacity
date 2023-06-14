@@ -29,7 +29,7 @@ class PoetryController extends Controller
     }
 
     public function index($id){
-//        $data = $this->poetry->ListPoetryApi(1,8930);
+//        $data = $this->oneindexApi(140);
 //        dd($data);
         $data = $this->poetry->ListPoetry($id);
         $semeter = $this->semeter->ListSemeter();
