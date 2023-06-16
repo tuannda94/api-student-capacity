@@ -9,11 +9,12 @@
         <!--begin::Container-->
         <div id="kt_content_container" class="container-xxl">
             <!--begin::Row-->
-
+            <div class="mb-5">
+                {{ Breadcrumbs::render('Management.poetry',$id_poetry ) }}
+            </div>
             <div class="card card-flush p-4">
                 <div class="row">
                     <div class=" col-lg-6">
-
                         <h1>
                             Danh sách ca thi {{ $name }}
                         </h1>

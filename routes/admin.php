@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\SemeterController;
 use App\Http\Controllers\Admin\PoetryController;
 use App\Http\Controllers\Admin\studentPoetryController;
 use App\Http\Controllers\Admin\playtopicController;
+use App\Http\Controllers\Admin\BlockController;
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::prefix('dashboard')->group(function () {
     Route::get('api-cuoc-thi', [DashboardController::class, 'chartCompetity'])->name('dashboard.chart-competity');
@@ -201,7 +202,14 @@ Route::prefix('semeter')->group(function () {
 });
 Route::prefix('accountStudent')->group(function () {
     Route::get('', [UserController::class, 'listStudent'])->name('manage.student.list');
+    Route::get('GetBlock/{id_semeter}', [BlockController::class, 'index'])->name('manage.semeter.list');
+    Route::get('GetSubject/{id_block}', [subjectController::class, 'ListSubject'])->name('manage.semeter.list');
+    Route::get('GetPoetry/{id_subject}', [PoetryController::class, 'ListPoetryRespone'])->name('manage.semeter.list');
+    Route::get('GetPoetryDetail/{id_subject}/{id_class}', [PoetryController::class, 'ListPoetryResponedetail'])->name('manage.semeter.list');
+    Route::get('ListUser/{id}', [studentPoetryController::class, 'listUser'])->name('admin.manage.semeter.index');
     Route::get('viewpoint/{id_user}', [UserController::class, 'Listpoint'])->name('manage.student.view');
+    Route::get('exportPoint/{id_user}', [UserController::class, 'Exportpoint'])->name('manage.student.export');
+
 });
 //Ca học =>done
 Route::prefix('poetry')->group(function () {

@@ -18,6 +18,42 @@ class poetry implements MPoetryInterface
         }
     }
 
+    public function ListPoetryRespone($idSubject){
+        try {
+            $records = $this->modelPoetry->where('id_subject',$idSubject)->get();
+            $records->load(['classsubject'  => function ($q) {
+                return $q->select('id','name','code_class');
+            }]);
+            return $records;
+        }catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    public function ListPoetryDetail($id_subject,$id_class){
+        try {
+            $records = $this->modelPoetry->where('id_subject',$id_subject)->where('id_class',$id_class)->get();
+            $records->load(['classsubject'  => function ($q) {
+                return $q->select('id','name','code_class');
+            }]);
+            $records->load(['subject'  => function ($q) {
+                return $q->select('id','name');
+            }]);
+            $records->load(['subject'  => function ($q) {
+                return $q->select('id','name');
+            }]);
+            $records->load(['examination'  => function ($q) {
+                return $q->select('id','name');
+            }]);
+            $records->load(['semeter'  => function ($q) {
+                return $q->select('id','name');
+            }]);
+            return $records;
+        }catch (\Exception $e) {
+            return false;
+        }
+    }
+
     public function ListPoetryApi($id,$id_user){
         try {
             $records = $this->modelPoetry->where('id_semeter',$id)->get();

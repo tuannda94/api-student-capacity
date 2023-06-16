@@ -17,10 +17,13 @@ use Google\Service\Script\Content;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Spatie\Permission\Models\Role;
 use App\Models\ResultCapacity;
 use App\Models\playtopic;
-
+use App\Services\Modules\MSemeter\Semeter;
 class UserController extends Controller
 {
     use TUploadImage, TCheckUserDrugTeam, TResponse;
@@ -32,7 +35,8 @@ class UserController extends Controller
         private User $modeluser,
         private Role $role,
         private ResultCapacity $resultCap,
-        private playtopic $playtopic
+        private playtopic $playtopic,
+        private Semeter $interfaceSemeter
     ) {
     }
 
@@ -55,6 +59,7 @@ class UserController extends Controller
             dd($th);
         }
     }
+
 
 
 
@@ -105,6 +110,56 @@ class UserController extends Controller
         $point = $this->playtopic->where('id_user', $id)->get();
         $user = DB::table('users')->find($id);
         return view('pages.Students.accountStudent.viewpoint',['point' => $point,'user'=>$user]);
+    }
+
+    public function Exportpoint($id_user){
+        $point = $this->playtopic->where('id_user', $id_user)->get();
+        $user = DB::table('users')->find($id_user);
+//        dd($user);
+        $data = [];
+        foreach($point as $key => $value){
+            $resultCapacity = $value->userStudent->resultCapacity->where('exam_id',$value->id_exam)->first();
+            if(isset($resultCapacity->scores) && $resultCapacity->scores  !== null){
+                $data[] = [
+                    $value->examStd->name,
+                    $value->subjectStd->semester_subject->first()->name,
+                    $value->campusName->name,
+                    $value->poetryStd->classsubject->name,
+                    $value->poetryStd->examination->name,
+                    $value->subjectStd->name,
+                    $resultCapacity->scores,
+                    $resultCapacity->created_at,
+                    $resultCapacity->updated_at
+                ];
+            }
+        }
+        $spreadsheet = new Spreadsheet();
+        // Thực hiện xử lý dữ liệu
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'Tên đề thi');
+        $sheet->setCellValue('B1', 'Học Kỳ');
+        $sheet->setCellValue('C1', 'Cơ Sở');
+        $sheet->setCellValue('D1', 'Lớp');
+        $sheet->setCellValue('E1', 'Ca Thi');
+        $sheet->setCellValue('F1', 'Môn Thi');
+        $sheet->setCellValue('G1', 'Điểm');
+        $sheet->setCellValue('H1', 'Thời gian bắt đầu');
+        $sheet->setCellValue('I1', 'Thời gian kết thúc');
+
+
+        $row = 2;
+        $column = 1;
+        foreach ($data as $recordata) {
+            foreach ($recordata as $value) {
+                $sheet->setCellValueByColumnAndRow($column, $row, $value);
+                $column++;
+            }
+            $row++;
+        }
+        $writer = new Xlsx($spreadsheet);
+        $outputFileName = 'diem_thi_cua_sinh_vien_'.$user->name.'_'.$user->mssv.'.xlsx';
+        $writer->save($outputFileName);
+        return response()->download($outputFileName)->deleteFileAfterSend(true,$outputFileName);
     }
     private function getStudents()
     {
@@ -181,9 +236,8 @@ class UserController extends Controller
     }
     public function listStudent()
     {
-        if (!$users = $this->getStudent()) return abort(404);
-        $roles =  $this->role::all();
-        return view('pages.Students.accountStudent.index', ['users' => $users, 'roles' => $roles]);
+        $listSemeter = $this->interfaceSemeter->GetSemeter();
+        return view('pages.Students.accountStudent.index',['semeters' => $listSemeter]);
     }
     public function listAdmin()
     {

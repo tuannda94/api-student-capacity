@@ -43,6 +43,11 @@ class subjectController extends Controller
         if (!($data = $this->subject->ListSubjectApi()))  return $this->responseApi(false);
         return $this->responseApi(true, $data);
     }
+
+    public  function ListSubject($id){
+        $data = $this->subject->ListSubjectRespone($id);
+        return response()->json(['data' => $data], 200);
+    }
     public function setemer($id){
         $this->checkTypeContest();
         if (!($data = $this->subject->getItemSubjectSetemer($id))) return abort(404);

@@ -27,6 +27,14 @@ class studentPoetryController extends Controller
         ]);
     }
 
+    public function listUser($id){
+        if (!($liststudent = $this->PoetryStudent->GetStudents($id))) return abort(404);
+        return view('pages.Students.accountStudent.listpoetry',[
+            'student' => $liststudent,
+            'id' => $id
+        ]);
+    }
+
     public function create(Request $request){
         $validator =  Validator::make(
             $request->all(),

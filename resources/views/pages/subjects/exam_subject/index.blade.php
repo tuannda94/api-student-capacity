@@ -1,13 +1,8 @@
 @extends('layouts.main')
-@section('page-title', 'Quản lý Đề thi ' . $name->name)
+@section('page-title', 'Quản lý đề thi ' . $name->name)
 @section('content')
-    <div class="row mb-4">
-        <div class="col-lg-10">
-            <ol class="breadcrumb text-muted fs-6 fw-bold">
-                <li class="breadcrumb-item px-3 text-muted">Danh sách đề thi {{ $name->name }}</li>
-            </ol>
-        </div>
-
+    <div class="mb-5">
+        {{ Breadcrumbs::render('Management.exam',$id,$name->name ) }}
     </div>
 
     <div class=" card card-flush  p-5">

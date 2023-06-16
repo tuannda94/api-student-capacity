@@ -2,9 +2,9 @@
 @section('title', 'Quản lý bộ câu hỏi')
 @section('page-title', 'Quản lý bộ câu hỏi')
 @section('content')
-
-
-
+    <div class="mb-5">
+        {{ Breadcrumbs::render('ManagementQuestion' ) }}
+    </div>
     <div class="card card-flush p-4">
         <div class="row mb-4">
             <div class=" col-lg-6">

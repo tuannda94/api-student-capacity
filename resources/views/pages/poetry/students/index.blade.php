@@ -42,7 +42,9 @@
         <!--begin::Container-->
         <div id="kt_content_container" class="container-xxl">
             <!--begin::Row-->
-
+            <div class="mb-5">
+{{--                {{ Breadcrumbs::render('Management.manage',$id) }}--}}
+            </div>
             <div class="card card-flush p-4">
                 <div class="row">
                     <div class=" col-lg-6">
