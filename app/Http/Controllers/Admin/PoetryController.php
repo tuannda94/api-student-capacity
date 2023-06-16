@@ -40,6 +40,16 @@ class PoetryController extends Controller
         return view('pages.poetry.index',['poetry' => $data,'semeter' => $semeter,'listSubject' => $ListSubject,'id_poetry' => $id,'name' => $name,'listExamination' => $listExamination,'listClass' => $listClass]);
     }
 
+    public function ListPoetryRespone($id_subject){
+        $data = $this->poetry->ListPoetryRespone($id_subject);
+        return response()->json(['data' => $data], 200);
+    }
+
+    public function ListPoetryResponedetail($id_subject,$id_class){
+        $data = $this->poetry->ListPoetryDetail($id_subject,$id_class);
+        return response()->json(['data' => $data], 200);
+    }
+
     public function indexApi($id,$id_user){
         if (!($data = $this->poetry->ListPoetryApi($id,$id_user)))  return $this->responseApi(false);
         return $this->responseApi(true, $data);

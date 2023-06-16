@@ -32,6 +32,14 @@ class Subject
             return false;
         }
     }
+
+    public function ListSubjectRespone($id){
+        try {
+            return $this->mSubject->where('id_block',$id)->get();
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
     public function ListSubject()
     {
         try {

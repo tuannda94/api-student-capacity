@@ -23,6 +23,11 @@ class SemeterController extends Controller
         return view('pages.semeter.index',['setemer' => $data]);
     }
 
+    public function ListSemeter($id_semeter){
+        $data = $this->semeter->GetSemeter();
+        return response()->json(['data' => $data], 200);
+    }
+
     public function indexApi(){
         if (!($data = $this->semeter->GetSemeterAPI()))  return $this->responseApi(false);
         return $this->responseApi(true, $data);
