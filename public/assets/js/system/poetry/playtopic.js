@@ -1,23 +1,23 @@
 const selectSubject = document.getElementById("exam_id");
-function eventSubject(btn,htmlimport){
-    btn.addEventListener("change", function() {
+function eventSubject(btn, htmlimport) {
+    btn.addEventListener("change", function () {
         var idCampus = btn.value;
         var idSubject = btn.getAttribute("data-subject");
         wanrning('Đang Tải dữ liệu ... !')
         console.log(idCampus);
-        if(idSubject != ""){
+        if (idSubject != "") {
             $.ajax({
                 url: `/admin/poetry/playTopic/getExam/${idCampus}/${idSubject}`,
                 type: 'GET',
-                success: function(response) {
-                    console.log( response.data);
+                success: function (response) {
+                    console.log(response.data);
                     let html = "";
                     notify('Tải dữ liệu thành công !')
-                    if(response.data != ""){
-                        html = response.data.map((value)=>{
+                    if (response.data != "") {
+                        html = response.data.map((value) => {
                             return `<option value="${value.id}">${value.name}</option>`
                         }).join(' ')
-                    }else  {
+                    } else {
                         html = '<option value="">Không có dữ liệu</option>'
                     }
 
@@ -34,22 +34,23 @@ function eventSubject(btn,htmlimport){
                     // // Gán các giá trị dữ liệu lấy được vào các trường tương ứng trong modal
                     // $('#edit_modal').modal('show');
                 },
-                error: function(response) {
+                error: function (response) {
                     console.log(response);
                     // Xử lý lỗi
                 }
             });
-        }else  {
+        } else {
             htmlimport.style.display = "none";
             notify('Tải dữ liệu thành công !')
         }
 
     });
 }
-eventSubject(selectElement,selectSubject);
+
+eventSubject(selectElement, selectSubject);
 
 const btnReloadtopic = document.querySelector('#reloadPlaytopic');
-btnReloadtopic.addEventListener('click',(e)=>{
+btnReloadtopic.addEventListener('click', (e) => {
     e.preventDefault();
     Swal.fire({
         title: 'Are you sure?',
@@ -69,15 +70,15 @@ btnReloadtopic.addEventListener('click',(e)=>{
             var id_poetry = $('#id_poetry').val();
 
             var dataAll = {
-                '_token' : _token,
-                'mixing' : mixing,
-                'campuses_id' : campuses_id,
-                'id_subject' : id_subject,
-                'exam_id' : exam_id,
-                'id_poetry' : id_poetry
+                '_token': _token,
+                'mixing': mixing,
+                'campuses_id': campuses_id,
+                'id_subject': id_subject,
+                'exam_id': exam_id,
+                'id_poetry': id_poetry
             }
             $.ajax({
-                type:'POST',
+                type: 'POST',
                 url: url,
                 data: dataAll,
                 success: (response) => {
@@ -139,12 +140,12 @@ btnReloadtopic.addEventListener('click',(e)=>{
                     //                  btnDelete = document.querySelectorAll('.btn-delete');
                     //                  dele(btnDelete)
                     wanrning('Đang tải dữ liệu mới ...');
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         window.location.reload();
-                    },1000);
+                    }, 1000);
                     $('#kt_modal_1').modal('hide');
                 },
-                error: function(response){
+                error: function (response) {
                     // console.log(response.responseText)
                     errors(response.responseText);
                     // $('#ajax-form').find(".print-error-msg").find("ul").html('');
