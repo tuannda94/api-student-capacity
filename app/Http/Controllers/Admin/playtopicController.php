@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\studentPoetry;
 use App\Services\Modules\MStudentManager\PoetryStudent;
 use App\Services\Traits\TResponse;
 use App\Services\Traits\TUploadImage;
@@ -82,9 +83,9 @@ class playtopicController extends Controller
         return $this->responseApi(true, $data);
     }
 
-    public function listExam($idCampus, $idSubject)
+    public function listExam($idSubject)
     {
-        $data = $this->exam->getListExam($idCampus, $idSubject);
+        $data = $this->exam->getListExam($idSubject);
 
         return response()->json(['data' => $data], 200);
 
@@ -92,25 +93,40 @@ class playtopicController extends Controller
 
     public function AddTopic(Request $request)
     {
-        $validator = Validator::make(
-            $request->all(),
-            [
-                'campuses_id' => 'required',
-                'mixing' => 'required',
-                'id_subject' => 'required',
-                'exam_id' => 'required'
-            ],
-            [
-                'mixing.required' => 'Vui lòng chọn chế độ trộn câu hỏi!',
-                'campuses_id.required' => 'Vui lòng chọn cơ sở!',
-                'exam_id.required' => 'Vui lòng chọn đề!',
-                'id_subject.required' => 'Không có data môn học'
-            ]
-        );
+        $rules = ['receive_mode' => 'required', 'time' => 'required'];
+        if (!isset($request->receive_mode)) {
+            $messages = ['receive_mode.required' => 'Vui lòng chọn cách thức phát đề!', 'time.required' => "Vui lòng nhập thời gian thi",];
+            $attributes = [];
+        } elseif ($request->receive_mode == 0) {
+            $rules = array_merge(['exam_id' => 'required',], $rules);
+            $messages = ['exam_id.required' => "Vui lòng chọn đề thi", 'time.required' => "Vui lòng nhập thời gian thi",];
+            $attributes = [];
+        } elseif ($request->receive_mode == 1) {
+            $rules = array_merge($rules, [
+                'id_subject' => ['required'],
+                'questions_quantity' => ['required', 'numeric', 'min:1'],
+                'ez_per_ques' => ['required', 'numeric', 'min:0', 'max: 100'],
+                'me_per_ques' => ['required', 'numeric', 'min:0', 'max: 100'],
+                'diff_per_ques' => ['required', 'numeric', 'min:0', 'max: 100'],
+            ]);
+            $messages = [
+                'required' => "Vui lòng nhập :attribute",
+                'min' => "Trường :attribute tối thiểu là :min",
+                'max' => "Trường :attribute tối đa là :max",
+            ];
+            $attributes = [
+                'questions_quantity' => 'số lượng câu hỏi',
+                'ez_per_ques' => '% số câu dễ',
+                'me_per_ques' => '% số câu trung bình',
+                'diff_per_ques' => '% số câu khó',
+                'time' => 'thời gian thi',
+            ];
+        }
+        $fields = array_keys($rules);
+        $validator = Validator::make($request->all(), $rules, $messages, $attributes);
 
         if ($validator->fails() == 1) {
             $errors = $validator->errors();
-            $fields = ['mixing', 'campuses_id', 'id_subject', 'exam_id'];
             foreach ($fields as $field) {
                 $fieldErrors = $errors->get($field);
 
@@ -122,37 +138,77 @@ class playtopicController extends Controller
             }
 
         }
-
-        if (!($liststudent = $this->PoetryStudent->GetStudents($request->id_poetry))) return abort(404);
-
-        if (count($liststudent) == 0) {
-            return response('Không có học sinh trong ca thi này', 404);
-        }
-        $is_mixing = $request->mixing == 1;
-        $questions = DB::table('exam_questions')
-            ->select('question_id')
-            ->where('exam_id', $request->exam_id)
-            ->pluck('question_id')->toArray();
         $dataInsertArr = [];
-        foreach ($liststudent as $object) {
-            if ($is_mixing) shuffle($questions);
-            $dataInsertArr[] = [
-                'id_user' => $object->id_student,
-                'id_exam' => $request->exam_id,
-                'id_poetry' => $request->id_poetry,
-                'id_campus' => $request->campuses_id,
-                'id_subject' => $request->id_subject,
-                'total' => 1,
-                'questions_order' => json_encode($questions),
-                'created_at' => now(),
-                'updated_at' => null
-            ];
-//            $dataInsertArr[] = $dataInsert;
-//            DB::table('playtopic')->insert($dataInsert);
+        $studentPoetryInstance = new studentPoetry();
+        if (!empty($request->poetry_student_id)) {
+            $poetriesId = $request->poetry_student_id;
+        } else {
+            $poetriesId = DB::table('student_poetry')
+                ->select(['id'])
+                ->where('id_poetry', $request->id_poetry)
+                ->pluck('id');
         }
-
+        if ($request->receive_mode == 0) {
+            $questions = DB::table('exam_questions')
+                ->select(['exam_questions.question_id'])
+                ->where('exam_id', $request->exam_id)
+                ->pluck('question_id')->toArray();
+            foreach ($poetriesId as $poetry_id) {
+                shuffle($questions);
+                $dataInsertArr[] = [
+                    'student_poetry_id' => $poetry_id,
+                    'has_received_exam' => 1,
+                    'exam_name' => $request->exam_name,
+                    'questions_order' => json_encode($questions),
+                    'exam_time' => $request->time,
+                ];
+            }
+        } else {
+            $questions = DB::table('exam_questions')
+                ->select(['exam_questions.question_id', 'questions.rank'])
+                ->leftJoin('questions', 'questions.id', '=', 'exam_questions.question_id')
+                ->leftJoin('exams', 'exams.id', '=', 'exam_questions.exam_id')
+                ->where('subject_id', $request->id_subject)
+                ->get()
+                ->groupBy('rank')
+                ->map(function ($item) {
+                    return $item->pluck('question_id')->toArray();
+                });
+            $diffQuesNum = round(($request->diff_per_ques / 100) * $request->questions_quantity);
+            $meQuesNum = round(($request->me_per_ques / 100) * $request->questions_quantity);
+            $ezQuesNum = $request->questions_quantity - $diffQuesNum - $meQuesNum;
+            $quesNumArr = [
+                config('util.RANK_QUESTION_EASY') => $ezQuesNum,
+                config('util.RANK_QUESTION_MEDIUM') => $meQuesNum,
+                config('util.RANK_QUESTION_DIFFICULT') => $diffQuesNum,
+            ];
+            foreach ($poetriesId as $poetry_id) {
+                $dataInsertArr[] = [
+                    'student_poetry_id' => $poetry_id,
+                    'has_received_exam' => 1,
+                    'exam_name' => "Ngẫu nhiên",
+                    'questions_order' => json_encode($this->getRandomQuestionsOrder($quesNumArr, $questions)),
+                    'exam_time' => $request->time,
+                ];
+            }
+        }
+        DB::table('playtopic')->whereIn('student_poetry_id', $poetriesId)->delete();
         DB::table('playtopic')->insert($dataInsertArr);
+//        batch()->update($studentPoetryInstance, $dataInsertArr, 'id');
+
         return response(['message' => "Thành công " . '<br>Vui lòng chờ 5s để làm mới dữ liệu'], 200);
+    }
+
+    public function getRandomQuestionsOrder($quesNumArr, $questions)
+    {
+        $questionsOrder = [];
+        foreach ($quesNumArr as $type => $quesNum) {
+            $randomKeys = array_rand($questions[$type], $quesNum);
+            $randomElements = array_intersect_key($questions[$type], array_flip($randomKeys));
+            array_push($questionsOrder, ...$randomElements);
+        }
+        shuffle($questionsOrder);
+        return $questionsOrder;
     }
 
     public function AddTopicReload(Request $request)
@@ -162,12 +218,12 @@ class playtopicController extends Controller
             $request->all(),
             [
                 'campuses_id' => 'required',
-                'mixing' => 'required',
+                'receive_mode' => 'required',
                 'id_subject' => 'required',
                 'exam_id' => 'required'
             ],
             [
-                'mixing.required' => 'Vui lòng chọn chế độ trộn câu hỏi!',
+                'receive_mode.required' => 'Vui lòng chọn chế độ trộn câu hỏi!',
                 'campuses_id.required' => 'Vui lòng chọn cơ sở!',
                 'exam_id.required' => 'Vui lòng chọn đề!',
                 'id_subject.required' => 'Không có data môn học'
@@ -176,7 +232,7 @@ class playtopicController extends Controller
 
         if ($validator->fails() == 1) {
             $errors = $validator->errors();
-            $fields = ['mixing', 'campuses_id', 'id_subject', 'exam_id'];
+            $fields = ['receive_mode', 'campuses_id', 'id_subject', 'exam_id'];
             foreach ($fields as $field) {
                 $fieldErrors = $errors->get($field);
 
@@ -201,14 +257,14 @@ class playtopicController extends Controller
         }
 //        DB::table('playtopic')->where('id_poetry', $request->id_poetry)->delete();
 
-        $is_mixing = $request->mixing == 1;
+        $is_receive_mode = $request->receive_mode == 1;
         $questions = DB::table('exam_questions')
             ->select('question_id')
             ->where('exam_id', $request->exam_id)
             ->pluck('question_id')->toArray();
         $dataInsertArr = [];
         foreach ($liststudent as $object) {
-            if ($is_mixing) shuffle($questions);
+            if ($is_receive_mode) shuffle($questions);
             $dataInsertArr[] = [
                 'id_user' => $object->id_student,
                 'id_exam' => $request->exam_id,

@@ -189,6 +189,7 @@ return [
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Barryvdh\Debugbar\ServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
+        Mavinoo\Batch\BatchServiceProvider::class,
     ],
 
     /*
@@ -209,6 +210,7 @@ return [
         'Menu' => App\Services\Manager\FMenu\FMenu::class,
         'Debugbar' => Barryvdh\Debugbar\Facades\Debugbar::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
+        'Batch' => Mavinoo\Batch\BatchFacade::class,
     ])->toArray(),
 
 ];

@@ -12,7 +12,9 @@ class poetry implements MPoetryInterface
 
     public function ListPoetry($id){
         try {
-            return $this->modelPoetry->where('id_semeter',$id)->paginate(10);
+            return $this->modelPoetry
+                ->with(['semeter', 'subject', 'classsubject', 'examination'])
+                ->where('id_semeter',$id)->paginate(10);
         }catch (\Exception $e) {
             return false;
         }

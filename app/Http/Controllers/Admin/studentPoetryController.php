@@ -9,34 +9,45 @@ use Illuminate\Http\Request;
 use App\Services\Modules\MStudentManager\PoetryStudent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Services\Modules\MExam\Exam;
 
 class studentPoetryController extends Controller
 {
     use TUploadImage, TResponse;
+
     public function __construct(
-        private PoetryStudent $PoetryStudent
+        private PoetryStudent $PoetryStudent,
+        private Exam          $exam
     )
     {
     }
 
-    public function index($id){
+    public function index($id)
+    {
+        [$liststudent, $id_subject] = $this->PoetryStudent->GetStudents($id);
+//        if (!$liststudent) return abort(404);
+        $examsList = $this->exam->getListExam($id_subject);
+//        dd($liststudent);
+        return view('pages.poetry.students.index', [
+            'student' => $liststudent,
+            'id' => $id,
+            'id_subject' => $id_subject,
+            'exams_list' => $examsList,
+        ]);
+    }
+
+    public function listUser($id)
+    {
         if (!($liststudent = $this->PoetryStudent->GetStudents($id))) return abort(404);
-        return view('pages.poetry.students.index',[
+        return view('pages.Students.accountStudent.listpoetry', [
             'student' => $liststudent,
             'id' => $id
         ]);
     }
 
-    public function listUser($id){
-        if (!($liststudent = $this->PoetryStudent->GetStudents($id))) return abort(404);
-        return view('pages.Students.accountStudent.listpoetry',[
-            'student' => $liststudent,
-            'id' => $id
-        ]);
-    }
-
-    public function create(Request $request){
-        $validator =  Validator::make(
+    public function create(Request $request)
+    {
+        $validator = Validator::make(
             $request->all(),
             [
                 'emailStudent' => 'required',
@@ -48,27 +59,27 @@ class studentPoetryController extends Controller
             ]
         );
 
-        if($validator->fails() == 1){
+        if ($validator->fails() == 1) {
             $errors = $validator->errors();
-            $fields = ['emailStudent','status'];
+            $fields = ['emailStudent', 'status'];
             foreach ($fields as $field) {
                 $fieldErrors = $errors->get($field);
 
                 if ($fieldErrors) {
                     foreach ($fieldErrors as $error) {
-                        return response($error,404);
+                        return response($error, 404);
                     }
                 }
             }
 
         }
         $data = null;
-        foreach ($request->emailStudent as $value){
-            $data[] = $this->PoetryStudent->findUser($value,$request->id_poetry);
+        foreach ($request->emailStudent as $value) {
+            $data[] = $this->PoetryStudent->findUser($value, $request->id_poetry);
         }
         $errors = 0;
         $data = array_filter($data, function ($item) use (&$errors) {
-            if(!is_object($item)){
+            if (!is_object($item)) {
                 $errors++;
             }
             return is_object($item);
@@ -76,21 +87,22 @@ class studentPoetryController extends Controller
 
 
         $success = 0;
-        foreach ($data as $object){
+        foreach ($data as $object) {
             $dataInsert = [
                 'id_poetry' => $request->id_poetry,
                 'id_student' => $object->id,
-                'status' =>  $request->status,
+                'status' => $request->status,
                 'created_at' => now(),
                 'updated_at' => null
             ];
             DB::table('student_poetry')->insert($dataInsert);
             $success++;
         }
-        return response( ['message' => "Thành công " . $success .'<br> Thất bại ' . $errors .'<br>Vui lòng chờ 5s để làm mới dữ liệu','data' => $data],200);
+        return response(['message' => "Thành công " . $success . '<br> Thất bại ' . $errors . '<br>Vui lòng chờ 5s để làm mới dữ liệu', 'data' => $data], 200);
     }
 
-    public function now_status(Request $request,$id){
+    public function now_status(Request $request, $id)
+    {
         $studentPoetry = $this->PoetryStudent->Item($id);
         if (!$studentPoetry) {
             return response()->json(['message' => 'Không tìm thấy'], 404);
@@ -100,15 +112,16 @@ class studentPoetryController extends Controller
         $studentPoetry->save();
         $data = $request->all();
         $data['id'] = $id;
-        return response( ['message' => "Cập nhật trạng thái thành công",'data' =>$data],200);
+        return response(['message' => "Cập nhật trạng thái thành công", 'data' => $data], 200);
     }
 
-    public function delete($id){
+    public function delete($id)
+    {
         try {
             $this->PoetryStudent->Item($id)->delete();
-            return response( ['message' => "Xóa Thành công"],200);
+            return response(['message' => "Xóa Thành công"], 200);
         } catch (\Throwable $th) {
-            return response( ['message' => 'Xóa thất bại'],404);
+            return response(['message' => 'Xóa thất bại'], 404);
         }
     }
 }

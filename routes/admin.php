@@ -229,7 +229,7 @@ Route::prefix('poetry')->group(function () {
     });
     Route::prefix('playTopic')->group(function(){
         Route::get('/{id_peotry}/{id_subject}', [playtopicController::class, 'index'])->name('admin.poetry.playtopic.index');
-        Route::get('getExam/{id_campus}/{id_subject}', [playtopicController::class, 'listExam']);
+        Route::get('getExam/{id_subject}', [playtopicController::class, 'listExam']);
         Route::post('addTopics', [playtopicController::class, 'AddTopic'])->name('admin.poetry.playtopic.create');
         Route::post('addTopicsReload', [playtopicController::class, 'AddTopicReload'])->name('admin.poetry.playtopic.create.reload');
     });
