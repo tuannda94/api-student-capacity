@@ -174,7 +174,7 @@
                                             </button>
                                         </div>
                                         <div class="menu-item px-3">
-                                            <button  class="menu-link px-3 border border-0 bg-transparent" onclick="location.href='{{ route('admin.poetry.manage.index',$value->id) }}'"   type="button">
+                                            <button  class="menu-link px-3 border border-0 bg-transparent" onclick="location.href='{{ route('admin.poetry.manage.index',['id' => $value->id,'id_poetry' =>$id_poetry ]) }}'"   type="button">
                                                 Chi tiết
                                             </button>
                                         </div>

@@ -45,8 +45,8 @@ class PoetryController extends Controller
         return response()->json(['data' => $data], 200);
     }
 
-    public function ListPoetryResponedetail($id_subject,$id_class){
-        $data = $this->poetry->ListPoetryDetail($id_subject,$id_class);
+    public function ListPoetryResponedetail(Request $request){
+        $data = $this->poetry->ListPoetryDetail($request->semeter,$request->block,$request->subject,$request->class);
         return response()->json(['data' => $data], 200);
     }
 

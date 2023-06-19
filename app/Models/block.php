@@ -9,4 +9,5 @@ class block extends Model
 {
     use HasFactory;
     protected $table = 'block_semeter';
+    protected $fillable = ['name','id_semeter'];
 }

@@ -20,22 +20,50 @@ class PoetryStudent implements MPoetryStudentsInterface
         {
             try {
                 $data = $this->model::where('id_poetry',$id_poetry)->paginate(10);
-//                $namePoetry = $this->model::with('poetry')
-//                    ->whereHas('poetry', function ($query) use ($id_poetry) {
-//                        $query->where('id', $id_poetry);
-//                    })
-//                    ->first();
                 foreach ($data as $item) {
-                    $user  = $item->userStudent()->first();
-
-                    if ($user) {
+                    $Checktopic  = $item->playtopic->where('id_poetry',$id_poetry)->first();
+                    if ($Checktopic) {
+                        $resultCap = $Checktopic->resultCapacity->where('exam_id',$Checktopic->id_exam)->first();
+                        $user = $Checktopic->userStudent;
+                        if($resultCap == null){
+                            $item->scores = 'Chưa làm';
+                        }else{
+                            $item->scores =  $resultCap->scores;
+                        }
                         $item->nameStudent = $user->name;
                         $item->emailStudent = $user->email;
                         $item->mssv = $user->mssv;
-                        // Sử dụng $name và $email theo nhu cầu của bạn
                     }
                 }
                 return $data;
+
+            }catch (\Exception $e){
+                return false;
+            }
+        }
+        public function GetStudentsResponse($id_poetry)
+        {
+            try {
+                $data = $this->model::where('id_poetry',$id_poetry)->get();
+                $excelData = [];
+                foreach ($data as $key => $item) {
+                    $Checktopic  = $item->playtopic->where('id_poetry',$id_poetry)->first();
+                    if ($Checktopic) {
+                        $resultCap = $Checktopic->resultCapacity->where('exam_id',$Checktopic->id_exam)->first();
+                        if(empty($resultCap)){
+                            continue;
+                        }
+                        $user = $Checktopic->userStudent;
+                        $excelData[] = [
+                            $key+1,
+                            $user->name,
+                            $user->email
+                            ,$user->mssv,
+                            $resultCap->scores,'Ca thi' . $id_poetry
+                        ];
+                    }
+                }
+                return $excelData;
 
 
             }catch (\Exception $e){

@@ -33,4 +33,9 @@ class playtopic extends Model
     {
         return $this->hasOne(Campus::class, 'id', 'id_campus');
     }
+
+    public function resultCapacity()
+    {
+        return $this->hasMany(ResultCapacity::class, 'user_id','id_user');
+    }
 }

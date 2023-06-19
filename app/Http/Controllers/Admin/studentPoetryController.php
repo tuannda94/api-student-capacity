@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 use App\Services\Modules\MStudentManager\PoetryStudent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class studentPoetryController extends Controller
 {
@@ -19,20 +24,73 @@ class studentPoetryController extends Controller
     {
     }
 
-    public function index($id){
+    public function index($id,$id_poetry){
         if (!($liststudent = $this->PoetryStudent->GetStudents($id))) return abort(404);
         return view('pages.poetry.students.index',[
             'student' => $liststudent,
-            'id' => $id
+            'id' => $id,
+            'id_poetry' => $id_poetry
         ]);
     }
 
     public function listUser($id){
         if (!($liststudent = $this->PoetryStudent->GetStudents($id))) return abort(404);
+//        dd($liststudent);
         return view('pages.Students.accountStudent.listpoetry',[
             'student' => $liststudent,
             'id' => $id
         ]);
+    }
+
+    public function UserExportpoint($id){
+        $liststudent = $this->PoetryStudent->GetStudentsResponse($id);
+        $spreadsheet = new Spreadsheet();
+
+        // Thực hiện xử lý dữ liệu
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'STT');
+        $sheet->setCellValue('B1', 'Tên sinh viên');
+        $sheet->setCellValue('C1', 'Email');
+        $sheet->setCellValue('D1', 'Mã sinh viên');
+        $sheet->setCellValue('E1', 'Điểm');
+        $sheet->setCellValue('F1', 'Ca Thi');
+
+        $borderStyle = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => '000000'],
+                ],
+            ],
+        ];
+
+        $row = 2;
+        $column = 1;
+        foreach ($liststudent as $recordata) {
+            foreach ($recordata as  $value) {
+                $sheet->setCellValueByColumnAndRow($column, $row, $value);
+                $sheet->getStyleByColumnAndRow($column, $row)->applyFromArray($borderStyle);
+                $column++;
+            }
+            $row++;
+            $column = 1;
+        }
+
+        $sheet->getColumnDimension('A')->setWidth(5);
+        $sheet->getColumnDimension('B')->setWidth(20);
+        $sheet->getColumnDimension('C')->setWidth(25);
+        $sheet->getColumnDimension('D')->setWidth(15);
+        $sheet->getColumnDimension('E')->setWidth(10);
+        $sheet->getColumnDimension('F')->setWidth(10);
+
+// Định dạng căn giữa và màu nền cho hàng tiêu đề
+        $sheet->getStyle('A1:F1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A1:F1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('DDDDDD');
+
+        $writer = new Xlsx($spreadsheet);
+        $outputFileName = 'diem_thi_sinh_vien_ca_thi_'.$id.'.xlsx';
+        $writer->save($outputFileName);
+        return response()->download($outputFileName)->deleteFileAfterSend(true,$outputFileName);
     }
 
     public function create(Request $request){

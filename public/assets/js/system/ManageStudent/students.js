@@ -19,6 +19,7 @@ function eventSubject(btn,htmlimport){
                     //insert data vào
                     if(response.data != ""){
                         html += response.data.map((value)=>{
+                            DataResult.nameBlock = value.name
                             return `<option value="${value.id}">${value.name}</option>`
                         }).join(' ')
                     }else  {
@@ -123,35 +124,23 @@ classSubjectSelect.addEventListener("change", function() {
 });
 const search = document.getElementById('searchResult');
 search.addEventListener('click',() => {
-    if (
-        "semeter" in DataResult &&
-        "block" in DataResult &&
-        "subject" in DataResult &&
-        "class" in DataResult
-    ) {
-        // Kiểm tra giá trị của từng thuộc tính
-        if (
-            DataResult.semeter &&
-            DataResult.block &&
-            DataResult.subject &&
-            DataResult.class
-        ) {
-            $.ajax({
-                url: `/admin/accountStudent/GetPoetryDetail/${DataResult.subject}/${DataResult.class}`,
-                type: 'GET',
-                success: function(response) {
-                    console.log( response.data);
-                    // console.log(response.data)
-                    //insert data vào
-                    var newRow = "";
-                    if(response.data != ""){
-                        newRow = response.data.map((value)=>{
-                            return `               <tr >
+    $.ajax({
+        url: `/admin/accountStudent/GetPoetryDetail`,
+        type: 'POST',
+        data : DataResult,
+        success: function(response) {
+            console.log( response.data);
+            // console.log(response.data)
+            //insert data vào
+            var newRow = "";
+            if(response.data != ""){
+                newRow = response.data.map((value)=>{
+                    return `               <tr >
                                     <td>
-                                        <a href="#" class="text-dark text-hover-primary">${ value.semeter.name}</a>
+                                        <span href="#" class="text-dark text-hover-primary">${ value.semeter.name}</span>
                                     </td>
                                     <td>
-                                        <a href="#" class="text-dark text-hover-primary">${ DataResult.nameBlock}</a>
+                                        <span href="#" class="text-dark text-hover-primary">${ value.subject.block.name}</span>
                                     </td>
                                     <td>
                                         <div class="badge badge-light-success">${ value.subject.name}</div>
@@ -161,26 +150,79 @@ search.addEventListener('click',() => {
                                     <td class="text-end"><button class="btn btn-primary er fs-6 px-4 py-2" onclick="location.href='admin/accountStudent/ListUser/${value.id}'">Xem Thêm</button></td>
                                 </tr>
                     `;
-                        }).join(' ')
-                    }else  {
-                        notify('Không có dữ liệu!')
-                        html = '<tr colspan="6"> Chưa có dữ liệu</tr>'
-                    }
+                }).join(' ')
+            }else  {
+                notify('Không có dữ liệu!')
+                html = '<tr colspan="6"> Chưa có dữ liệu</tr>'
+            }
 
-                    $('#table-data tbody').append(newRow);
+            $('#table-data tbody').html(newRow);
 
-                },
-                error: function(response) {
+        },
+        error: function(response) {
 
-                    console.log(response);
-                }
-            });
-
-        } else {
-            errors("Vui lòng chọn đủ các thông tin");
+            console.log(response);
         }
-    } else {
-        console.log(DataResult)
-        errors("Vui lòng chọn đủ môn và bộ môn cần tra cứu");
-    }
+    });
+    // if (
+    //     "semeter" in DataResult &&
+    //     "block" in DataResult &&
+    //     "subject" in DataResult &&
+    //     "class" in DataResult
+    // ) {
+    //     // Kiểm tra giá trị của từng thuộc tính
+    //     if (
+    //         DataResult.semeter &&
+    //         DataResult.block &&
+    //         DataResult.subject &&
+    //         DataResult.class
+    //     ) {
+    //         $.ajax({
+    //             url: `/admin/accountStudent/GetPoetryDetail`,
+    //             type: 'POST',
+    //             data : DataResult,
+    //             success: function(response) {
+    //                 console.log( response.data);
+    //                 // console.log(response.data)
+    //                 //insert data vào
+    //                 var newRow = "";
+    //                 if(response.data != ""){
+    //                     newRow = response.data.map((value)=>{
+    //                         return `               <tr >
+    //                                 <td>
+    //                                     <a href="#" class="text-dark text-hover-primary">${ value.semeter.name}</a>
+    //                                 </td>
+    //                                 <td>
+    //                                     <a href="#" class="text-dark text-hover-primary">${ DataResult.nameBlock}</a>
+    //                                 </td>
+    //                                 <td>
+    //                                     <div class="badge badge-light-success">${ value.subject.name}</div>
+    //                                 </td>
+    //                                 <td data-order="2022-03-10T14:40:00+05:00">${ value.classsubject.name}</td>
+    //                                 <td class="text-end pe-0">${ value.examination.name}</td>
+    //                                 <td class="text-end"><button class="btn btn-primary er fs-6 px-4 py-2" onclick="location.href='admin/accountStudent/ListUser/${value.id}'">Xem Thêm</button></td>
+    //                             </tr>
+    //                 `;
+    //                     }).join(' ')
+    //                 }else  {
+    //                     notify('Không có dữ liệu!')
+    //                     html = '<tr colspan="6"> Chưa có dữ liệu</tr>'
+    //                 }
+    //
+    //                 $('#table-data tbody').append(newRow);
+    //
+    //             },
+    //             error: function(response) {
+    //
+    //                 console.log(response);
+    //             }
+    //         });
+    //
+    //     } else {
+    //         errors("Vui lòng chọn đủ các thông tin");
+    //     }
+    // } else {
+    //     console.log(DataResult)
+    //     errors("Vui lòng chọn đủ môn và bộ môn cần tra cứu");
+    // }
 })
