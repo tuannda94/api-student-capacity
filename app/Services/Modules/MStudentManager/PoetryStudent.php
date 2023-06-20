@@ -25,7 +25,6 @@ class PoetryStudent implements MPoetryStudentsInterface
         try {
             $user = (new User())->getTable();
             $poetry = (new poetry())->getTable();
-//            dd((new User())->getTable());
             $data = $this->model::query()
                 ->select(
                     [
@@ -38,46 +37,63 @@ class PoetryStudent implements MPoetryStudentsInterface
                         "{$user}.name as nameStudent",
                         "{$user}.email as emailStudent",
                         "{$user}.mssv",
-                        "{$poetry}.id_subject"
+                        "{$poetry}.id_subject",
+                        'result_capacity.scores'
                     ]
                 )
                 ->leftJoin($user, "{$user}.id", '=', "{$this->table}.id_student")
                 ->leftJoin($poetry, "{$poetry}.id", '=', "{$this->table}.id_poetry")
                 ->leftJoin('playtopic', "playtopic.student_poetry_id", '=', "{$this->table}.id")
-                ->where('id_poetry', $id_poetry)
+                ->leftJoin('result_capacity', "result_capacity.playtopic_id", '=', "playtopic.id")
+                ->where("{$this->table}.id_poetry", $id_poetry)
                 ->orderBy("{$this->table}.id")
                 ->paginate(10);
-//                $namePoetry = $this->model::with('poetry')
-//                    ->whereHas('poetry', function ($query) use ($id_poetry) {
-//                        $query->where('id', $id_poetry);
-//                    })
-//                    ->first();
-//            foreach ($data as $item) {
-//                $user = $item->userStudent;
-//                $poetry = $item->poetry;
-//
-//                if ($user) {
-//                    $item->nameStudent = $user->name;
-//                    $item->emailStudent = $user->email;
-//                    $item->mssv = $user->mssv;
-//                    // Sử dụng $name và $email theo nhu cầu của bạn
-//                }
-//                if ($poetry) {
-//                    $item->id_subject = $poetry->id_subject;
-//                }
-//            }
-            return [$data, $data->first()->id_subject,];
-
+            return $data;
 
         } catch (\Exception $e) {
             return false;
         }
     }
 
-    public function getModel()
+    public function GetStudentsResponse($id_poetry)
     {
-        return $this->model;
+        try {
+            $user = (new User())->getTable();
+            $data = $this->model::query()
+                ->select(
+                    [
+                        "{$this->table}.id",
+                        "{$user}.name as nameStudent",
+                        "{$user}.email as emailStudent",
+                        "{$user}.mssv",
+                        'result_capacity.scores'
+                    ]
+                )
+                ->leftJoin($user, "{$user}.id", '=', "{$this->table}.id_student")
+                ->leftJoin('playtopic', "playtopic.student_poetry_id", '=', "{$this->table}.id")
+                ->leftJoin('result_capacity', "result_capacity.playtopic_id", '=', "playtopic.id")
+                ->where("{$this->table}.id_poetry", $id_poetry)
+                ->orderBy("{$this->table}.id")
+                ->paginate(10);
+            $excelData = [];
+            foreach ($data as $key => $item) {
+                if (isset($item->scores)) {
+                    $excelData[] = [
+                        $key + 1,
+                        $item->nameStudent,
+                        $item->emailStudent,
+                        $item->mssv,
+                        $item->scores,
+                        'Ca thi ' . $id_poetry
+                    ];
+                }
+            }
+            return $excelData;
 
+
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function Store()

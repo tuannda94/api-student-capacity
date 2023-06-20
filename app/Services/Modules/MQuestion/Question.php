@@ -22,6 +22,15 @@ class Question implements MQuestionInterface
         }
     }
 
+    public function findInId($id = [], $with = [], $select = [])
+    {
+        if (count($select) > 0) {
+            return $this->model::select($select)->whereIn('id', $id)->with($with)->get();
+        } else {
+            return $this->model::whereIn('id', $id)->with($with)->get();
+        }
+    }
+
     public function createQuestionsAndAttchSkill($question, $skill)
     {
         $question =  $this->model::create($question);

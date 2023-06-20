@@ -20,6 +20,11 @@ class ResultCapacityDetail implements MResultCapacityDetailInterface
         return $this->model::create($data);
     }
 
+    public function insert($data = [])
+    {
+        return $this->model::insert($data);
+    }
+
     public function checkExam($id_user,$id_exam){
 
     }

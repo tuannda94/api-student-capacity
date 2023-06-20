@@ -40,7 +40,17 @@ class playtopicController extends Controller
     public function show($id)
     {
 //        return $id;
-        $round = $this->exam->getItemApi($id);
+//        $round = $this->exam->getItemApi($id);
+        $round = $this->playtopicModel->query()
+            ->select([
+                'playtopic.id',
+                'playtopic.exam_name as name',
+                'subject.name as name_subject',
+            ])
+            ->leftJoin('student_poetry', 'student_poetry.id', '=', 'playtopic.student_poetry_id')
+            ->leftJoin('poetry', 'poetry.id', '=', 'student_poetry.id_poetry')
+            ->leftJoin('subject', 'subject.id', '=', 'poetry.id_subject')
+            ->where('playtopic.id','=',$id)->first();
 //        return $round;
         if (is_null($round)) {
             return $this->responseApi(false, 'Không tồn tại trong hệ thống !');

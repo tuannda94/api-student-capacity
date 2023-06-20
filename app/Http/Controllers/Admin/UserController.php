@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Contest;
 use App\Models\User;
+use App\Models\modelroles;
 use App\Services\Modules\MContest\MContestInterface;
 use App\Services\Modules\MUser\MUserInterface;
 use App\Services\Traits\TCheckUserDrugTeam;
@@ -24,20 +25,29 @@ use Spatie\Permission\Models\Role;
 use App\Models\ResultCapacity;
 use App\Models\playtopic;
 use App\Services\Modules\MSemeter\Semeter;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use App\Models\branches;
+use App\Models\Campus;
+
 class UserController extends Controller
 {
     use TUploadImage, TCheckUserDrugTeam, TResponse;
 
 
     public function __construct(
-        private MUserInterface $user,
+        private MUserInterface    $user,
         private MContestInterface $contest,
-        private User $modeluser,
-        private Role $role,
-        private ResultCapacity $resultCap,
-        private playtopic $playtopic,
-        private Semeter $interfaceSemeter
-    ) {
+        private User              $modeluser,
+        private Role              $role,
+        private ResultCapacity    $resultCap,
+        private playtopic         $playtopic,
+        private Semeter           $interfaceSemeter,
+        private branches          $branches,
+        private Campus            $campus
+    )
+    {
     }
 
     public function TeamUserSearch(Request $request)
@@ -59,8 +69,6 @@ class UserController extends Controller
             dd($th);
         }
     }
-
-
 
 
     public function list(Request $request)
@@ -99,37 +107,91 @@ class UserController extends Controller
                 'pagination' => [
                     'currentPage' => $pageNumber,
                     'pageSize' => $pageSize,
-                    'totalItem' =>  $totalItem,
+                    'totalItem' => $totalItem,
                     'totalPage' => ceil($totalItem / $pageSize)
                 ]
             ]
         ]);
     }
 
-    public  function Listpoint($id){
-        $point = $this->playtopic->where('id_user', $id)->get();
+    public function Listpoint($id, $id_poetry)
+    {
         $user = DB::table('users')->find($id);
-        return view('pages.Students.accountStudent.viewpoint',['point' => $point,'user'=>$user]);
+        $subjectIdToSubjectName = DB::table('subject')->select('id', 'name')->pluck('name', 'id')->toArray();
+        $campusCodeToCampusName = DB::table('campuses')->select('code', 'name')->pluck('name', 'code')->toArray();
+        $examinationIdToExaminationName = DB::table('examination')->select('id', 'name')->pluck('name', 'id')->toArray();
+        $classIdToClassName = DB::table('class')->select('id', 'name')->pluck('name', 'id')->toArray();
+        $semesterIdToSemesterName = DB::table('semester')->select('id', 'name')->pluck('name', 'id')->toArray();
+        $point = $this->playtopic
+            ->query()
+            ->select([
+                'playtopic.exam_name',
+                'poetry.id_subject',
+                'poetry.id_semeter',
+                'poetry.id_examination',
+                'poetry.id_class',
+                'result_capacity.scores',
+                'result_capacity.created_at',
+                'result_capacity.updated_at',
+            ])
+            ->join('student_poetry', 'student_poetry.id', '=', 'playtopic.student_poetry_id')
+            ->join('poetry', 'poetry.id', '=', 'student_poetry.id_poetry')
+            ->join('result_capacity', 'result_capacity.playtopic_id', '=', 'playtopic.id')
+            ->where('student_poetry.id_student', $id)
+            ->get();
+        foreach ($point as $item) {
+            $item->semester_name = $semesterIdToSemesterName[$item->id_semeter];
+            $item->campus_name = $campusCodeToCampusName[$user->campus_code];
+            $item->class_name = $classIdToClassName[$item->id_class];
+            $item->examination_name = $examinationIdToExaminationName[$item->id_examination];
+            $item->subject_name = $subjectIdToSubjectName[$item->id_subject];
+        }
+
+//        $point = $this->playtopic->where('id_user', $id)->get();
+        return view('pages.Students.accountStudent.viewpoint', ['point' => $point, 'user' => $user, 'id' => $id, 'id_poetry' => $id_poetry]);
     }
 
-    public function Exportpoint($id_user){
-        $point = $this->playtopic->where('id_user', $id_user)->get();
+    public function Exportpoint($id_user)
+    {
+        $subjectIdToSubjectName = DB::table('subject')->select('id', 'name')->pluck('name', 'id')->toArray();
+        $campusCodeToCampusName = DB::table('campuses')->select('code', 'name')->pluck('name', 'code')->toArray();
+        $examinationIdToExaminationName = DB::table('examination')->select('id', 'name')->pluck('name', 'id')->toArray();
+        $classIdToClassName = DB::table('class')->select('id', 'name')->pluck('name', 'id')->toArray();
+        $semesterIdToSemesterName = DB::table('semester')->select('id', 'name')->pluck('name', 'id')->toArray();
+        $point = $this->playtopic
+            ->query()
+            ->select([
+                'playtopic.exam_name',
+                'poetry.id_subject',
+                'poetry.id_semeter',
+                'poetry.id_examination',
+                'poetry.id_class',
+                'result_capacity.scores',
+                'result_capacity.created_at',
+                'result_capacity.updated_at',
+            ])
+            ->join('student_poetry', 'student_poetry.id', '=', 'playtopic.student_poetry_id')
+            ->join('poetry', 'poetry.id', '=', 'student_poetry.id_poetry')
+            ->join('result_capacity', 'result_capacity.playtopic_id', '=', 'playtopic.id')
+            ->where('student_poetry.id_student', $id_user)
+            ->get();
         $user = DB::table('users')->find($id_user);
 //        dd($user);
         $data = [];
-        foreach($point as $key => $value){
-            $resultCapacity = $value->userStudent->resultCapacity->where('exam_id',$value->id_exam)->first();
-            if(isset($resultCapacity->scores) && $resultCapacity->scores  !== null){
+        foreach ($point as $key => $value) {
+//            $resultCapacity = $value->userStudent->resultCapacity->where('exam_id',$value->id_exam)->first();
+//            if(isset($resultCapacity->scores) && $resultCapacity->scores  !== null){
+            if (isset($value->scores)) {
                 $data[] = [
-                    $value->examStd->name,
-                    $value->subjectStd->semester_subject->first()->name,
-                    $value->campusName->name,
-                    $value->poetryStd->classsubject->name,
-                    $value->poetryStd->examination->name,
-                    $value->subjectStd->name,
-                    $resultCapacity->scores,
-                    $resultCapacity->created_at,
-                    $resultCapacity->updated_at
+                    $value->exam_name,
+                    $semesterIdToSemesterName[$value->id_semeter],
+                    $campusCodeToCampusName[$user->campus_code],
+                    $classIdToClassName[$value->id_class],
+                    $examinationIdToExaminationName[$value->id_examination],
+                    $subjectIdToSubjectName[$value->id_subject],
+                    $value->scores,
+                    $value->created_at,
+                    $value->updated_at
                 ];
             }
         }
@@ -145,22 +207,45 @@ class UserController extends Controller
         $sheet->setCellValue('G1', 'Điểm');
         $sheet->setCellValue('H1', 'Thời gian bắt đầu');
         $sheet->setCellValue('I1', 'Thời gian kết thúc');
-
+        $borderStyle = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => '000000'],
+                ],
+            ],
+        ];
 
         $row = 2;
         $column = 1;
         foreach ($data as $recordata) {
             foreach ($recordata as $value) {
                 $sheet->setCellValueByColumnAndRow($column, $row, $value);
+                $sheet->getStyleByColumnAndRow($column, $row)->applyFromArray($borderStyle);
                 $column++;
             }
             $row++;
+            $column = 1;
         }
+        $sheet->getColumnDimension('A')->setWidth(15);
+        $sheet->getColumnDimension('B')->setWidth(20);
+        $sheet->getColumnDimension('C')->setWidth(15);
+        $sheet->getColumnDimension('D')->setWidth(15);
+        $sheet->getColumnDimension('E')->setWidth(10);
+        $sheet->getColumnDimension('F')->setWidth(10);
+        $sheet->getColumnDimension('G')->setWidth(10);
+        $sheet->getColumnDimension('H')->setWidth(25);
+        $sheet->getColumnDimension('I')->setWidth(25);
+        // Định dạng căn giữa và màu nền cho hàng tiêu đề
+        $sheet->getStyle('A1:I1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A1:I1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('DDDDDD');
+
         $writer = new Xlsx($spreadsheet);
-        $outputFileName = 'diem_thi_cua_sinh_vien_'.$user->name.'_'.$user->mssv.'.xlsx';
+        $outputFileName = 'diem_thi_cua_sinh_vien_' . $user->name . '_' . $user->mssv . '.xlsx';
         $writer->save($outputFileName);
-        return response()->download($outputFileName)->deleteFileAfterSend(true,$outputFileName);
+        return response()->download($outputFileName)->deleteFileAfterSend(true, $outputFileName);
     }
+
     private function getStudents()
     {
         try {
@@ -176,6 +261,7 @@ class UserController extends Controller
             return false;
         }
     }
+
     private function getUser()
     {
         try {
@@ -184,6 +270,9 @@ class UserController extends Controller
                 ->sort(request('sort') == 'asc' ? 'asc' : 'desc', request('sort_by') ?? null, 'users')
                 ->search(request('q') ?? null, ['name', 'email'])
                 ->has_role(request('role') ?? null)
+                ->whereDoesntHave('roles', function ($query) {
+                    $query->where('name', 'student');
+                })
                 ->paginate(request('limit') ?? $limit);
 
             return $users;
@@ -191,6 +280,7 @@ class UserController extends Controller
             return false;
         }
     }
+
     private function getStudent()
     {
         try {
@@ -204,9 +294,10 @@ class UserController extends Controller
             return false;
         }
     }
+
     public function index()
     {
-        if (!$users = $this->getUser())    return response()->json(
+        if (!$users = $this->getUser()) return response()->json(
             [
                 'status' => false,
                 'payload' => 'Trang không tồn tại !'
@@ -234,23 +325,148 @@ class UserController extends Controller
             200
         );
     }
+
+    public function create(Request $request)
+    {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'name_add' => 'required',
+                'email_add' => 'required|unique:users,email',
+                'branches_id' => 'required',
+                'campus_id' => 'required',
+                'status' => 'required',
+                'roles_id' => 'required'
+            ],
+            [
+                'name_add.required' => 'Không để trống tên tài khoản!',
+                'email_add.required' => 'Không để trống email!',
+                'email_add.unique' => 'Email này đã tồn tại',
+                'branches_id.required' => 'Vui lòng chọn Chi nhánh!',
+                'campus_id.required' => 'Vui lòng chọn cơ sở!',
+                'roles_id.required' => 'Vui lòng chọn chức vụ cho tài khoản!',
+                'status.required' => 'Vui lòng chọn trạng thái!'
+            ]
+        );
+
+        if ($validator->fails() == 1) {
+            $errors = $validator->errors();
+            $fields = ['name_add', 'email_add', 'branches_id', 'campus_id', 'roles_id', 'status'];
+            foreach ($fields as $field) {
+                $fieldErrors = $errors->get($field);
+
+                if ($fieldErrors) {
+                    foreach ($fieldErrors as $error) {
+                        return response($error, 404);
+                    }
+                }
+            }
+
+        }
+        $data = [
+            'name' => $request->name_add,
+            'email' => $request->email_add,
+            'avatar' => NULL,
+            'status' => $request->status,
+            'mssv' => NULL,
+            'branch_id' => $request->branches_id,
+            'campus_code' => $request->campus_id
+        ];
+        DB::table('users')->insert($data);
+        $id = DB::getPdo()->lastInsertId();
+        DB::table('model_has_roles')->insert(
+            [
+                'role_id' => $request->roles_id,
+                'model_type' => 'App\Models\User',
+                'model_id' => $id
+            ]
+        );
+        return response(['message' => "Thành công <br>Vui lòng chờ 5s để làm mới dữ liệu", 'data' => $data], 200);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'name_update' => 'required',
+                'email_update' => 'required',
+                'branches_id_update' => 'required',
+                'campus_id_update' => 'required',
+                'status_update_update' => 'required',
+                'roles_id_update' => 'required'
+            ],
+            [
+                'name_update.required' => 'Không để trống tên tài khoản!',
+                'email_update.required' => 'Không để trống email!',
+                'branches_id_update.required' => 'Vui lòng chọn Chi nhánh!',
+                'campus_id_update.required' => 'Vui lòng chọn cơ sở!',
+                'roles_id_update.required' => 'Vui lòng chọn chức vụ cho tài khoản!',
+                'status_update_update.required' => 'Vui lòng chọn trạng thái!'
+            ]
+        );
+
+        if ($validator->fails() == 1) {
+            $errors = $validator->errors();
+            $fields = ['name_update', 'email_update', 'branches_id_update', 'campus_id_update', 'roles_id_update', 'status_update_update'];
+            foreach ($fields as $field) {
+                $fieldErrors = $errors->get($field);
+
+                if ($fieldErrors) {
+                    foreach ($fieldErrors as $error) {
+                        return response($error, 404);
+                    }
+                }
+            }
+
+        }
+        $user = User::find($id);
+        $user->name = $request->name_update;
+        $user->email = $request->email_update;
+        $user->status = $request->status_update_update;
+        $user->branch_id = $request->branches_id_update;
+        $user->campus_code = $request->campus_id_update;
+        $user->save();
+
+        $role = modelroles::where('model_id', $id)->update(['role_id' => $request->roles_id_update]);;
+        return response(['message' => "Thành công <br>Vui lòng chờ 5s để làm mới dữ liệu"], 200);
+    }
+
+    public function edit($id)
+    {
+        try {
+            $user = User::find($id);
+            return response()->json([
+                'message' => "Thành công",
+                'data' => $user,
+            ], 200);
+        } catch (\Throwable $th) {
+            return response(['message' => "Thêm thất bại"], 404);
+        }
+    }
+
     public function listStudent()
     {
         $listSemeter = $this->interfaceSemeter->GetSemeter();
-        return view('pages.Students.accountStudent.index',['semeters' => $listSemeter]);
+        return view('pages.Students.accountStudent.index', ['semeters' => $listSemeter]);
     }
+
     public function listAdmin()
     {
         if (!$users = $this->getUser()) return abort(404);
-        $roles =  $this->role::all();
-        return view('pages.auth.index', ['users' => $users, 'roles' => $roles]);
+        $branches = $this->branches::all();
+        $roles = $this->role::all();
+        $Campus = $this->campus::all();
+        return view('pages.auth.index', ['users' => $users, 'roles' => $roles, 'branches' => $branches, 'campus' => $Campus]);
     }
 
-    public function stdManagement(){
+    public function stdManagement()
+    {
         if (!$users = $this->getStudent()) return abort(404);
-        $roles =  $this->role::all();
+        $roles = $this->role::all();
         return view('pages.Students.index', ['users' => $users, 'roles' => $roles]);
     }
+
     private function checkRole()
     {
         if (auth()->user()->hasAnyRole(['admin', 'super admin'])) return true;
@@ -259,7 +475,7 @@ class UserController extends Controller
 
     public function un_status($id)
     {
-        if (!$this->checkRole())   return response()->json([
+        if (!$this->checkRole()) return response()->json([
             'status' => false,
             'payload' => 'Không thể câp nhật trạng thái !',
         ]);
@@ -283,7 +499,7 @@ class UserController extends Controller
 
     public function re_status($id)
     {
-        if (!$this->checkRole())   return response()->json([
+        if (!$this->checkRole()) return response()->json([
             'status' => false,
             'payload' => 'Không thể câp nhật trạng thái !',
         ]);

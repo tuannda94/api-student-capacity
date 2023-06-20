@@ -23,6 +23,7 @@ class ResultCapacity extends Model
         'donot_answer',
         'false_answer',
         'true_answer',
+        'playtopic_id'
     ];
 
     public function user()

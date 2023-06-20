@@ -51,10 +51,10 @@ class QuestionController extends Controller
         Exam                       $exam,
         private MSkillInterface    $skillRepo,
         private MQuestionInterface $questionRepo,
-        subject                    $subject,
-        ClassModel                 $class,
-        poetry                     $poetry,
-        semeter_subject            $semeter_subject
+        subject                     $subject,
+        ClassModel $class,
+        poetry $poetry,
+        semeter_subject $semeter_subject
     )
     {
         $this->skillModel = $skill;
@@ -478,11 +478,10 @@ class QuestionController extends Controller
             ], 400);
         }
     }
-
-    public function importAndRunSemeter(ImportQuestion $request, $semeter_id)
+    public function importAndRunSemeter(ImportQuestion $request, $semeter_id,$idBlock)
     {
         try {
-            $this->readExClass($request->ex_file, $semeter_id);
+            $this->readExClass($request->ex_file, $semeter_id,$idBlock);
 //            $import = new QuestionsImport($exam_id);
 //            Excel::import($import, $request->ex_file);
 //            dd();
@@ -490,7 +489,7 @@ class QuestionController extends Controller
 //                "status" => true,
 //                "payload" => "Thành công "
 //            ]);
-            return redirect()->route('admin.poetry.index', $semeter_id);
+            return redirect()->route('admin.poetry.index',['id' => $semeter_id,'id_block' => $idBlock]);
 
         } catch (\Throwable $th) {
             return response()->json([
@@ -501,7 +500,6 @@ class QuestionController extends Controller
             ], 400);
         }
     }
-
     public function readExcel($file, $exam_id)
     {
         $spreadsheet = IOFactory::load($file);
@@ -688,48 +686,35 @@ class QuestionController extends Controller
         $exams->save();
     }
 
-    public function storeQuestionAnswer($data, $exam_id, &$imgCodeToQuestionId)
-    {
-        DB::transaction(function () use ($data, $exam_id, &$imgCodeToQuestionId) {
-            $question = app(MQuestionInterface::class)->createQuestionsAndAttchSkill($data['questions'], $data['skill']);
-            if (!$question) throw new \Exception("Error create question ");
-            if ($exam_id) app(MExamInterface::class)->attachQuestion($exam_id, $question->id);
-            app(MAnswerInterface::class)->createAnswerByIdQuestion($data['answers'], $question->id);
-            foreach ($data['imgCode'] as $imgCode) {
-                $imgCode = trim($imgCode, '[]');
-                $imgCodeToQuestionId[$imgCode] = $question->id;
-            }
-        });
-    }
-
-    public function readExClass($file, $id_semeter)
+    public function readExClass($file, $id_semeter,$idBlock)
     {
         $spreadsheet = IOFactory::load($file);
         $sheetCount = $spreadsheet->getSheetCount();
         // Lấy ra sheet chứa câu hỏi
         $questionsSheet = $spreadsheet->getSheet(0);
-        $infoSubject = $questionsSheet->toArray();
+        $infoSubject= $questionsSheet->toArray();
         unset($infoSubject[0]);
         $infoSubject = array_values($infoSubject);
         $arrItem = [];
-        foreach ($infoSubject as $value) {
-            $subjectFind = $this->subjectModel->where('code_subject', $value[4])->first();
+        foreach ($infoSubject as $value){
+            $subjectFind = $this->subjectModel->where('code_subject',$value[4])->first();
             $id_subject = $subjectFind != null ? $subjectFind->id : null;
-            if ($subjectFind == null) {
+            if($subjectFind == null){
                 $id_subject = DB::table('subject')->insertGetId(
                     [
                         'name' => $value[3],
                         'status' => 1,
                         'created_at' => now(),
                         'updated_at' => NULL,
-                        'code_subject' => $value[4]
+                        'code_subject' =>  $value[4],
+                        'id_block' => $idBlock
                     ]
                 );
 
             }
-            $Classfind = $this->classModel->where('name', $value[5])->first();
+            $Classfind = $this->classModel->where('name',$value[5])->first();
             $idClass = $Classfind != null ? $Classfind->id : null;
-            if ($Classfind == null) {
+            if($Classfind == null){
                 $idClass = DB::table('class')->insertGetId(
                     [
                         'name' => $value[5],
@@ -739,11 +724,11 @@ class QuestionController extends Controller
                     ]
                 );
             }
-            $semeterSubjectFind = $this->semeter_subject->where('id_semeter', $id_semeter)->where('id_subject', $id_subject)->first();
-            if ($semeterSubjectFind == null) {
-                DB::table('semester_subject')->insert(
+            $semeterSubjectFind =    $this->semeter_subject->where('id_semeter',$id_semeter)->where('id_subject',$id_subject)->first();
+            if($semeterSubjectFind == null){
+               DB::table('semester_subject')->insert(
                     [
-                        'id_semeter' => $id_semeter,
+                        'id_semeter' =>$id_semeter,
                         'id_subject' => $id_subject,
                         'status' => now(),
                         'created_at' => Carbon::now(),
@@ -769,7 +754,6 @@ class QuestionController extends Controller
         DB::table('poetry')->insert($arrItem);
 
     }
-
     public function catchError($data, $message)
     {
         if (($data == null || trim($data) == "")) {
@@ -779,10 +763,23 @@ class QuestionController extends Controller
         return $data;
     }
 
+    public function storeQuestionAnswer($data, $exam_id, &$imgCodeToQuestionId)
+    {
+        DB::transaction(function () use ($data, $exam_id, &$imgCodeToQuestionId) {
+            $question = app(MQuestionInterface::class)->createQuestionsAndAttchSkill($data['questions'], $data['skill']);
+            if (!$question) throw new \Exception("Error create question ");
+            if ($exam_id) app(MExamInterface::class)->attachQuestion($exam_id, $question->id);
+            app(MAnswerInterface::class)->createAnswerByIdQuestion($data['answers'], $question->id);
+            foreach ($data['imgCode'] as $imgCode) {
+                $imgCode = trim($imgCode, '[]');
+                $imgCodeToQuestionId[$imgCode] = $question->id;
+            }
+        });
+    }
 
     public function getImgCode($text, $arr = [])
     {
-        $regImgCode = '/\[anh\d+\]/';
+        $regImgCode = '/\[anh\d\]/';
         preg_match_all($regImgCode, $text, $imgCode);
         if (!empty($imgCode[0])) {
             $arr = array_merge($arr, $imgCode[0]);
@@ -811,12 +808,11 @@ class QuestionController extends Controller
         return $this->responseApi(true, $data);
     }
 
-    public function timeNow($timeFormat)
-    {
+    public function timeNow($timeFormat){
         $dateString = $timeFormat;
         $date = Carbon::createFromFormat('d/m/Y', $dateString);
         $formattedDate = $date->format('Y-m-d');
         $currentDateTime = Carbon::now();
-        return $formattedDate . ' ' . $currentDateTime->format('H:i:s');
+        return  $formattedDate . ' ' . $currentDateTime->format('H:i:s');
     }
 }

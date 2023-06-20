@@ -28,16 +28,16 @@ class PoetryController extends Controller
     {
     }
 
-    public function index($id){
+    public function index($id,$idblock){
 //        $data = $this->oneindexApi(140);
 //        dd($data);
-        $data = $this->poetry->ListPoetry($id);
+        $data = $this->poetry->ListPoetry($id,$idblock);
         $semeter = $this->semeter->ListSemeter();
         $name = $this->semeter->getName($id);
         $listExamination = $this->examination->getList();
         $ListSubject = $this->subject->getItemSubjectSetemerReponse($id);
         $listClass = $this->class->getClass();
-        return view('pages.poetry.index',['poetry' => $data,'semeter' => $semeter,'listSubject' => $ListSubject,'id_poetry' => $id,'name' => $name,'listExamination' => $listExamination,'listClass' => $listClass]);
+        return view('pages.poetry.index',['poetry' => $data,'semeter' => $semeter,'listSubject' => $ListSubject,'id_poetry' => $id,'idBlock' => $idblock,'name' => $name,'listExamination' => $listExamination,'listClass' => $listClass]);
     }
 
     public function ListPoetryRespone($id_subject){
@@ -45,8 +45,8 @@ class PoetryController extends Controller
         return response()->json(['data' => $data], 200);
     }
 
-    public function ListPoetryResponedetail($id_subject,$id_class){
-        $data = $this->poetry->ListPoetryDetail($id_subject,$id_class);
+    public function ListPoetryResponedetail(Request $request){
+        $data = $this->poetry->ListPoetryDetail($request->semeter,$request->block,$request->subject,$request->class);
         return response()->json(['data' => $data], 200);
     }
 

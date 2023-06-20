@@ -35,7 +35,7 @@
         }
     </style>
     <!-- CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-notify@0.5.5/dist/simple-notify.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-notify@0.5.5/dist/simple-notify.min.css" />
     <!-- JS -->
     <script src="https://cdn.jsdelivr.net/npm/simple-notify@0.5.5/dist/simple-notify.min.js"></script>
     <div class="post d-flex flex-column-fluid" id="kt_post">
@@ -43,7 +43,7 @@
         <div id="kt_content_container" class="container-xxl">
             <!--begin::Row-->
             <div class="mb-5">
-                {{--                {{ Breadcrumbs::render('Management.manage',$id) }}--}}
+                {{ Breadcrumbs::render('manageSemeter',['id' => $id,'id_poetry' => $id_poetry,'id_block' => $idBlock]) }}
             </div>
             <div class="card card-flush p-4">
                 <div class="row">
@@ -55,7 +55,7 @@
                     </div>
                     <div class="col-lg-6 btn-group justify-content-end">
                         <div class="">
-                            @if(!empty($student))
+                            @if($student->count() > 0)
                                 <div class=" d-flex flex-row-reverse bd-highlight">
                                     <label data-bs-toggle="modal" data-bs-target="#kt_modal_2" type="button"
                                            class="btn btn-primary me-3">
@@ -116,12 +116,13 @@
                             <th scope="col">Trạng thái</th>
                             <th scope="col">Trạng thái phát đề</th>
                             <th scope="col">Tên đề thi</th>
+                            <th scope="col">Điểm</th>
                             <th scope="col">Thời gian thi</th>
                             <th colspan="2"></th>
                         </tr>
                         </thead>
                         <tbody>
-                        @if(!empty($student))
+                        @if($student->count() > 0)
                             @foreach($student as $key => $value)
                                 <tr>
                                     <td><input type="checkbox" class="form-check-input checkbox-student" data-id="{{ $value->id }}" name="" id=""></td>
@@ -147,8 +148,9 @@
                                     <td>
                                         {{ trim($value->exam_name) === "" ? "Chưa có đề thi" : $value->exam_name }}
                                     </td>
+                                    <td>{{ trim($value->scores) === "" ? "Chưa thi" : $value->scores }}</td>
                                     <td>
-                                        {{ trim($value->exam_time) === "" ? "Chưa có thời gian" : $value->exam_time . "phút" }}
+                                        {{ trim($value->exam_time) === "" ? "Chưa có thời gian" : $value->exam_time . " phút" }}
                                     </td>
                                     <td class="text-end">
                                         <a href="#" class="btn btn-light btn-active-light-primary btn-sm"
@@ -190,14 +192,14 @@
                             @endforeach
                         @else
                             <tr id="error_null">
-                                <td colspan="7">
+                                <td colspan="10">
                                     <h1 class="text-center">Không có học sinh nào trong ca thi</h1>
                                 </td>
                             </tr>
                         @endif
                         </tbody>
                     </table>
-                    @if(!empty($student))
+                    @if($student->count() > 0)
                         <nav>
                             <ul class="pagination">
                                 {{ $student->links() }}
