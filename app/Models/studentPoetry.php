@@ -18,4 +18,8 @@ class studentPoetry extends Model
     {
         return $this->belongsTo(poetry::class, 'id_poetry', 'id');
     }
+
+    public function playtopic(){
+        return $this->hasMany(playtopic::class,'id_user','id_student');
+    }
 }

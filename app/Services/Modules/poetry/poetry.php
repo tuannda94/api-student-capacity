@@ -36,18 +36,32 @@ class poetry implements MPoetryInterface
         }
     }
 
-    public function ListPoetryDetail($id_subject, $id_class)
-    {
+    public function ListPoetryDetail($idSemeter,$idBlock,$id_subject,$id_class){
         try {
-            $records = $this->modelPoetry->where('id_subject', $id_subject)->where('id_class', $id_class)->get();
-            $records->load(['classsubject' => function ($q) {
-                return $q->select('id', 'name', 'code_class');
+            $records = $this->modelPoetry->when(!empty($idSemeter), function ($query) use ($idSemeter) {
+                $query->where('id_semeter', $idSemeter);
+            })
+                ->when(!empty($idBlock), function ($query) use ($idBlock) {
+                    $query->whereHas('subject', function ($subQuery) use ($idBlock) {
+                        $subQuery->where('id_block', $idBlock);
+                    });
+                })
+                ->when(!empty($id_subject) && empty($id_class), function ($query) use ($id_subject) {
+                    $query->where('id_subject', $id_subject);
+                })
+                ->when(!empty($id_subject) && !empty($id_class), function ($query) use ($id_subject, $id_class) {
+                    $query->where('id_subject', $id_subject)
+                        ->where('id_class', $id_class);
+                })
+                ->get();
+            $records->load(['classsubject'  => function ($q) {
+                return $q->select('id','name','code_class');
             }]);
             $records->load(['subject' => function ($q) {
-                return $q->select('id', 'name');
+                return $q->select('subject.id','subject.name');
             }]);
-            $records->load(['subject' => function ($q) {
-                return $q->select('id', 'name');
+            $records->load(['subject.block' => function ($q) {
+                return $q->select('id','name');
             }]);
             $records->load(['examination' => function ($q) {
                 return $q->select('id', 'name');

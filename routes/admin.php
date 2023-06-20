@@ -205,11 +205,11 @@ Route::prefix('accountStudent')->group(function () {
     Route::get('GetBlock/{id_semeter}', [BlockController::class, 'index'])->name('manage.semeter.list');
     Route::get('GetSubject/{id_block}', [subjectController::class, 'ListSubject'])->name('manage.semeter.list');
     Route::get('GetPoetry/{id_subject}', [PoetryController::class, 'ListPoetryRespone'])->name('manage.semeter.list');
-    Route::get('GetPoetryDetail/{id_subject}/{id_class}', [PoetryController::class, 'ListPoetryResponedetail'])->name('manage.semeter.list');
+    Route::post('GetPoetryDetail', [PoetryController::class, 'ListPoetryResponedetail'])->name('manage.semeter.list');
     Route::get('ListUser/{id}', [studentPoetryController::class, 'listUser'])->name('admin.manage.semeter.index');
-    Route::get('viewpoint/{id_user}', [UserController::class, 'Listpoint'])->name('manage.student.view');
+    Route::get('viewpoint/{id_user}/{id_poetry}', [UserController::class, 'Listpoint'])->name('manage.student.view');
     Route::get('exportPoint/{id_user}', [UserController::class, 'Exportpoint'])->name('manage.student.export');
-
+    Route::get('exportUserPoint/{id}', [studentPoetryController::class, 'UserExportpoint'])->name('manage.student.list.export');
 });
 //Ca học =>done
 Route::prefix('poetry')->group(function () {
@@ -222,7 +222,7 @@ Route::prefix('poetry')->group(function () {
 //    call lai route bên hoc ky
     Route::get('getsubject/{id}', [subjectController::class, 'getsemeter'])->name('admin.poetry.subject.index');
     Route::prefix('manage')->group(function () {
-        Route::get('/{id}', [studentPoetryController::class, 'index'])->name('admin.poetry.manage.index');
+        Route::get('/{id}/{id_poetry}', [studentPoetryController::class, 'index'])->name('admin.poetry.manage.index');
         Route::post('/form-add-student', [studentPoetryController::class, 'create'])->name('admin.poetry.manage.create');
         Route::put('now-status/{id}', [studentPoetryController::class, 'now_status'])->name('admin.poetry.un.status');
         Route::delete('delete/{id}', [studentPoetryController::class, 'delete'])->name('admin.poetry.delete');

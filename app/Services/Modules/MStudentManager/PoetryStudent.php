@@ -38,13 +38,15 @@ class PoetryStudent implements MPoetryStudentsInterface
                         "{$user}.name as nameStudent",
                         "{$user}.email as emailStudent",
                         "{$user}.mssv",
-                        "{$poetry}.id_subject"
+                        "{$poetry}.id_subject",
+                        'result_capacity.scores'
                     ]
                 )
                 ->leftJoin($user, "{$user}.id", '=', "{$this->table}.id_student")
                 ->leftJoin($poetry, "{$poetry}.id", '=', "{$this->table}.id_poetry")
                 ->leftJoin('playtopic', "playtopic.student_poetry_id", '=', "{$this->table}.id")
-                ->where('id_poetry', $id_poetry)
+                ->leftJoin('result_capacity', "result_capacity.playtopic_id", '=', "playtopic.id")
+                ->where("{$this->table}.id_poetry", $id_poetry)
                 ->orderBy("{$this->table}.id")
                 ->paginate(10);
 //                $namePoetry = $this->model::with('poetry')
@@ -67,6 +69,34 @@ class PoetryStudent implements MPoetryStudentsInterface
 //                }
 //            }
             return [$data, $data->first()->id_subject,];
+
+            }catch (\Exception $e){
+                return false;
+            }
+        }
+        public function GetStudentsResponse($id_poetry)
+        {
+            try {
+                $data = $this->model::where('id_poetry',$id_poetry)->get();
+                $excelData = [];
+                foreach ($data as $key => $item) {
+                    $Checktopic  = $item->playtopic->where('id_poetry',$id_poetry)->first();
+                    if ($Checktopic) {
+                        $resultCap = $Checktopic->resultCapacity->where('exam_id',$Checktopic->id_exam)->first();
+                        if(empty($resultCap)){
+                            continue;
+                        }
+                        $user = $Checktopic->userStudent;
+                        $excelData[] = [
+                            $key+1,
+                            $user->name,
+                            $user->email
+                            ,$user->mssv,
+                            $resultCap->scores,'Ca thi' . $id_poetry
+                        ];
+                    }
+                }
+                return $excelData;
 
 
         } catch (\Exception $e) {

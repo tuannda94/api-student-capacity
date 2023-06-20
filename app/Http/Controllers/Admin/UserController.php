@@ -24,6 +24,9 @@ use Spatie\Permission\Models\Role;
 use App\Models\ResultCapacity;
 use App\Models\playtopic;
 use App\Services\Modules\MSemeter\Semeter;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 class UserController extends Controller
 {
     use TUploadImage, TCheckUserDrugTeam, TResponse;
@@ -106,16 +109,16 @@ class UserController extends Controller
         ]);
     }
 
-    public  function Listpoint($id){
+    public  function Listpoint($id,$id_poetry){
         $point = $this->playtopic->where('id_user', $id)->get();
         $user = DB::table('users')->find($id);
-        return view('pages.Students.accountStudent.viewpoint',['point' => $point,'user'=>$user]);
+        return view('pages.Students.accountStudent.viewpoint',['point' => $point,'user'=>$user,'id'=>$id,'id_poetry' => $id_poetry]);
     }
 
     public function Exportpoint($id_user){
         $point = $this->playtopic->where('id_user', $id_user)->get();
         $user = DB::table('users')->find($id_user);
-//        dd($user);
+        dd($user);
         $data = [];
         foreach($point as $key => $value){
             $resultCapacity = $value->userStudent->resultCapacity->where('exam_id',$value->id_exam)->first();
@@ -145,17 +148,39 @@ class UserController extends Controller
         $sheet->setCellValue('G1', 'Điểm');
         $sheet->setCellValue('H1', 'Thời gian bắt đầu');
         $sheet->setCellValue('I1', 'Thời gian kết thúc');
-
+        $borderStyle = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => '000000'],
+                ],
+            ],
+        ];
 
         $row = 2;
         $column = 1;
         foreach ($data as $recordata) {
             foreach ($recordata as $value) {
                 $sheet->setCellValueByColumnAndRow($column, $row, $value);
+                $sheet->getStyleByColumnAndRow($column, $row)->applyFromArray($borderStyle);
                 $column++;
             }
             $row++;
+            $column = 1;
         }
+        $sheet->getColumnDimension('A')->setWidth(15);
+        $sheet->getColumnDimension('B')->setWidth(20);
+        $sheet->getColumnDimension('C')->setWidth(15);
+        $sheet->getColumnDimension('D')->setWidth(15);
+        $sheet->getColumnDimension('E')->setWidth(10);
+        $sheet->getColumnDimension('F')->setWidth(10);
+        $sheet->getColumnDimension('G')->setWidth(10);
+        $sheet->getColumnDimension('H')->setWidth(25);
+        $sheet->getColumnDimension('I')->setWidth(25);
+        // Định dạng căn giữa và màu nền cho hàng tiêu đề
+        $sheet->getStyle('A1:I1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A1:I1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('DDDDDD');
+
         $writer = new Xlsx($spreadsheet);
         $outputFileName = 'diem_thi_cua_sinh_vien_'.$user->name.'_'.$user->mssv.'.xlsx';
         $writer->save($outputFileName);
