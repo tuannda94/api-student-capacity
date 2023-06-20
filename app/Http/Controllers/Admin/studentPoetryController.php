@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\poetry;
+use App\Models\subject;
 use App\Services\Traits\TResponse;
 use App\Services\Traits\TUploadImage;
 use Illuminate\Http\Request;
@@ -22,14 +24,16 @@ class studentPoetryController extends Controller
 
     public function __construct(
         private PoetryStudent $PoetryStudent,
-        private Exam          $exam
+        private Exam          $exam,
+        private poetry       $poetry,
     )
     {
     }
 
-    public function index($id,$id_poetry)
+    public function index($id, $id_poetry, $idBlock)
     {
-        [$liststudent, $id_subject] = $this->PoetryStudent->GetStudents($id);
+        $liststudent = $this->PoetryStudent->GetStudents($id);
+        $id_subject = $this->poetry->query()->where('id', $id)->first()->id_subject;
 //        if (!$liststudent) return abort(404);
         $examsList = $this->exam->getListExam($id_subject);
 //        dd($liststudent);
@@ -38,7 +42,8 @@ class studentPoetryController extends Controller
             'id' => $id,
             'id_subject' => $id_subject,
             'exams_list' => $examsList,
-            'id_poetry' => $id_poetry
+            'id_poetry' => $id_poetry,
+            'idBlock' => $idBlock
         ]);
     }
 
@@ -51,7 +56,8 @@ class studentPoetryController extends Controller
         ]);
     }
 
-    public function UserExportpoint($id){
+    public function UserExportpoint($id)
+    {
         $liststudent = $this->PoetryStudent->GetStudentsResponse($id);
         $spreadsheet = new Spreadsheet();
 
@@ -76,7 +82,7 @@ class studentPoetryController extends Controller
         $row = 2;
         $column = 1;
         foreach ($liststudent as $recordata) {
-            foreach ($recordata as  $value) {
+            foreach ($recordata as $value) {
                 $sheet->setCellValueByColumnAndRow($column, $row, $value);
                 $sheet->getStyleByColumnAndRow($column, $row)->applyFromArray($borderStyle);
                 $column++;
@@ -97,13 +103,14 @@ class studentPoetryController extends Controller
         $sheet->getStyle('A1:F1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('DDDDDD');
 
         $writer = new Xlsx($spreadsheet);
-        $outputFileName = 'diem_thi_sinh_vien_ca_thi_'.$id.'.xlsx';
+        $outputFileName = 'diem_thi_sinh_vien_ca_thi_' . $id . '.xlsx';
         $writer->save($outputFileName);
-        return response()->download($outputFileName)->deleteFileAfterSend(true,$outputFileName);
+        return response()->download($outputFileName)->deleteFileAfterSend(true, $outputFileName);
     }
 
-    public function create(Request $request){
-        $validator =  Validator::make(
+    public function create(Request $request)
+    {
+        $validator = Validator::make(
             $request->all(),
             [
                 'emailStudent' => 'required',

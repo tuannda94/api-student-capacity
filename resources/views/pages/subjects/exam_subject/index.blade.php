@@ -10,7 +10,8 @@
             <div class="col-lg-12">
                 <div class=" d-flex justify-content-end">
                     <div>
-                        <a class=" btn btn-primary me-2" target="_blank" href="{{ route('admin.download.execel.pass') }}">
+                        <a class=" btn btn-primary me-2" target="_blank"
+                           href="{{ route('admin.download.execel.pass') }}">
                             <span class="svg-icon svg-icon-x svg-icon-primary   ">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                      fill="none">
@@ -35,80 +36,81 @@
                 <div class="table-responsive">
                     <table class="table table-row-dashed table-row-gray-300 gy-7">
                         <thead>
-                            <tr class="fw-bolder fs-6 text-gray-800">
-                                <th>#</th>
-                                <th>Tên</th>
-                                <th>Mô tả đề</th>
-                                <th>Cơ sở ra đề</th>
-                                <th>Số câu hỏi</th>
-                                <th>Tải lên bộ câu hỏi</th>
-{{--                                <th>Đề bài</th>--}}
-                                <th>Trạng thái </th>
-                                <th>Thao tác</th>
-                            </tr>
+                        <tr class="fw-bolder fs-6 text-gray-800">
+                            <th>#</th>
+                            <th>Tên</th>
+                            <th>Mô tả đề</th>
+                            <th>Cơ sở ra đề</th>
+                            <th>Số câu hỏi</th>
+                            <th>Tải lên bộ câu hỏi</th>
+                            {{--                                <th>Đề bài</th>--}}
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            @php
-                                $key = 1;
-                            @endphp
-                            @foreach ($exams as $exam)
-                                <tr>
-                                    <td>{{ $key++ }}</td>
+                        @php
+                            $key = 1;
+                        @endphp
+                        @foreach ($exams as $exam)
+                            <tr>
+                                <td>{{ $key++ }}</td>
 
-                                    <td>{{ $exam->name }}</td>
+                                <td>{{ $exam->name }}</td>
 
-                                    <td>
-                                        <button class="btn  btn-primary btn-sm" type="button" data-bs-toggle="modal"
+                                <td>
+                                    <button class="btn  btn-primary btn-sm" type="button" data-bs-toggle="modal"
                                             data-bs-target="#exampleModal_{{ $exam->id }}">
-                                            Xem Thêm
-                                        </button>
-                                        <!-- Modal -->
-                                        <div style="margin: auto; display: none;" class="modal fade"
-                                            id="exampleModal_{{ $exam->id }}" tabindex="-1"
-                                            aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLabel">
-                                                            Mô tả đề thi
-                                                        </h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        Xem Thêm
+                                    </button>
+                                    <!-- Modal -->
+                                    <div style="margin: auto; display: none;" class="modal fade"
+                                         id="exampleModal_{{ $exam->id }}" tabindex="-1"
+                                         aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">
+                                                        Mô tả đề thi
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body  ">
-                                                        {{ $exam->description }}
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary"
+                                                </div>
+                                                <div class="modal-body  ">
+                                                    {{ $exam->description }}
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
                                                             data-bs-dismiss="modal">Thoát
-                                                        </button>
-                                                    </div>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
 
-                                    </td>
+                                </td>
 
-                                    <td>{{ $exam->campus->name }}</td>
-                                    <td>{{ $exam->total_questions }}</td>
-                                    <td data-bs-toggle="tooltip"
-                                        title="Tải lên bộ câu hỏi bằng excel">
-                                        <button
-                                            style="background: #ccc;
+                                <td>{{ $exam->campus->name }}</td>
+                                <td>{{ $exam->total_questions }}</td>
+                                <td data-bs-toggle="tooltip"
+                                    title="Tải lên bộ câu hỏi bằng excel">
+                                    <button
+                                        style="background: #ccc;
                                                                                                                     padding: 1vh 1vh 1vh 2vh;
                                                                                                                     border-radius: 20px;"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#kt_modal_exc_{{ $exam->id }}"
-                                            type="button"
-                                            class="btn   me-3"
-                                            id="kt_file_manager_new_folder">
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#kt_modal_exc_{{ $exam->id }}"
+                                        type="button"
+                                        class="btn   me-3"
+                                        id="kt_file_manager_new_folder">
                                                                                             <span
                                                                                                 class="svg-icon svg-icon-2">
-                                                                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                                                                     width="24"
-                                                                                                     height="24"
-                                                                                                     viewBox="0 0 24 24"
-                                                                                                     fill="none">
+                                                                                                <svg
+                                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                                    width="24"
+                                                                                                    height="24"
+                                                                                                    viewBox="0 0 24 24"
+                                                                                                    fill="none">
                                                                                                     <path opacity="0.3"
                                                                                                           d="M10 4H21C21.6 4 22 4.4 22 5V7H10V4Z"
                                                                                                           fill="black">
@@ -123,112 +125,114 @@
                                                                                                     </path>
                                                                                                 </svg>
                                                                                             </span>
-                                        </button>
+                                    </button>
 
-                                    </td>
-{{--                                    <td>--}}
-{{--                                        --}}{{-- <a href="{{ Storage::disk('s3')->temporaryUrl($exam->external_url, now()->addHour(), [--}}
-{{--                                            'ResponseContentDisposition' => 'attachment',--}}
-{{--                                        ]) }}"--}}
-{{--                                            class=" btn btn-success btn-sm">Tải--}}
-{{--                                            xuống</a>   --}}
+                                </td>
+                                {{--                                    <td>--}}
+                                {{--                                        --}}{{-- <a href="{{ Storage::disk('s3')->temporaryUrl($exam->external_url, now()->addHour(), [--}}
+                                {{--                                            'ResponseContentDisposition' => 'attachment',--}}
+                                {{--                                        ]) }}"--}}
+                                {{--                                            class=" btn btn-success btn-sm">Tải--}}
+                                {{--                                            xuống</a>   --}}
 
-{{--                                        <button data-id="{{ $exam->id }}"--}}
-{{--                                            data-external_url="{{ route('dowload.file') . '?url=' . $exam->external_url }}"--}}
-{{--                                            type="button" class="download_file btn btn-success btn-sm">Tải xuống</button>--}}
-{{--                                    </td>--}}
-                                    <td>
-                                        @hasanyrole('admin|super admin')
-                                            <div class="form-check form-switch">
-                                                <input value="{{ $exam->status }}" data-id="{{ $exam->id }}"
-                                                    class="form-select-status form-check-input" @checked($exam->status == 1)
-                                                    type="checkbox" role="switch">
-                                            </div>
-                                        @else
-                                             <div class="form-check form-switch">
-                                                <input value="{{ $exam->status }}" data-id="{{ $exam->id }}"
-                                                    class="form-check-input" @checked($exam->status == 1) type="checkbox"
-                                                    disabled role="switch">
-                                            </div>
+                                {{--                                        <button data-id="{{ $exam->id }}"--}}
+                                {{--                                            data-external_url="{{ route('dowload.file') . '?url=' . $exam->external_url }}"--}}
+                                {{--                                            type="button" class="download_file btn btn-success btn-sm">Tải xuống</button>--}}
+                                {{--                                    </td>--}}
+                                <td>
+                                    @hasanyrole('admin|super admin')
+                                    <div class="form-check form-switch">
+                                        <input value="{{ $exam->status }}" data-id="{{ $exam->id }}"
+                                               class="form-select-status form-check-input" @checked($exam->status == 1)
+                                               type="checkbox" role="switch">
+                                    </div>
+                                    @else
+                                        <div class="form-check form-switch">
+                                            <input value="{{ $exam->status }}" data-id="{{ $exam->id }}"
+                                                   class="form-check-input" @checked($exam->status == 1) type="checkbox"
+                                                   disabled role="switch">
+                                        </div>
                                         @endhasrole
 
-                                    </td>
-                                    <td>
-                                       <div class="d-flex justify-content-between">
-                                           <button type="button" class="btn btn-info btn-question" onclick="location.href='{{ route('admin.subject.question.index',$exam->id) }}'" >
-                                               Câu Hỏi
-                                           </button>
-                                           <button
-                                               data-href=""
-                                               data-date_time="{{ $name->created_at  }}"
-                                               class="edit_exam btn btn-primary btn-sm">
-                                               Chỉnh sửa đề
-                                           </button>
-                                       </div>
-                                    </td>
-                                </tr>
-                                <div class="modal fade" tabindex="-1"
-                                     id="kt_modal_exc_{{ $exam->id }}">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">
-                                                    Tải lên
-                                                    excel
-                                                    <strong>{{ $exam->name }}</strong>
-                                                </h5>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-between">
+                                        <button type="button" class="btn btn-info btn-question"
+                                                onclick="location.href='{{ route('admin.subject.question.index',$exam->id) }}'">
+                                            Câu Hỏi
+                                        </button>
+                                        <button
+                                            data-href=""
+                                            data-date_time="{{ $name->created_at  }}"
+                                            class="edit_exam btn btn-primary btn-sm">
+                                            Chỉnh sửa đề
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <div class="modal fade" tabindex="-1"
+                                 id="kt_modal_exc_{{ $exam->id }}">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">
+                                                Tải lên
+                                                excel
+                                                <strong>{{ $exam->name }}</strong>
+                                            </h5>
 
-                                                <!--begin::Close-->
-                                                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2"
-                                                     data-bs-dismiss="modal" aria-label="Close">
-                                                    <span class="svg-icon svg-icon-2x"></span>
-                                                    Thoát
-                                                </div>
-                                                <!--end::Close-->
+                                            <!--begin::Close-->
+                                            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2"
+                                                 data-bs-dismiss="modal" aria-label="Close">
+                                                <span class="svg-icon svg-icon-2x"></span>
+                                                Thoát
                                             </div>
-                                            <form class="form-submit"
-                                                  action="{{ route('admin.question.excel.import.exam', ['exam' => $exam->id]) }}"
-                                                  method="POST" enctype="multipart/form-data">
-                                                @csrf
-                                                <div class="modal-body text-center">
-                                                    <div class="HDSD">
-                                                    </div>
-                                                    <label for="up-file{{ $exam->id }}"
-                                                           class="">
-                                                        <i data-bs-toggle="tooltip"
-                                                           title="Click để upload file"
-                                                           style="font-size: 100px;"
-                                                           role="button"
-                                                           class="bi bi-cloud-plus-fill"></i>
-                                                    </label>
-                                                    <input style="display: none" type="file"
-                                                           name="ex_file" class="up-file"
-                                                           id="up-file{{ $exam->id }}">
-                                                    <div style="display: none"
-                                                         class="progress show-p mt-3 h-25px w-100">
-                                                        <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated"
-                                                             role="progressbar" style="width: 0%"
-                                                             aria-valuenow="0" aria-valuemin="0"
-                                                             aria-valuemax="100">
-                                                        </div>
-                                                    </div>
-                                                    <p class="show-name">
-                                                    </p>
-                                                    <p class="text-danger error_ex_file">
-                                                    </p>
-                                                </div>
-
-                                                <div class="modal-footer">
-                                                    <button type="submit"
-                                                            class="upload-file btn btn-primary">Tải
-                                                        lên
-                                                    </button>
-                                                </div>
-                                            </form>
+                                            <!--end::Close-->
                                         </div>
+                                        <form class="form-submit"
+                                              action="{{ route('admin.question.excel.import.exam', ['exam' => $exam->id]) }}"
+                                              method="POST" enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="modal-body text-center">
+                                                <div class="HDSD">
+                                                </div>
+                                                <label for="up-file{{ $exam->id }}"
+                                                       class="">
+                                                    <i data-bs-toggle="tooltip"
+                                                       title="Click để upload file"
+                                                       style="font-size: 100px;"
+                                                       role="button"
+                                                       class="bi bi-cloud-plus-fill"></i>
+                                                </label>
+                                                <input style="display: none" type="file"
+                                                       name="ex_file" class="up-file"
+                                                       id="up-file{{ $exam->id }}">
+                                                <div style="display: none"
+                                                     class="progress show-p mt-3 h-25px w-100">
+                                                    <div
+                                                        class="progress-bar bg-primary progress-bar-striped progress-bar-animated"
+                                                        role="progressbar" style="width: 0%"
+                                                        aria-valuenow="0" aria-valuemin="0"
+                                                        aria-valuemax="100">
+                                                    </div>
+                                                </div>
+                                                <p class="show-name">
+                                                </p>
+                                                <p class="text-danger error_ex_file">
+                                                </p>
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="submit"
+                                                        class="upload-file btn btn-primary">Tải
+                                                    lên
+                                                </button>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
-                            @endforeach
+                            </div>
+                        @endforeach
                         </tbody>
                     </table>
                     <div class="modal fade" tabindex="-1" id="show_question" style="display: none;" aria-hidden="true">
@@ -236,7 +240,8 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h1 class="modal-title fs-5" id="exampleModalLabel">Bộ Câu hỏi</h1>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
                                     <table class="table">
@@ -253,20 +258,28 @@
                                         <tr>
                                             <td>1</td>
                                             <td>
-                                                <a data-bs-toggle="collapse" href="#multiCollapseExample0" role="button" class="mb-3 collapsed" aria-expanded="false" aria-controls="multiCollapseExample0">
-                                                    Add a note about this part of the document <br>   <span style="background: #ccc ; color : white ; padding : 5px ; margin : 1px"> Không có skill </span>
+                                                <a data-bs-toggle="collapse" href="#multiCollapseExample0" role="button"
+                                                   class="mb-3 collapsed" aria-expanded="false"
+                                                   aria-controls="multiCollapseExample0">
+                                                    Add a note about this part of the document <br> <span
+                                                        style="background: #ccc ; color : white ; padding : 5px ; margin : 1px"> Không có skill </span>
                                                 </a>
 
-                                                <div class="multi-collapse collapse" id="multiCollapseExample0" style="">
+                                                <div class="multi-collapse collapse" id="multiCollapseExample0"
+                                                     style="">
                                                     <div class="card card-body">
 
-                                                        <p> Click Power Point / Tabs Review / Group Comment/ New Comment  <strong>- Đáp án đúng </strong>  </p>
+                                                        <p> Click Power Point / Tabs Review / Group Comment/ New Comment
+                                                            <strong>- Đáp án đúng </strong></p>
 
-                                                        <p> Click Power Point / Tabs View / Group Comment/ New Comment  </p>
+                                                        <p> Click Power Point / Tabs View / Group Comment/ New
+                                                            Comment </p>
 
-                                                        <p> Click Power Point / Tabs Insert / Group Comment/ New Comment  </p>
+                                                        <p> Click Power Point / Tabs Insert / Group Comment/ New
+                                                            Comment </p>
 
-                                                        <p> Click Power Point / Tabs Home / Group Comment/ New Comment  </p>
+                                                        <p> Click Power Point / Tabs Home / Group Comment/ New
+                                                            Comment </p>
 
                                                     </div>
                                                 </div>
@@ -284,7 +297,8 @@
                                     </table>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -310,7 +324,7 @@
     <script>
         const btnQuestion = document.querySelectorAll('.btn-question');
         for (const btnQuestionElement of btnQuestion) {
-            btnQuestionElement.addEventListener('click',(e)=>{
+            btnQuestionElement.addEventListener('click', (e) => {
                 let id = e.target.getAttribute('data-id');
 
             })
@@ -318,33 +332,39 @@
     </script>
     <script src="assets/js/system/capacity/main.js"></script>
     <script>
-        $(document).ready(function() {
-            $('.up-file').on("change", function() {
+        $(document).ready(function () {
+            $('.up-file').on("change", function () {
                 $('.show-name').html($(this)[0].files[0].name);
             })
             $('.form-submit').ajaxForm({
-                beforeSend: function() {
+                beforeSend: function () {
                     $(".error_ex_file").html("");
                     $(".upload-file").html("Đang tải dữ liệu ..")
                     $(".progress").show();
                     var percentage = '0';
                 },
-                uploadProgress: function(event, position, total, percentComplete) {
+                uploadProgress: function (event, position, total, percentComplete) {
                     var percentage = percentComplete;
-                    $('.progress .progress-bar').css("width", percentage + '%', function() {
+                    $('.progress .progress-bar').css("width", percentage + '%', function () {
                         return $(this).attr("aria-valuenow", percentage) + "%";
                     })
                 },
-                success: function() {
+                success: function () {
                     $(".progress").hide();
                     $(".upload-file").html("Tải lên")
                     toastr.success("Tải lên thành công !");
                     $('.up-file').val('');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                    setTimeout(() => {
+                        $('.modal').modal('hide');
+                    }, 500);
                     // window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     $(".upload-file").html("Tải lên")
-                    $('.progress .progress-bar').css("width", 0 + '%', function() {
+                    $('.progress .progress-bar').css("width", 0 + '%', function () {
                         return $(this).attr("aria-valuenow", 0) + "%";
                     })
                     $(".progress").hide();

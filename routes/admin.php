@@ -189,6 +189,7 @@ Route::prefix('semeter')->group(function () {
     Route::put('update/{id}', [SemeterController::class, 'update'])->name('admin.semeter.update');
     Route::delete('delete/{id}', [SemeterController::class, 'delete'])->name('admin.semeter.delete');
     Route::put('now-status/{id}', [SemeterController::class, 'now_status'])->name('admin.semeter.un.status');
+    Route::get('block/{id}', [BlockController::class, 'block'])->name('admin.semeter.block');
     Route::prefix('subject')->group(function () {
         Route::get('/{id}', [subjectController::class, 'setemer'])->name('admin.semeter.subject.index');
         Route::group([
@@ -213,7 +214,7 @@ Route::prefix('accountStudent')->group(function () {
 });
 //Ca học =>done
 Route::prefix('poetry')->group(function () {
-    Route::get('/{id}', [PoetryController::class, 'index'])->name('admin.poetry.index');
+    Route::get('/{id}/{id_block}', [PoetryController::class, 'index'])->name('admin.poetry.index');
     Route::post('form-add-poetry', [PoetryController::class, 'create'])->name('admin.poetry.create');
     Route::put('now-status/{id}', [PoetryController::class, 'now_status'])->name('admin.poetry.un.status');
     Route::delete('delete/{id}', [PoetryController::class, 'delete'])->name('admin.poetry.delete');
@@ -222,7 +223,7 @@ Route::prefix('poetry')->group(function () {
 //    call lai route bên hoc ky
     Route::get('getsubject/{id}', [subjectController::class, 'getsemeter'])->name('admin.poetry.subject.index');
     Route::prefix('manage')->group(function () {
-        Route::get('/{id}/{id_poetry}', [studentPoetryController::class, 'index'])->name('admin.poetry.manage.index');
+        Route::get('/{id}/{id_poetry}/{id_block}', [studentPoetryController::class, 'index'])->name('admin.poetry.manage.index');
         Route::post('/form-add-student', [studentPoetryController::class, 'create'])->name('admin.poetry.manage.create');
         Route::put('now-status/{id}', [studentPoetryController::class, 'now_status'])->name('admin.poetry.un.status');
         Route::delete('delete/{id}', [studentPoetryController::class, 'delete'])->name('admin.poetry.delete');
@@ -248,6 +249,9 @@ Route::group([
 
     Route::prefix('acount')->group(function () {
         Route::get('', [UserController::class, 'listAdmin'])->name('admin.acount.list');
+        Route::post('add-account', [UserController::class, 'create'])->name('admin.acount.add');
+        Route::get('edit/{id}', [UserController::class, 'edit'])->name('admin.acount.edit');
+        Route::put('update/{id}', [UserController::class, 'update'])->name('admin.acount.update');
 //        Route::post('un-status/{id}', [UserController::class, 'un_status'])->name('admin.acount.un.status');
 //        Route::post('re-status/{id}', [UserController::class, 're_status'])->name('admin.acount.re.status');
 //        Route::post('change-role', [UserController::class, 'changeRole'])->name('admin.acount.change.role');
@@ -293,7 +297,7 @@ Route::group([
 
         Route::post('import', [QuestionController::class, 'import'])->name('admin.question.excel.import');
         Route::post('import/{exam}', [QuestionController::class, 'importAndRunExam'])->name('admin.question.excel.import.exam');
-        Route::post('importEx/{semeter}', [QuestionController::class, 'importAndRunSemeter'])->name('admin.semeter.excel.import');
+        Route::post('importEx/{semeter}/{idBlock}', [QuestionController::class, 'importAndRunSemeter'])->name('admin.semeter.excel.import');
         Route::get('export', [QuestionController::class, 'exportQe'])->name('admin.question.excel.export');
 
 

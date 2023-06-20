@@ -86,8 +86,17 @@ class SemeterController extends Controller
             'updated_at' => NULL
         ];
 
+
         DB::table('semester')->insert($data);
         $id = DB::getPdo()->lastInsertId();
+        $Blocks = [];
+        for ($i = 0; $i < 2;$i++){
+            $Blocks[] = [
+                'name' => 'Block ' .$i+1,
+                'id_semeter' => $id,
+            ];
+        }
+        DB::table('block_semeter')->insert($Blocks);
         $data = $request->all();
         $data['id'] = $id;
         return response( ['message' => "Thêm thành công",'data' =>$data],200);
