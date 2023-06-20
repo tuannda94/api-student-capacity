@@ -148,7 +148,7 @@
                                         {{ trim($value->exam_name) === "" ? "Chưa có đề thi" : $value->exam_name }}
                                     </td>
                                     <td>
-                                        {{ trim($value->exam_time) === "" ? "Chưa có thời gian" : $value->exam_time . "phút" }}
+                                        {{ trim($value->exam_time) === "" ? "Chưa có thời gian" : $value->exam_time . " phút" }}
                                     </td>
                                     <td class="text-end">
                                         <a href="#" class="btn btn-light btn-active-light-primary btn-sm"
