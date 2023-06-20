@@ -31,17 +31,20 @@ Breadcrumbs::for('Management.subject', function (BreadcrumbTrail $trail,$id) {
     $trail->parent('Semeter');
     $trail->push('Quản lí môn học' , route('admin.semeter.subject.index',$id));
 });
-
-// Học Kỳ > Quản lí ca thi
-Breadcrumbs::for('Management.poetry', function (BreadcrumbTrail $trail,$id) {
+// Học Kỳ > Blocks
+Breadcrumbs::for('Management.block', function (BreadcrumbTrail $trail,$id_semeter) {
     $trail->parent('Semeter');
-    $trail->push('Quản lí ca thi' , route('admin.poetry.index',$id));
+    $trail->push('Blocks' , route('admin.semeter.block',$id_semeter));
+});
+// Học Kỳ > Blocks > Quản lí ca thi
+Breadcrumbs::for('Management.poetry', function (BreadcrumbTrail $trail,$id,$idblock) {
+    $trail->parent('Management.block',$id);
+    $trail->push('Quản lí ca thi' , route('admin.poetry.index',['id' => $id,'id_block' => $idblock]));
 });
 
 // Học Kỳ > Quản lí ca thi > Danh sách ca thi
 Breadcrumbs::for('manageSemeter', function (BreadcrumbTrail $trail,$args) {
-
-    $trail->parent('Management.poetry',$args['id_poetry']);
+    $trail->parent('Management.poetry',$args['id_poetry'],$args['id_block']);
     $trail->push('Danh sách ca thi' , route('admin.poetry.manage.index',$args));
 });
 

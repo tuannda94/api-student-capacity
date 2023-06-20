@@ -24,12 +24,13 @@ class studentPoetryController extends Controller
     {
     }
 
-    public function index($id,$id_poetry){
+    public function index($id,$id_poetry,$idBlock){
         if (!($liststudent = $this->PoetryStudent->GetStudents($id))) return abort(404);
         return view('pages.poetry.students.index',[
             'student' => $liststudent,
             'id' => $id,
-            'id_poetry' => $id_poetry
+            'id_poetry' => $id_poetry,
+            'idBlock' => $idBlock
         ]);
     }
 

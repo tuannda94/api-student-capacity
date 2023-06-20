@@ -10,9 +10,13 @@ class poetry implements MPoetryInterface
     {
     }
 
-    public function ListPoetry($id){
+    public function ListPoetry($id,$idblock){
         try {
-            return $this->modelPoetry->where('id_semeter',$id)->paginate(10);
+            $records = $this->modelPoetry->where('id_semeter',$id)
+                ->whereHas('subject',function($q) use ($idblock){
+                    $q->where('id_block',$idblock);
+                })->paginate(10);
+            return $records;
         }catch (\Exception $e) {
             return false;
         }

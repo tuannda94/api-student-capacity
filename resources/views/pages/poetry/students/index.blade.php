@@ -43,7 +43,7 @@
         <div id="kt_content_container" class="container-xxl">
             <!--begin::Row-->
             <div class="mb-5">
-                {{ Breadcrumbs::render('manageSemeter',['id' => $id,'id_poetry' => $id_poetry]) }}
+                {{ Breadcrumbs::render('manageSemeter',['id' => $id,'id_poetry' => $id_poetry,'id_block' => $idBlock]) }}
             </div>
             <div class="card card-flush p-4">
                 <div class="row">

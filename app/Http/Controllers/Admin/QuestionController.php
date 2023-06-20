@@ -478,10 +478,10 @@ class QuestionController extends Controller
             ], 400);
         }
     }
-    public function importAndRunSemeter(ImportQuestion $request, $semeter_id)
+    public function importAndRunSemeter(ImportQuestion $request, $semeter_id,$idBlock)
     {
         try {
-            $this->readExClass($request->ex_file, $semeter_id);
+            $this->readExClass($request->ex_file, $semeter_id,$idBlock);
 //            $import = new QuestionsImport($exam_id);
 //            Excel::import($import, $request->ex_file);
 //            dd();
@@ -489,7 +489,7 @@ class QuestionController extends Controller
 //                "status" => true,
 //                "payload" => "Thành công "
 //            ]);
-            return redirect()->route('admin.poetry.index',$semeter_id);
+            return redirect()->route('admin.poetry.index',['id' => $semeter_id,'id_block' => $idBlock]);
 
         } catch (\Throwable $th) {
             return response()->json([
@@ -686,7 +686,7 @@ class QuestionController extends Controller
         $exams->save();
     }
 
-    public function readExClass($file, $id_semeter)
+    public function readExClass($file, $id_semeter,$idBlock)
     {
         $spreadsheet = IOFactory::load($file);
         $sheetCount = $spreadsheet->getSheetCount();
@@ -706,7 +706,8 @@ class QuestionController extends Controller
                         'status' => 1,
                         'created_at' => now(),
                         'updated_at' => NULL,
-                        'code_subject' =>  $value[4]
+                        'code_subject' =>  $value[4],
+                        'id_block' => $idBlock
                     ]
                 );
 

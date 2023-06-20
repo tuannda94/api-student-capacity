@@ -20,4 +20,9 @@ class BlockController extends Controller
         $data = $this->block->getWhereList($id_semeter);
         return response()->json(['data' => $data], 200);
     }
+
+    public function block($id_semeter){
+        $data = $this->block->getWhereList($id_semeter);
+        return view('pages.blocks.index',['data' => $data,'id' => $id_semeter]);
+    }
 }

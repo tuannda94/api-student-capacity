@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Contest;
 use App\Models\User;
+use App\Models\modelroles;
 use App\Services\Modules\MContest\MContestInterface;
 use App\Services\Modules\MUser\MUserInterface;
 use App\Services\Traits\TCheckUserDrugTeam;
@@ -27,6 +28,8 @@ use App\Services\Modules\MSemeter\Semeter;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use App\Models\branches;
+use App\Models\Campus;
 class UserController extends Controller
 {
     use TUploadImage, TCheckUserDrugTeam, TResponse;
@@ -39,7 +42,9 @@ class UserController extends Controller
         private Role $role,
         private ResultCapacity $resultCap,
         private playtopic $playtopic,
-        private Semeter $interfaceSemeter
+        private Semeter $interfaceSemeter,
+        private branches $branches,
+        private Campus $campus
     ) {
     }
 
@@ -209,6 +214,9 @@ class UserController extends Controller
                 ->sort(request('sort') == 'asc' ? 'asc' : 'desc', request('sort_by') ?? null, 'users')
                 ->search(request('q') ?? null, ['name', 'email'])
                 ->has_role(request('role') ?? null)
+                ->whereDoesntHave('roles', function ($query) {
+                    $query->where('name', 'student');
+                })
                 ->paginate(request('limit') ?? $limit);
 
             return $users;
@@ -259,6 +267,120 @@ class UserController extends Controller
             200
         );
     }
+
+    public function create(Request $request){
+        $validator =  Validator::make(
+            $request->all(),
+            [
+                'name_add' => 'required',
+                'email_add' => 'required|unique:users,email',
+                'branches_id' => 'required',
+                'campus_id' => 'required',
+                'status' => 'required',
+                'roles_id' => 'required'
+            ],
+            [
+                'name_add.required' => 'Không để trống tên tài khoản!',
+                'email_add.required' => 'Không để trống email!',
+                'email_add.unique' => 'Email này đã tồn tại',
+                'branches_id.required' => 'Vui lòng chọn Chi nhánh!',
+                'campus_id.required' => 'Vui lòng chọn cơ sở!',
+                'roles_id.required' => 'Vui lòng chọn chức vụ cho tài khoản!',
+                'status.required' => 'Vui lòng chọn trạng thái!'
+            ]
+        );
+
+        if($validator->fails() == 1){
+            $errors = $validator->errors();
+            $fields = ['name_add','email_add','branches_id','campus_id','roles_id','status'];
+            foreach ($fields as $field) {
+                $fieldErrors = $errors->get($field);
+
+                if ($fieldErrors) {
+                    foreach ($fieldErrors as $error) {
+                        return response($error,404);
+                    }
+                }
+            }
+
+        }
+        $data =  [
+            'name' => $request->name_add,
+            'email' => $request->email_add,
+            'avatar' => NULL,
+            'status' => $request->status,
+            'mssv' => NULL,
+            'branch_id' =>  $request->branches_id,
+            'campus_code' =>  $request->campus_id
+        ];
+        DB::table('users')->insert($data);
+        $id = DB::getPdo()->lastInsertId();
+        DB::table('model_has_roles')->insert(
+            [
+                'role_id' => $request->roles_id,
+                'model_type' => 'App\Models\User',
+                'model_id' => $id
+            ]
+        );
+        return response( ['message' => "Thành công <br>Vui lòng chờ 5s để làm mới dữ liệu",'data' => $data],200);
+    }
+    public function update(Request $request,$id){
+        $validator =  Validator::make(
+            $request->all(),
+            [
+                'name_update' => 'required',
+                'email_update' => 'required',
+                'branches_id_update' => 'required',
+                'campus_id_update' => 'required',
+                'status_update_update' => 'required',
+                'roles_id_update' => 'required'
+            ],
+            [
+                'name_update.required' => 'Không để trống tên tài khoản!',
+                'email_update.required' => 'Không để trống email!',
+                'branches_id_update.required' => 'Vui lòng chọn Chi nhánh!',
+                'campus_id_update.required' => 'Vui lòng chọn cơ sở!',
+                'roles_id_update.required' => 'Vui lòng chọn chức vụ cho tài khoản!',
+                'status_update_update.required' => 'Vui lòng chọn trạng thái!'
+            ]
+        );
+
+        if($validator->fails() == 1){
+            $errors = $validator->errors();
+            $fields = ['name_update','email_update','branches_id_update','campus_id_update','roles_id_update','status_update_update'];
+            foreach ($fields as $field) {
+                $fieldErrors = $errors->get($field);
+
+                if ($fieldErrors) {
+                    foreach ($fieldErrors as $error) {
+                        return response($error,404);
+                    }
+                }
+            }
+
+        }
+        $user = User::find($id);
+        $user->name = $request->name_update;
+        $user->email = $request->email_update;
+        $user->status = $request->status_update_update;
+        $user->branch_id = $request->branches_id_update;
+        $user->campus_code = $request->campus_id_update;
+        $user->save();
+
+        $role = modelroles::where('model_id',$id)->update(['role_id' => $request->roles_id_update]);;
+        return response( ['message' => "Thành công <br>Vui lòng chờ 5s để làm mới dữ liệu"],200);
+    }
+    public function edit($id){
+        try{
+            $user = User::find($id);
+            return response()->json([
+                'message' => "Thành công",
+                'data' => $user,
+            ],200);
+        }catch (\Throwable $th){
+            return response( ['message' => "Thêm thất bại"],404);
+        }
+    }
     public function listStudent()
     {
         $listSemeter = $this->interfaceSemeter->GetSemeter();
@@ -267,8 +389,10 @@ class UserController extends Controller
     public function listAdmin()
     {
         if (!$users = $this->getUser()) return abort(404);
+        $branches = $this->branches::all();
         $roles =  $this->role::all();
-        return view('pages.auth.index', ['users' => $users, 'roles' => $roles]);
+        $Campus = $this->campus::all();
+        return view('pages.auth.index', ['users' => $users, 'roles' => $roles,'branches' => $branches,'campus'=> $Campus]);
     }
 
     public function stdManagement(){
