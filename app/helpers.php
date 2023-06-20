@@ -2,7 +2,7 @@
 if (!function_exists('renderQuesAndAns')) {
     function renderQuesAndAns($text, $imageCodeArr = [])
     {
-        $regImageCode = '/\[anh\d\]/';
+        $regImageCode = '/\[anh\d+\]/';
 //        $text = 'Hjhj [anh1] [anh5]';
         preg_match_all($regImageCode, $text, $matches);
         $imgCodeColArr = array_column($imageCodeArr, 'img_code');
