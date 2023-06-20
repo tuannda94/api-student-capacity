@@ -123,7 +123,7 @@ class UserController extends Controller
     public function Exportpoint($id_user){
         $point = $this->playtopic->where('id_user', $id_user)->get();
         $user = DB::table('users')->find($id_user);
-        dd($user);
+//        dd($user);
         $data = [];
         foreach($point as $key => $value){
             $resultCapacity = $value->userStudent->resultCapacity->where('exam_id',$value->id_exam)->first();
