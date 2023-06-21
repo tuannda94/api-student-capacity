@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\poetry;
 use App\Models\subject;
+use App\Models\User;
 use App\Services\Traits\TResponse;
 use App\Services\Traits\TUploadImage;
 use Illuminate\Http\Request;
@@ -25,7 +26,7 @@ class studentPoetryController extends Controller
     public function __construct(
         private PoetryStudent $PoetryStudent,
         private Exam          $exam,
-        private poetry       $poetry,
+        private poetry        $poetry,
     )
     {
     }
@@ -136,32 +137,50 @@ class studentPoetryController extends Controller
             }
 
         }
-        $data = null;
-        foreach ($request->emailStudent as $value) {
-            $data[] = $this->PoetryStudent->findUser($value, $request->id_poetry);
+        $id_poetry = $request->id_poetry;
+//        $data = null;
+        $studentsQuery = User::query()
+            ->with('poetry_student')
+            ->select(['id', 'email'])
+            ->whereIn('email', $request->emailStudent)
+            ->whereHas('roles', function ($query) {
+                $query->where('id', config('util.STUDENT_ROLE'));
+            })
+            ->whereDoesntHave('poetry_student', function ($query) use ($id_poetry) {
+                $query->where('id_poetry', $id_poetry);
+            });
+        if (!auth()->user()->hasRole('super admin')) {
+            $studentsQuery->where('campus_code', auth()->user()->campus_code);
         }
-        $errors = 0;
-        $data = array_filter($data, function ($item) use (&$errors) {
-            if (!is_object($item)) {
-                $errors++;
-            }
-            return is_object($item);
-        });
+        $students = $studentsQuery->get();
+        $emailFiltered = $students->pluck('email')->toArray();
+        $userSuccessCount = count($emailFiltered);
+        $userFailedCount = count(array_diff($request->emailStudent, $emailFiltered));
+//        foreach ($request->emailStudent as $value) {
+//            $data[] = $this->PoetryStudent->findUser($value, $request->id_poetry);
+//        }
+//        $errors = 0;
+//        $data = array_filter($data, function ($item) use (&$errors) {
+//            if (!is_object($item)) {
+//                $errors++;
+//            }
+//            return is_object($item);
+//        });
 
 
-        $success = 0;
-        foreach ($data as $object) {
+        $dataInsertArr = [];
+        foreach ($students as $object) {
             $dataInsert = [
-                'id_poetry' => $request->id_poetry,
+                'id_poetry' => $id_poetry,
                 'id_student' => $object->id,
                 'status' => $request->status,
                 'created_at' => now(),
                 'updated_at' => null
             ];
-            DB::table('student_poetry')->insert($dataInsert);
-            $success++;
+            $dataInsertArr[] = $dataInsert;
         }
-        return response(['message' => "Thành công " . $success . '<br> Thất bại ' . $errors . '<br>Vui lòng chờ 5s để làm mới dữ liệu', 'data' => $data], 200);
+        DB::table('student_poetry')->insert($dataInsertArr);
+        return response(['message' => "Thành công " . $userSuccessCount . '<br> Thất bại ' . $userFailedCount . '<br>Vui lòng chờ 5s để làm mới dữ liệu', 'data' => $students], 200);
     }
 
     public function now_status(Request $request, $id)

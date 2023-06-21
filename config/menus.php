@@ -1,4 +1,5 @@
 <?php
+$ROLE_SUPER_ADMIN = 'super admin';
 $ROLE_HAS_ADMINS = 'admin|super admin';
 $ROLE_JUDGE = 'admin|super admin|judge|teacher';
 $TYPE_CAPACITY = 1;
@@ -42,7 +43,7 @@ return [
                 "name" => "Quản lí cơ sở ",
                 "param" => '',
                 "link" => "admin.basis.list",
-                "role" => $ROLE_HAS_ADMINS
+                "role" => $ROLE_SUPER_ADMIN
             ],
         ]
     ], // Test nang luc

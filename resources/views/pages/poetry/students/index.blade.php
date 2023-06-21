@@ -479,8 +479,8 @@
                 data: dataAll,
                 success: (response) => {
                     console.log(response)
-                    $('#form-submit')[0].reset();
-                    emailList = [];
+                    // $('#form-submit')[0].reset();
+                    // emailList = [];
                     notify(response.message);
                     $('#kt_modal_1').modal('hide');
                     setTimeout(function () {

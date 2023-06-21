@@ -266,14 +266,23 @@ class UserController extends Controller
     {
         try {
             $limit = 10;
-            $users = $this->modeluser::status(request('status') ?? null)
+            $usersQuery = $this->modeluser::status(request('status') ?? null)
                 ->sort(request('sort') == 'asc' ? 'asc' : 'desc', request('sort_by') ?? null, 'users')
+                ->with('roles')
                 ->search(request('q') ?? null, ['name', 'email'])
                 ->has_role(request('role') ?? null)
+                ->where('id', '<>', auth()->user()->id)
                 ->whereDoesntHave('roles', function ($query) {
                     $query->where('name', 'student');
-                })
-                ->paginate(request('limit') ?? $limit);
+                });
+            if (!auth()->user()->hasRole('super admin')) {
+                $usersQuery
+                    ->where('campus_code', auth()->user()->campus_code)
+                    ->whereDoesntHave('roles', function ($query) {
+                        $query->where('name', 'super admin');
+                    });
+            }
+            $users = $usersQuery->paginate(request('limit') ?? $limit);
 
             return $users;
         } catch (\Throwable $e) {
@@ -336,7 +345,7 @@ class UserController extends Controller
                 'branches_id' => 'required',
                 'campus_id' => 'required',
                 'status' => 'required',
-                'roles_id' => 'required'
+                'roles_id' => 'required|numeric|min:1',
             ],
             [
                 'name_add.required' => 'Không để trống tên tài khoản!',
@@ -345,10 +354,10 @@ class UserController extends Controller
                 'branches_id.required' => 'Vui lòng chọn Chi nhánh!',
                 'campus_id.required' => 'Vui lòng chọn cơ sở!',
                 'roles_id.required' => 'Vui lòng chọn chức vụ cho tài khoản!',
-                'status.required' => 'Vui lòng chọn trạng thái!'
+                'status.required' => 'Vui lòng chọn trạng thái!',
+                'roles_id.min' => 'Vui lòng chọn chức vụ',
             ]
         );
-
         if ($validator->fails() == 1) {
             $errors = $validator->errors();
             $fields = ['name_add', 'email_add', 'branches_id', 'campus_id', 'roles_id', 'status'];
@@ -362,6 +371,14 @@ class UserController extends Controller
                 }
             }
 
+        }
+        if (!auth()->user()->hasRole('super admin')) {
+            if ($request->campus_id !== auth()->user()->campus_code) {
+                return response('Bạn không có quyền thêm tài khoản vào cơ sở này', 404);
+            }
+            if ($request->roles_id <= auth()->user()->roles[0]->id) {
+                return response('Bạn không có quyền thêm tài khoản với chức vụ ngang hoặc lớn hơn mình', 404);
+            }
         }
         $data = [
             'name' => $request->name_add,
@@ -394,7 +411,7 @@ class UserController extends Controller
                 'branches_id_update' => 'required',
                 'campus_id_update' => 'required',
                 'status_update_update' => 'required',
-                'roles_id_update' => 'required'
+                'roles_id_update' => 'required|numeric|min:1',
             ],
             [
                 'name_update.required' => 'Không để trống tên tài khoản!',
@@ -402,7 +419,8 @@ class UserController extends Controller
                 'branches_id_update.required' => 'Vui lòng chọn Chi nhánh!',
                 'campus_id_update.required' => 'Vui lòng chọn cơ sở!',
                 'roles_id_update.required' => 'Vui lòng chọn chức vụ cho tài khoản!',
-                'status_update_update.required' => 'Vui lòng chọn trạng thái!'
+                'status_update_update.required' => 'Vui lòng chọn trạng thái!',
+                'roles_id_update.min' => 'Vui lòng chọn chức vụ',
             ]
         );
 
@@ -419,6 +437,14 @@ class UserController extends Controller
                 }
             }
 
+        }
+        if (!auth()->user()->hasRole('super admin')) {
+            if ($request->campus_id_update !== auth()->user()->campus_code) {
+                return response('Bạn không có quyền thêm tài khoản vào cơ sở này', 404);
+            }
+            if ($request->roles_id_update <= auth()->user()->roles[0]->id) {
+                return response('Bạn không có quyền thêm tài khoản với chức vụ ngang hoặc lớn hơn mình', 404);
+            }
         }
         $user = User::find($id);
         $user->name = $request->name_update;
@@ -455,9 +481,18 @@ class UserController extends Controller
     {
         if (!$users = $this->getUser()) return abort(404);
         $branches = $this->branches::all();
-        $roles = $this->role::all();
-        $Campus = $this->campus::all();
-        return view('pages.auth.index', ['users' => $users, 'roles' => $roles, 'branches' => $branches, 'campus' => $Campus]);
+        $rolesModel = $this->role->query();
+        $CampusModel = $this->campus->query();
+        if (!auth()->user()->hasRole('super admin')) {
+            $rolesModel->where('id', '<>', config('util.SUPER_ADMIN_ROLE'));
+            $CampusModel->where('code', auth()->user()->campus_code);
+        }
+        $roles = $rolesModel->get();
+        $Campus = $CampusModel->get();
+        $campusCodeToCampusName = $Campus->mapWithKeys(function ($item) {
+            return [$item['code'] => $item['name']];
+        })->all();
+        return view('pages.auth.index', ['users' => $users, 'roles' => $roles, 'branches' => $branches, 'campus' => $Campus, 'campusCodeToCampusName' => $campusCodeToCampusName,]);
     }
 
     public function stdManagement()

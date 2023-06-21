@@ -86,4 +86,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Wishlist::class, 'user_id');
     }
+
+    public function poetry_student()
+    {
+        return $this->hasMany(studentPoetry::class, 'id_student', 'id');
+    }
 }
