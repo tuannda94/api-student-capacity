@@ -743,6 +743,7 @@ class QuestionController extends Controller
                 'id_subject' => $id_subject,
                 'id_class' => $idClass,
                 'id_examination' => $value[2],
+                'id_campus' => $value[7],
                 'status' => 1,
                 'start_time' => $time,
                 'end_time' => $time,

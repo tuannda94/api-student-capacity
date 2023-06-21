@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\PoetryController;
 use App\Http\Controllers\Admin\studentPoetryController;
 use App\Http\Controllers\Admin\playtopicController;
 use App\Http\Controllers\Admin\BlockController;
+use App\Http\Controllers\Admin\chartController;
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::prefix('dashboard')->group(function () {
     Route::get('api-cuoc-thi', [DashboardController::class, 'chartCompetity'])->name('dashboard.chart-competity');
@@ -211,6 +212,10 @@ Route::prefix('accountStudent')->group(function () {
     Route::get('viewpoint/{id_user}/{id_poetry}', [UserController::class, 'Listpoint'])->name('manage.student.view');
     Route::get('exportPoint/{id_user}', [UserController::class, 'Exportpoint'])->name('manage.student.export');
     Route::get('exportUserPoint/{id}', [studentPoetryController::class, 'UserExportpoint'])->name('manage.student.list.export');
+});
+
+Route::prefix('chart')->group(function(){
+    Route::get('',[chartController::class, 'index'])->name('admin.chart');
 });
 //Ca học =>done
 Route::prefix('poetry')->group(function () {

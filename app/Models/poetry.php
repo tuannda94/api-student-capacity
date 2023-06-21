@@ -29,4 +29,8 @@ class poetry extends Model
         return $this->hasOne(examination::class,'id','id_examination');
     }
 
+    public function campus(){
+        return $this->hasOne(Campus::class,'id','id_campus');
+    }
+
 }
