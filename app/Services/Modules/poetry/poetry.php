@@ -139,7 +139,7 @@ class poetry implements MPoetryInterface
     {
         try {
             $poetry = $this->modelPoetry::find($id);
-            $data = ['name_semeter' => $poetry->semeter->name, 'name_subject' => $poetry->subject->name, 'nameClass' => $poetry->classsubject->name, 'nameExamtion' => $poetry->examination->name, 'start_time1' => $poetry->start_time, 'end_time2' => $poetry->end_time];
+            $data = ['name_semeter' => $poetry->semeter->name, 'name_subject' => $poetry->subject->name, 'nameClass' => $poetry->classsubject->name, 'nameExamtion' => $poetry->examination->name, 'name_campus' => $poetry->campus->name];
             return $data;
         } catch (\Exception $e) {
             return false;
