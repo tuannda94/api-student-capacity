@@ -122,7 +122,7 @@ class ExamController extends Controller
 //        );
 //    }
 
-    public function create($id)
+    public function create($id,$name)
     {
         $campus = $this->campus->apiIndex();
 //        if ($round->contest->type != request('type') ?? 0) abort(404);
@@ -131,7 +131,8 @@ class ExamController extends Controller
             'pages.subjects.exam_subject.form-add',
             [
                 'campus' => $campus,
-                'id' => $id
+                'id' => $id,
+                'name' => $name
             ]
         );
     }
@@ -192,15 +193,15 @@ class ExamController extends Controller
 
              $dataMer = [
                  'name' => $request->name,
-                 'description' => $request->description,
+                 'description' =>  $request->description,
                 'round_id' => 36,
                 'type' => 1,
                 'status' => 1,
                 'external_url' => 'null',
-                'time' => $request->time_exam,
+                'time' => NULL,
                 'time_type' => 'null',
                  'subject_id' => $request->id,
-                 'campus_id' =>  $request->campus_exam,
+                 'campus_id' => 1,
 
             ];
 
@@ -210,12 +211,11 @@ class ExamController extends Controller
 //                'description',
 //                'campus_exam'
 //            ]), $dataMer);
-//            dd($dataMer);
             $this->exam::create($dataMer);
             return redirect()->route('admin.exam.index', $request->id);
         } catch (\Throwable $th) {
-            Log::info($th->getMessage());
-            return abort(404);
+//            Log::info($th->getMessage());
+            return $th;
         }
     }
 

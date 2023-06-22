@@ -101,6 +101,7 @@
                             <th scope="col">Môn thi</th>
                             <th scope="col">Lớp thi</th>
                             <th scope="col">Ca thi</th>
+                            <th scope="col">Cơ sở</th>
                             <th scope="col">Trạng thái</th>
                             <th colspan="2"></th>
                         </tr>
@@ -120,6 +121,9 @@
                                 </td>
                                 <td>
                                     {{ $value->examination->name }}
+                                </td>
+                                <td>
+                                    {{ $value->campus->name }}
                                 </td>
                                 <td>
                                     <div class="form-check form-switch">
@@ -259,6 +263,7 @@
                 <form id="form-submit" action="{{ route('admin.poetry.create') }}" >
                     @csrf
                     <input type="hidden" id="semeter_id" value="{{ $id_poetry }}">
+                    <input type="hidden" id="id_block" value="{{ $idBlock }}">
 {{--                    <div class="form-group m-10">--}}
 {{--                        <select class="form-select" name="semeter" id="semeter_id">--}}
 {{--                            <option selected value="">--Chọn kỳ học--</option>--}}
@@ -272,6 +277,14 @@
                             <option selected value="">--Chọn môn học--</option>
                             @foreach($listSubject as $subject)
                                 <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group m-10">
+                        <select class="form-select" name="subject" id="campus_id">
+                            <option selected value="">--Chọn cơ sở--</option>
+                            @foreach($listcampus as $campus)
+                                <option value="{{ $campus->id }}">{{ $campus->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -332,19 +345,18 @@
                     @csrf
                     <input type="hidden" name="id_update" id="id_update">
                     <input type="hidden" id="semeter_id_update" value="{{ $id_poetry }}">
-{{--                    <div class="form-group m-10">--}}
-{{--                        <label for="" class="form-label">Kỳ học</label>--}}
-{{--                    <select class="form-select" name="semeter" id="semeter_id_update">--}}
-{{--                        <option selected value="">--Chọn kỳ học--</option>--}}
-{{--                        @foreach($semeter as $value)--}}
-{{--                            <option value="{{ $value->id }}">{{ $value->name }}</option>--}}
-{{--                        @endforeach--}}
-{{--                    </select>--}}
-{{--                    </div>--}}
                     <div class="form-group m-10">
                         <select class="form-select" name="subject" id="subject_id_update" >
                             @foreach($listSubject as $subject)
                                 <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group m-10">
+                        <select class="form-select" name="subject" id="campus_id_update">
+                            <option selected value="">--Chọn cơ sở--</option>
+                            @foreach($listcampus as $campus)
+                                <option value="{{ $campus->id }}">{{ $campus->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -382,7 +394,7 @@
                         >
                     </div>
                     <div class="modal-footer">
-                        <button type="button" id="btn-update" class=" btn btn-primary">Tải lên </button>
+                        <button type="button" id="btn-update" class=" btn btn-primary">Cập nhật </button>
                     </div>
                 </form>
             </div>
@@ -475,18 +487,22 @@
         $('#upload-basis').click(function (e){
             e.preventDefault();
             var url = $('#form-submit').attr("action");
+            var id_block = $('#id_block').val();
             var semeter_id = $('#semeter_id').val();
             var subject_id = $('#subject_id').val();
             var examination_id = $('#examination_id').val();
+            var campus_id = $('#campus_id').val();
             var class_id = $('#class_id').val();
             var status = $('#status_add').val();
             var start_time_semeter = $('#start_time').val();
             var end_time_semeter = $('#end_time').val();
             var dataAll = {
                 '_token' : _token,
+                'id_block' : id_block,
                 'semeter_id' : semeter_id,
                 'subject_id' : subject_id,
                 'examination_id' : examination_id,
+                'campus_id': campus_id,
                 'class_id' : class_id,
                 'status' : status,
                 'start_time_semeter' : start_time_semeter,
@@ -587,11 +603,12 @@
                         type: 'GET',
                         success: function(response) {
                             console.log(response);
-                            notify('Tải dữ liệu thành công !')
+                            // notify('Tải dữ liệu thành công !')
                             $('#semeter_id_update').val(response.data.poetry.id_semeter);
                             $('#subject_id_update').val(response.data.poetry.id_subject);
                             $('#examination_id_update').val(response.data.poetry.id_examination);
                             $('#class_id_update').val(response.data.poetry.id_class);
+                            $('#campus_id_update').val(response.data.poetry.id_campus);
                             console.log(response.data.poetry.id_subject);
                             // const selectSubject = document.getElementById("subject_id_update");
                             // let html = "";
@@ -632,6 +649,7 @@
                 var subject_id_update = $('#subject_id_update').val();
                 var examination_id_update = $('#examination_id_update').val();
                 var class_id_update = $('#class_id_update').val();
+                var campus_id_update = $('#campus_id_update').val();
                 var status_update = $('#status_update').val();
                 var id = $('#id_update').val();
 
@@ -643,6 +661,7 @@
                     'subject_id_update' : subject_id_update,
                     'examination_id_update' : examination_id_update,
                     'class_id_update' : class_id_update,
+                    'campus_id_update' : campus_id_update,
                     'status_update' : status_update,
                     'start_time_semeter' : date_start,
                     'end_time_semeter' : date_end
@@ -664,11 +683,10 @@
                         elembtn[3].innerText = response.data.name_subject;
                         elembtn[5].innerText = response.data.nameClass;
                         elembtn[7].innerText = response.data.nameExamtion;
+                        elembtn[9].innerText = response.data.name_campus;
                         const output = response.data.status_update == 1 ? true : false;
                         // console.log(elembtn[5].childNodes[1].childNodes[1]);
-                        elembtn[9].childNodes[1].childNodes[1].checked= output
-                        elembtn[11].innerText =  response.data.start_time1;
-                        elembtn[13].innerText =  response.data.end_time2;
+                        elembtn[11].childNodes[1].childNodes[1].checked= output
 
                         btnEdit = document.querySelectorAll('.btn-edit');
                         update(btnEdit)
@@ -749,7 +767,52 @@
         }
 
     </script>
-
+    <script src="assets/js/system/formatlist/formatlis.js"></script>
+    <script src="assets/js/system/capacity/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.up-file').on("change", function () {
+                $('.show-name').html($(this)[0].files[0].name);
+            })
+            $('.form-submit').ajaxForm({
+                beforeSend: function () {
+                    $(".error_ex_file").html("");
+                    $(".upload-file").html("Đang tải dữ liệu ..")
+                    $(".progress").show();
+                    var percentage = '0';
+                },
+                uploadProgress: function (event, position, total, percentComplete) {
+                    var percentage = percentComplete;
+                    $('.progress .progress-bar').css("width", percentage + '%', function () {
+                        return $(this).attr("aria-valuenow", percentage) + "%";
+                    })
+                },
+                success: function () {
+                    $(".progress").hide();
+                    $(".upload-file").html("Tải lên")
+                    toastr.success("Tải lên thành công !");
+                    $('.up-file').val('');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                    setTimeout(() => {
+                        $('.modal').modal('hide');
+                    }, 500);
+                    // window.location.reload();
+                },
+                error: function (xhr, status, error) {
+                    $(".upload-file").html("Tải lên")
+                    $('.progress .progress-bar').css("width", 0 + '%', function () {
+                        return $(this).attr("aria-valuenow", 0) + "%";
+                    })
+                    $(".progress").hide();
+                    var err = JSON.parse(xhr.responseText);
+                    if (err.errors) $(".error_ex_file").html(err.errors.ex_file);
+                }
+            });
+        })
+    </script>
     {{--    Cập nhật trang thái nhanh--}}
 
 @endsection

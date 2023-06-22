@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\Modules\MClass\classModel;
 use App\Services\Modules\MClassSubject\ClassSubject;
 use App\Services\Modules\MExamination\Examination;
+use App\Services\Modules\MStudentManager\PoetryStudent;
 use App\Services\Modules\MSubjects\Subject;
 use App\Services\Traits\TResponse;
 use App\Services\Traits\TUploadImage;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Services\Modules\poetry\poetry;
 use App\Services\Modules\MSemeter\Semeter;
+use App\Models\Campus;
 class PoetryController extends Controller
 {
     use TUploadImage, TResponse;
@@ -23,7 +25,8 @@ class PoetryController extends Controller
         private Subject  $subject,
         private Examination $examination,
         private ClassSubject $classSubject,
-        private classModel $class
+        private classModel $class,
+        private PoetryStudent $PoetryStudent,
     )
     {
     }
@@ -37,7 +40,10 @@ class PoetryController extends Controller
         $listExamination = $this->examination->getList();
         $ListSubject = $this->subject->getItemSubjectSetemerReponse($id);
         $listClass = $this->class->getClass();
-        return view('pages.poetry.index',['poetry' => $data,'semeter' => $semeter,'listSubject' => $ListSubject,'id_poetry' => $id,'idBlock' => $idblock,'name' => $name,'listExamination' => $listExamination,'listClass' => $listClass]);
+        $listCampus = Campus::all();
+        return view('pages.poetry.index',['poetry' => $data,'semeter' => $semeter,'listSubject' => $ListSubject
+            ,'id_poetry' => $id,
+            'listcampus' => $listCampus,'idBlock' => $idblock,'name' => $name,'listExamination' => $listExamination,'listClass' => $listClass]);
     }
 
     public function ListPoetryRespone($id_subject){
@@ -48,6 +54,22 @@ class PoetryController extends Controller
     public function ListPoetryResponedetail(Request $request){
         $data = $this->poetry->ListPoetryDetail($request->semeter,$request->block,$request->subject,$request->class);
         return response()->json(['data' => $data], 200);
+    }
+
+    public function ListPoetryResponedetailChart(Request $request){
+        $dataResult = $this->poetry->ListPoetryDetailChart($request->semeter,$request->block,$request->subject);
+        $dataWithStudents = [];
+        foreach ($dataResult as $value){
+            $studentsDetail = $this->PoetryStudent->GetStudentsDetail( $value['id_poetry']);
+            $dataWithStudents['namePoetry'][] =$value['name'];
+            $dataWithStudents['student']['total'][] = $studentsDetail->count();
+            $dataWithStudents['student']['tookExam'][] = $studentsDetail->whereNotNull('scores')->count();
+            $dataWithStudents['student']['notExam'][] = $studentsDetail->whereNull('scores')->count();
+        }
+
+
+
+        return response()->json(['data' => $dataWithStudents], 200);
     }
 
     public function indexApi($id,$id_user){
@@ -65,16 +87,20 @@ class PoetryController extends Controller
             $request->all(),
             [
                 'semeter_id' => 'required',
+                'id_block' => 'required',
                 'subject_id' => 'required',
                 'examination_id' => 'required',
                 'class_id' => 'required',
+                'campus_id' => 'required',
                 'status' => 'required',
                 'start_time_semeter' => 'nullable|date',
                 'end_time_semeter' => 'nullable|date|after:start_time_semeter'
             ],
             [
-                'semeter_id.required' => 'Vui lòng chọn tên kỳ học !',
+                'semeter_id.required' => 'Thiếu id kỳ học !',
+                'id_block.required' => 'Thiếu id block !',
                 'subject_id.required' => 'Vui lòng chọn môn học !',
+                'campus_id.required' => 'Vui lòng chọn cơ sở !',
                 'examination_id.required' => 'Vui lòng chọn ca thi !',
                 'class_id.required' => 'Vui lòng chọn lớp !',
                 'status.required' => 'Vui lòng chọn trạng thái',
@@ -86,7 +112,7 @@ class PoetryController extends Controller
 
         if($validator->fails() == 1){
             $errors = $validator->errors();
-            $fields = ['semeter_id', 'subject_id','examination_id','class_id','status', 'start_time_semeter','end_time_semeter'];
+            $fields = ['semeter_id','id_block', 'subject_id','examination_id','class_id','campus_id','status', 'start_time_semeter','end_time_semeter'];
             foreach ($fields as $field) {
                 $fieldErrors = $errors->get($field);
 
@@ -98,11 +124,18 @@ class PoetryController extends Controller
             }
 
         }
+        DB::table('block_subject')->insert(
+            [
+                'id_subject' => $request->subject_id,
+                'id_block' => $request->id_block
+            ]
+        );
         $data = [
             'id_semeter' => $request->semeter_id,
             'id_subject' => $request->subject_id,
             'id_class' => $request->class_id,
             'id_examination' => $request->examination_id,
+            'id_campus' =>  $request->campus_id,
             'status' => $request->status,
             'start_time' => $request->start_time_semeter,
             'end_time' => $request->end_time_semeter,
@@ -161,6 +194,7 @@ class PoetryController extends Controller
                 'subject_id_update' => 'required',
                 'examination_id_update' => 'required',
                 'class_id_update' => 'required',
+                'campus_id_update' => 'required',
                 'status_update' => 'required',
                 'start_time_semeter' => 'nullable|date',
                 'end_time_semeter' => 'nullable|date|after:start_time_semeter'
@@ -170,6 +204,7 @@ class PoetryController extends Controller
                 'subject_id_update.required' => 'Vui lòng chọn môn học !',
                 'examination_id_update.required' => 'Vui lòng chọn ca thi !',
                 'class_id_update.required' => 'Vui lòng chọn lớp !',
+                'campus_id_update.required' => 'Không để trống cơ sở!',
                 'status_update.required' => 'Vui lòng chọn trạng thái',
                 'start_time_semeter.nullable' => 'Vui lòng chọn thời gian bắt đầu',
                 'end_time_semeter.nullable' => 'Vui lòng chọn thời gian kết thúc',
@@ -178,7 +213,7 @@ class PoetryController extends Controller
         );
         if($validator->fails() == 1){
             $errors = $validator->errors();
-            $fields = ['semeter_id', 'subject_id','examination_id_update','class_id_update','status', 'start_time_semeter','end_time_semeter'];
+            $fields = ['semeter_id', 'subject_id','examination_id_update','class_id_update','campus_id_update','status', 'start_time_semeter','end_time_semeter'];
             foreach ($fields as $field) {
                 $fieldErrors = $errors->get($field);
 
@@ -198,6 +233,7 @@ class PoetryController extends Controller
         $poetry->id_subject	 =  $request->subject_id_update;
         $poetry->id_class	 =  $request->class_id_update;
         $poetry->id_examination	 =  $request->examination_id_update;
+        $poetry->id_campus	 =  $request->campus_id_update;
         $poetry->status = $request->status_update;
         $poetry->start_time = $request->start_time_semeter;
         $poetry->end_time = $request->end_time_semeter;

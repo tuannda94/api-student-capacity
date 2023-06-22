@@ -13,7 +13,7 @@ for (const ckElement of cks) {
             data: dataAll,
             success: (response) => {
                 // console.log(response)
-                notify(response.message);
+                // notify(response.message);
                 const idup =  `data-id='${response.data.id}'`;
                 // console.log(idup);
                 var buttons = document.querySelector('button.btn-edit['+idup+']');

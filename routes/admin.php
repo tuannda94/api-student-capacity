@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\PoetryController;
 use App\Http\Controllers\Admin\studentPoetryController;
 use App\Http\Controllers\Admin\playtopicController;
 use App\Http\Controllers\Admin\BlockController;
+use App\Http\Controllers\Admin\chartController;
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::prefix('dashboard')->group(function () {
     Route::get('api-cuoc-thi', [DashboardController::class, 'chartCompetity'])->name('dashboard.chart-competity');
@@ -131,7 +132,7 @@ Route::prefix('subject')->group(function () {
 
     Route::prefix('exam')->group(function () {
         Route::get('/{id}', [ExamController::class, 'index'])->name('admin.exam.index');
-        Route::get('create/{id}', [ExamController::class, 'create'])->name('admin.exam.create');
+        Route::get('create/{id}/{name}', [ExamController::class, 'create'])->name('admin.exam.create');
         Route::post('store', [ExamController::class, 'store'])->name('admin.exam.store');
         Route::get('{id_exam}/edit', [ExamController::class, 'edit'])->name('admin.exam.edit');
         Route::post('{id_exam}/un-status', [ExamController::class, 'un_status'])->name('admin.exam.un_status');
@@ -139,9 +140,9 @@ Route::prefix('subject')->group(function () {
         Route::put('{id_exam}', [ExamController::class, 'update'])->name('admin.exam.update');
     });
     Route::prefix('question')->group(function () {
-        Route::get('/{id}', [QuestionController::class, 'indexSubject'])->name('admin.subject.question.index');
+        Route::get('/{id}/{id_subject}/{name}', [QuestionController::class, 'indexSubject'])->name('admin.subject.question.index');
         Route::get('edit/{id}', [QuestionController::class, 'editSubject'])->name('admin.subject.question.edit');
-        Route::delete('destroy/{id}/{id_exam}', [QuestionController::class, 'destroysubject'])->name('admin.subject.question.destroy');
+        Route::get('destroy/{id}/{id_exam}', [QuestionController::class, 'destroysubject'])->name('admin.subject.question.destroy');
         Route::post('un-status/{id}', [QuestionController::class, 'un_status'])->name('admin.subject.question.un.status');
         Route::post('re-status/{id}', [QuestionController::class, 're_status'])->name('admin.subject.question.re.status');
         Route::delete('delete/{id}', [QuestionController::class, 'deletesubject'])->name('admin.subject.question.delete');
@@ -208,9 +209,15 @@ Route::prefix('accountStudent')->group(function () {
     Route::get('GetPoetry/{id_subject}', [PoetryController::class, 'ListPoetryRespone'])->name('manage.semeter.list');
     Route::post('GetPoetryDetail', [PoetryController::class, 'ListPoetryResponedetail'])->name('manage.semeter.list');
     Route::get('ListUser/{id}', [studentPoetryController::class, 'listUser'])->name('admin.manage.semeter.index');
-    Route::get('viewpoint/{id_user}/{id_poetry}', [UserController::class, 'Listpoint'])->name('manage.student.view');
+    Route::get('viewpoint/{id_user}', [UserController::class, 'Listpoint'])->name('manage.student.view');
     Route::get('exportPoint/{id_user}', [UserController::class, 'Exportpoint'])->name('manage.student.export');
     Route::get('exportUserPoint/{id}', [studentPoetryController::class, 'UserExportpoint'])->name('manage.student.list.export');
+});
+
+Route::prefix('chart')->group(function(){
+    Route::get('',[chartController::class, 'index'])->name('admin.chart');
+    Route::post('GetPoetryDetail', [PoetryController::class, 'ListPoetryResponedetailChart'])->name('manage.semeter.list');
+    Route::get('detail',[chartController::class, 'detail'])->name('admin.chart.detail');
 });
 //Ca học =>done
 Route::prefix('poetry')->group(function () {
@@ -279,7 +286,7 @@ Route::group([
         return response()->download(public_path('assets/media/excel/excel_download.xlsx'));
     })->name("admin.download.execel.pass");
     Route::get('dowload-frm-excel-poetry', function () {
-        return response()->download(public_path('assets/media/excel/Poetry-dowload.xlsx'));
+        return response()->download(public_path('assets/media/excel/Poetry-dowload-new.xlsx'));
     })->name("admin.download.execel.poetry");
     Route::post('upload-image', [CkeditorController::class, 'updoadFile'])->name('admin.ckeditor.upfile');
     Route::prefix('questions')->group(function () {

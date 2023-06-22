@@ -117,14 +117,16 @@ class QuestionController extends Controller
         return $data;
     }
 
-    public function indexSubject($id)
+    public function indexSubject($id,$id_subject,$name)
     {
         $skills = $this->skillModel::all();
         if (!($questions = $this->getQuestion($id)->paginate(request('limit') ?? 10))) return abort(404);
         return view('pages.subjects.question.list', [
             'questions' => $questions,
             'skills' => $skills,
-            'id' => $id
+            'id' => $id,
+            'id_subject' => $id_subject,
+            'name' => $name
         ]);
     }
 
@@ -706,12 +708,20 @@ class QuestionController extends Controller
                         'status' => 1,
                         'created_at' => now(),
                         'updated_at' => NULL,
-                        'code_subject' =>  $value[4],
-                        'id_block' => $idBlock
+                        'code_subject' =>  $value[4]
                     ]
                 );
 
+
+
             }
+            DB::table('block_subject')->insertGetId(
+                [
+                    'id_subject' => $id_subject,
+                    'id_block' => $idBlock
+                ]
+            );
+
             $Classfind = $this->classModel->where('name',$value[5])->first();
             $idClass = $Classfind != null ? $Classfind->id : null;
             if($Classfind == null){
@@ -743,6 +753,7 @@ class QuestionController extends Controller
                 'id_subject' => $id_subject,
                 'id_class' => $idClass,
                 'id_examination' => $value[2],
+                'id_campus' => $value[7],
                 'status' => 1,
                 'start_time' => $time,
                 'end_time' => $time,
