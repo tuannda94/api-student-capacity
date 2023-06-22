@@ -27,9 +27,7 @@ class ExamNewRequest extends FormRequest
         if ($this->route()->id) $ruleName = 'required|min:4|max:255|unique:exams,name,' . $this->route()->id . ',id';
         $rule = [
             'name' => $ruleName,
-            'description' => 'required|min:4',
-            'campus_exam' => 'required',
-            'time_exam' => 'required|numeric|min:0|max:1000',
+            'description' => 'required',
         ];
         return $rule;
     }
@@ -40,15 +38,15 @@ class ExamNewRequest extends FormRequest
             'name.required' => trans('validate.required'),
             'name.unique' => trans('validate.unique'),
             'name.min' => trans('validate.min'),
-            'description.min' => trans('validate.min'),
+//            'description.min' => trans('validate.min'),
             'name.max' => trans('validate.max'),
             'description.required' => trans('validate.required'),
             'campus_exam.required' => trans('validate.required'),
 
-            'time_exam.numeric' => trans('validate.numeric'),
-            'time_exam.max' => trans('validate.max'),
-            'time_exam.min' => trans('validate.min'),
-            'time_exam.required' => trans('validate.required'),
+//            'time_exam.numeric' => trans('validate.numeric'),
+//            'time_exam.max' => trans('validate.max'),
+//            'time_exam.min' => trans('validate.min'),
+//            'time_exam.required' => trans('validate.required'),
         ];
     }
 }

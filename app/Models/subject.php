@@ -19,4 +19,9 @@ class subject extends Model
         return $this->hasOne(block::class, 'id', 'id_block');
     }
 
+    public function block_subject()
+    {
+        return $this->hasOne(blockSubject::class, 'id_subject', 'id');
+    }
+
 }

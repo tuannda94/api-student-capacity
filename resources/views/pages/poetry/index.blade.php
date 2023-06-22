@@ -314,14 +314,15 @@
                 <form id="form-submit" action="{{ route('admin.poetry.create') }}">
                     @csrf
                     <input type="hidden" id="semeter_id" value="{{ $id_poetry }}">
-                    {{--                    <div class="form-group m-10">--}}
-                    {{--                        <select class="form-select" name="semeter" id="semeter_id">--}}
-                    {{--                            <option selected value="">--Chọn kỳ học--</option>--}}
-                    {{--                            @foreach($semeter as $value)--}}
-                    {{--                                <option value="{{ $value->id }}">{{ $value->name }}</option>--}}
-                    {{--                            @endforeach--}}
-                    {{--                        </select>--}}
-                    {{--                    </div>--}}
+                    <input type="hidden" id="id_block" value="{{ $idBlock }}">
+{{--                    <div class="form-group m-10">--}}
+{{--                        <select class="form-select" name="semeter" id="semeter_id">--}}
+{{--                            <option selected value="">--Chọn kỳ học--</option>--}}
+{{--                            @foreach($semeter as $value)--}}
+{{--                                <option value="{{ $value->id }}">{{ $value->name }}</option>--}}
+{{--                            @endforeach--}}
+{{--                        </select>--}}
+{{--                    </div>--}}
                     <div class="form-group m-10">
                         <select class="form-select" name="subject" id="subject_id">
                             <option selected value="">--Chọn môn học--</option>
@@ -331,7 +332,7 @@
                         </select>
                     </div>
                     <div class="form-group m-10">
-                        <select class="form-select" name="subject" id="subject_id">
+                        <select class="form-select" name="subject" id="campus_id">
                             <option selected value="">--Chọn cơ sở--</option>
                             @foreach($listcampus as $campus)
                                 <option value="{{ $campus->id }}">{{ $campus->name }}</option>
@@ -339,7 +340,7 @@
                         </select>
                     </div>
                     <div class="form-group m-10">
-                        <select class="form-select" name="subject" id="campus_id">
+                        <select class="form-select" name="subject" id="examination_id">
                             <option selected value="">--Chọn ca thi--</option>
                             @foreach($listExamination as $exam)
                                 <option value="{{ $exam->id }}">{{ $exam->name }}</option>
@@ -542,6 +543,7 @@
         $('#upload-basis').click(function (e) {
             e.preventDefault();
             var url = $('#form-submit').attr("action");
+            var id_block = $('#id_block').val();
             var semeter_id = $('#semeter_id').val();
             var subject_id = $('#subject_id').val();
             var examination_id = $('#examination_id').val();
@@ -551,10 +553,11 @@
             var start_time_semeter = $('#start_time').val();
             var end_time_semeter = $('#end_time').val();
             var dataAll = {
-                '_token': _token,
-                'semeter_id': semeter_id,
-                'subject_id': subject_id,
-                'examination_id': examination_id,
+                '_token' : _token,
+                'id_block' : id_block,
+                'semeter_id' : semeter_id,
+                'subject_id' : subject_id,
+                'examination_id' : examination_id,
                 'campus_id': campus_id,
                 'class_id': class_id,
                 'status': status,
@@ -657,7 +660,7 @@
                         type: 'GET',
                         success: function (response) {
                             console.log(response);
-                            notify('Tải dữ liệu thành công !')
+                            // notify('Tải dữ liệu thành công !')
                             $('#semeter_id_update').val(response.data.poetry.id_semeter);
                             $('#subject_id_update').val(response.data.poetry.id_subject);
                             $('#examination_id_update').val(response.data.poetry.id_examination);
@@ -824,7 +827,52 @@
         }
 
     </script>
-
+    <script src="assets/js/system/formatlist/formatlis.js"></script>
+    <script src="assets/js/system/capacity/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.up-file').on("change", function () {
+                $('.show-name').html($(this)[0].files[0].name);
+            })
+            $('.form-submit').ajaxForm({
+                beforeSend: function () {
+                    $(".error_ex_file").html("");
+                    $(".upload-file").html("Đang tải dữ liệu ..")
+                    $(".progress").show();
+                    var percentage = '0';
+                },
+                uploadProgress: function (event, position, total, percentComplete) {
+                    var percentage = percentComplete;
+                    $('.progress .progress-bar').css("width", percentage + '%', function () {
+                        return $(this).attr("aria-valuenow", percentage) + "%";
+                    })
+                },
+                success: function () {
+                    $(".progress").hide();
+                    $(".upload-file").html("Tải lên")
+                    toastr.success("Tải lên thành công !");
+                    $('.up-file').val('');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                    setTimeout(() => {
+                        $('.modal').modal('hide');
+                    }, 500);
+                    // window.location.reload();
+                },
+                error: function (xhr, status, error) {
+                    $(".upload-file").html("Tải lên")
+                    $('.progress .progress-bar').css("width", 0 + '%', function () {
+                        return $(this).attr("aria-valuenow", 0) + "%";
+                    })
+                    $(".progress").hide();
+                    var err = JSON.parse(xhr.responseText);
+                    if (err.errors) $(".error_ex_file").html(err.errors.ex_file);
+                }
+            });
+        })
+    </script>
     {{--    Cập nhật trang thái nhanh--}}
 
 @endsection

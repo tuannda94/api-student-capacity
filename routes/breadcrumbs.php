@@ -9,11 +9,24 @@ use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 Breadcrumbs::for('ManagementStudent', function (BreadcrumbTrail $trail) {
     $trail->push('Quản Lí Môn Học', route('admin.subject.list'));
 });
-// Quản lí Môn học > Quản lí đề thi
+// Quản lí Môn học > Ngân hàng đề thi môn
 Breadcrumbs::for('Management.exam', function (BreadcrumbTrail $trail,$id,$name) {
     $trail->parent('ManagementStudent');
-    $trail->push('Quản lí đề thi ' .$name, route('admin.exam.index',$id));
+    $trail->push('Ngân hàng đề thi môn ' .$name, route('admin.exam.index',$id));
 });
+
+// Quản lí Môn học > Ngân hàng đề thi môn > Thêm mới đề
+Breadcrumbs::for('Management.exam.create', function (BreadcrumbTrail $trail,$id,$name) {
+    $trail->parent('Management.exam',$id,$name);
+    $trail->push('Thêm mới đề' , route('admin.exam.create',['id' => $id,'name' => $name]));
+});
+
+// Quản lí Môn học > Ngân hàng đề thi môn > câu hỏi
+Breadcrumbs::for('Management.exam.question', function (BreadcrumbTrail $trail,$id,$name,$id_exam) {
+    $trail->parent('Management.exam',$id,$name);
+    $trail->push('Thêm mới đề' , route('admin.subject.question.index',['id' => $id_exam,'id_subject' => $id,'name' => $name  ]));
+});
+
 
 // Quản lí Môn học > Quản Lí bộ câu hỏi
 Breadcrumbs::for('ManagementQuestion', function (BreadcrumbTrail $trail) {
@@ -68,9 +81,9 @@ Breadcrumbs::for('StudentsPoint', function (BreadcrumbTrail $trail,$id) {
     $trail->push('Quản Lí sinh viên', route('admin.manage.semeter.index',$id));
 });
 
-Breadcrumbs::for('StudentsPointDetail', function (BreadcrumbTrail $trail, $id,$id_poetry) {
-    $trail->parent('StudentsPoint',$id_poetry);
-    $trail->push('Quản Lí điểm sinh viên', route('manage.student.view',['id_user' => $id,'id_poetry' => $id_poetry]));
+Breadcrumbs::for('StudentsPointDetail', function (BreadcrumbTrail $trail, $id) {
+    $trail->parent('Students');
+    $trail->push('Quản Lí điểm sinh viên', route('manage.student.view',['id_user' => $id]));
 });
 
 

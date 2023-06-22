@@ -118,14 +118,16 @@ class QuestionController extends Controller
         return $data;
     }
 
-    public function indexSubject($id)
+    public function indexSubject($id,$id_subject,$name)
     {
         $skills = $this->skillModel::all();
         if (!($questions = $this->getQuestion($id)->paginate(request('limit') ?? 10))) return abort(404);
         return view('pages.subjects.question.list', [
             'questions' => $questions,
             'skills' => $skills,
-            'id' => $id
+            'id' => $id,
+            'id_subject' => $id_subject,
+            'name' => $name
         ]);
     }
 

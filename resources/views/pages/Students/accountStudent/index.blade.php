@@ -55,12 +55,10 @@
                                 <thead>
                                 <!--begin::Table row-->
                                 <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase">
-                                    <th class="min-w-100px">Kỳ học</th>
-                                    <th class="min-w-100px">Block</th>
-                                    <th class="min-w-100px">Môn</th>
-                                    <th class="min-w-100px">Lớp</th>
-                                    <th class="text-end min-w-75px">Ca Học</th>
-                                    <th class="text-end min-w-100px pe-5">Action</th>
+                                    <th class="min-w-100px">Tên sinh viên</th>
+                                    <th class="min-w-100px">Email</th>
+                                    <th class="min-w-100px">Mã Sinh viên</th>
+                                    <th class="min-w-100px">Cơ sở</th>
                                 </tr>
                                 <!--end::Table row-->
                                 </thead>

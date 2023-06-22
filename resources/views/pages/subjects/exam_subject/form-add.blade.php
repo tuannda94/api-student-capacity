@@ -3,6 +3,9 @@
 @section('page-title', 'Thêm mới Đề thi ')
 @section('content')
     <div class=" card card-flush  p-5">
+        <div class="mb-5">
+            {{ Breadcrumbs::render('Management.exam.create',$id,$name) }}
+        </div>
         <div class="row">
             <div class="col-lg-12">
                 <form id="myForm" action="{{ route('admin.exam.store', ['id' => $id]) }}" method="post"
@@ -18,37 +21,38 @@
                                     <p class="text-danger">{{ $message }}</p>
                                 @enderror
                             </div>
+
+                        </div>
+                        <div class="col-lg-6">
                             <div class="form-group mb-4">
                                 <label class="form-label" for="">Mô tả đề thi</label>
                                 <textarea class="form-control" name="description" id="" rows="3">
                                    {{ old('description') }}
                                 </textarea>
                                 @error('description')
-                                    <p class="text-danger">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group mb-4">
-                                <label class="form-label" for="">Cơ sở ra đề</label>
-                                <select class="form-select" name="campus_exam">
-                                    <option selected value="">Chọn cơ sở</option>
-                                    @foreach($campus as $value)
-                                        <option value="{{ $value->id }}">{{ $value->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('campus_exam')
-                                    <p class="text-danger">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div class="form-group mb-4">
-                                <label class="form-label" for="">Thời gian làm bài</label>
-                                <input type="text" name="time_exam" value="{{ old('time_exam') }}" id=""
-                                       class="form-control" placeholder="">
-                                @error('time_exam')
                                 <p class="text-danger">{{ $message }}</p>
                                 @enderror
                             </div>
+{{--                            <div class="form-group mb-4">--}}
+{{--                                <label class="form-label" for="">Cơ sở ra đề</label>--}}
+{{--                                <select class="form-select" name="campus_exam">--}}
+{{--                                    <option selected value="">Chọn cơ sở</option>--}}
+{{--                                    @foreach($campus as $value)--}}
+{{--                                        <option value="{{ $value->id }}">{{ $value->name }}</option>--}}
+{{--                                    @endforeach--}}
+{{--                                </select>--}}
+{{--                                @error('campus_exam')--}}
+{{--                                    <p class="text-danger">{{ $message }}</p>--}}
+{{--                                @enderror--}}
+{{--                            </div>--}}
+{{--                            <div class="form-group mb-4">--}}
+{{--                                <label class="form-label" for="">Thời gian làm bài</label>--}}
+{{--                                <input type="text" name="time_exam" value="{{ old('time_exam') }}" id=""--}}
+{{--                                       class="form-control" placeholder="">--}}
+{{--                                @error('time_exam')--}}
+{{--                                <p class="text-danger">{{ $message }}</p>--}}
+{{--                                @enderror--}}
+{{--                            </div>--}}
 {{--                            @if ($round->contest->type == config('util.TYPE_CONTEST'))--}}
 {{--                                <div class="form-group mb-4">--}}
 {{--                                    <label class="form-label" for="">File đề thi</label>--}}

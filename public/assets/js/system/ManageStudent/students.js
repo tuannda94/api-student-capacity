@@ -130,24 +130,22 @@ search.addEventListener('click',() => {
         data : DataResult,
         success: function(response) {
             console.log( response.data);
-            // console.log(response.data)
+            console.log(response.data)
             //insert data vào
             var newRow = "";
             if(response.data != ""){
                 newRow = response.data.map((value)=>{
                     return `               <tr >
                                     <td>
-                                        <span href="#" class="text-dark text-hover-primary">${ value.semeter.name}</span>
+                                        <span href="#" class="text-dark text-hover-primary">${ value.name}</span>
                                     </td>
                                     <td>
-                                        <span href="#" class="text-dark text-hover-primary">${ value.subject.block.name}</span>
+                                        <span href="#" class="text-dark text-hover-primary">${ value.email}</span>
                                     </td>
                                     <td>
-                                        <div class="badge badge-light-success">${ value.subject.name}</div>
+                                        <div class="badge badge-light-success" style="cursor: pointer;" onclick="location.href='admin/accountStudent/viewpoint/${value.id}'">${ value.mssv}</div>
                                     </td>
-                                    <td data-order="2022-03-10T14:40:00+05:00">${ value.classsubject.name}</td>
-                                    <td class="text-end pe-0">${ value.examination.name}</td>
-                                    <td class="text-end"><button class="btn btn-primary er fs-6 px-4 py-2" onclick="location.href='admin/accountStudent/ListUser/${value.id}'">Xem Thêm</button></td>
+                                    <td data-order="2022-03-10T14:40:00+05:00">${ value.campus.name}</td>
                                 </tr>
                     `;
                 }).join(' ')
