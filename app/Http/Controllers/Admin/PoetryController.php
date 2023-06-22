@@ -15,57 +15,77 @@ use Illuminate\Support\Facades\Validator;
 use App\Services\Modules\poetry\poetry;
 use App\Services\Modules\MSemeter\Semeter;
 use App\Models\Campus;
+
 class PoetryController extends Controller
 {
     use TUploadImage, TResponse;
+
     public function __construct(
-        private poetry $poetry,
-        private Semeter $semeter,
-        private Subject  $subject,
-        private Examination $examination,
+        private poetry       $poetry,
+        private Semeter      $semeter,
+        private Subject      $subject,
+        private Examination  $examination,
         private ClassSubject $classSubject,
-        private classModel $class
+        private classModel   $class
     )
     {
     }
 
-    public function index($id,$idblock){
+    public function index($id, $idblock)
+    {
 //        $data = $this->oneindexApi(140);
 //        dd($data);
-        $data = $this->poetry->ListPoetry($id,$idblock);
+        $data = $this->poetry->ListPoetry($id, $idblock);
         $semeter = $this->semeter->ListSemeter();
         $name = $this->semeter->getName($id);
         $listExamination = $this->examination->getList();
         $ListSubject = $this->subject->getItemSubjectSetemerReponse($id);
         $listClass = $this->class->getClass();
-        $listCampus = Campus::all();
-        return view('pages.poetry.index',['poetry' => $data,'semeter' => $semeter,'listSubject' => $ListSubject
-            ,'id_poetry' => $id,
-            'listcampus' => $listCampus,'idBlock' => $idblock,'name' => $name,'listExamination' => $listExamination,'listClass' => $listClass]);
+        $listCampusQuery = (new Campus())->query();
+        if (!auth()->user()->hasRole('super admin')) {
+            $listCampusQuery->where('id', auth()->user()->campus_id);
+        }
+        $listCampus = $listCampusQuery->get();
+        return view('pages.poetry.index', [
+            'poetry' => $data,
+            'semeter' => $semeter,
+            'listSubject' => $ListSubject,
+            'id_poetry' => $id,
+            'listcampus' => $listCampus,
+            'idBlock' => $idblock,
+            'name' => $name,
+            'listExamination' => $listExamination,
+            'listClass' => $listClass
+        ]);
     }
 
-    public function ListPoetryRespone($id_subject){
+    public function ListPoetryRespone($id_subject)
+    {
         $data = $this->poetry->ListPoetryRespone($id_subject);
         return response()->json(['data' => $data], 200);
     }
 
-    public function ListPoetryResponedetail(Request $request){
-        $data = $this->poetry->ListPoetryDetail($request->semeter,$request->block,$request->subject,$request->class);
+    public function ListPoetryResponedetail(Request $request)
+    {
+        $data = $this->poetry->ListPoetryDetail($request->semeter, $request->block, $request->subject, $request->class);
         return response()->json(['data' => $data], 200);
     }
 
-    public function indexApi($id,$id_user){
-        if (!($data = $this->poetry->ListPoetryApi($id,$id_user)))  return $this->responseApi(false);
+    public function indexApi($id, $id_user)
+    {
+        if (!($data = $this->poetry->ListPoetryApi($id, $id_user))) return $this->responseApi(false);
         return $this->responseApi(true, $data);
     }
 
-    public function oneindexApi($id_poetry){
-        if (!($data = $this->poetry->onePoetryApi($id_poetry)))  return $this->responseApi(false);
+    public function oneindexApi($id_poetry)
+    {
+        if (!($data = $this->poetry->onePoetryApi($id_poetry))) return $this->responseApi(false);
         return $this->responseApi(true, $data);
     }
 
-    public function create(Request $request){
-        $validator =  Validator::make(
+    public function create(Request $request)
+    {
+        $validator = Validator::make(
             $request->all(),
             [
                 'semeter_id' => 'required',
@@ -92,15 +112,15 @@ class PoetryController extends Controller
             ]
         );
 
-        if($validator->fails() == 1){
+        if ($validator->fails() == 1) {
             $errors = $validator->errors();
-            $fields = ['semeter_id','id_block', 'subject_id','examination_id','class_id','campus_id','status', 'start_time_semeter','end_time_semeter'];
+            $fields = ['semeter_id', 'id_block', 'subject_id', 'examination_id', 'class_id', 'campus_id', 'status', 'start_time_semeter', 'end_time_semeter'];
             foreach ($fields as $field) {
                 $fieldErrors = $errors->get($field);
 
                 if ($fieldErrors) {
                     foreach ($fieldErrors as $error) {
-                        return response($error,404);
+                        return response($error, 404);
                     }
                 }
             }
@@ -111,7 +131,7 @@ class PoetryController extends Controller
             'id_subject' => $request->subject_id,
             'id_class' => $request->class_id,
             'id_examination' => $request->examination_id,
-            'id_campus' =>  $request->campus_id,
+            'id_campus' => $request->campus_id,
             'status' => $request->status,
             'start_time' => $request->start_time_semeter,
             'end_time' => $request->end_time_semeter,
@@ -121,14 +141,15 @@ class PoetryController extends Controller
 
         DB::table('poetry')->insert($data);
         $id = DB::getPdo()->lastInsertId();
-        $data = array_merge($data,$this->poetry->getItem($id)) ;
+        $data = array_merge($data, $this->poetry->getItem($id));
 
 //        $data = $request->all();
         $data['id'] = $id;
-        return response( ['message' => "Thêm thành công",'data' =>$data],200);
+        return response(['message' => "Thêm thành công", 'data' => $data], 200);
     }
 
-    public function now_status(Request $request,$id){
+    public function now_status(Request $request, $id)
+    {
         $poetry = $this->poetry->getItempoetry($id);
         if (!$poetry) {
             return response()->json(['message' => 'Không tìm thấy'], 404);
@@ -138,32 +159,35 @@ class PoetryController extends Controller
         $poetry->save();
         $data = $request->all();
         $data['id'] = $id;
-        return response( ['message' => "Cập nhật trạng thái thành công",'data' =>$data],200);
+        return response(['message' => "Cập nhật trạng thái thành công", 'data' => $data], 200);
     }
 
-    public function delete($id){
+    public function delete($id)
+    {
         try {
             $this->poetry->getItempoetry($id)->delete();
-            return response( ['message' => "Xóa Thành công"],200);
+            return response(['message' => "Xóa Thành công"], 200);
         } catch (\Throwable $th) {
-            return response( ['message' => 'Xóa thất bại'],404);
+            return response(['message' => 'Xóa thất bại'], 404);
         }
     }
 
-    public function edit($id){
-        try{
+    public function edit($id)
+    {
+        try {
             $poetry = $this->poetry->getItempoetry($id);
             return response()->json([
                 'message' => "Thành công",
                 'data' => $poetry,
-            ],200);
-        }catch (\Throwable $th){
-            return response( ['message' => "Thêm thất bại"],404);
+            ], 200);
+        } catch (\Throwable $th) {
+            return response(['message' => "Thêm thất bại"], 404);
         }
     }
 
-    public function update(Request $request,$id){
-        $validator =  Validator::make(
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make(
             $request->all(),
             [
                 'semeter_id_update' => 'required',
@@ -187,15 +211,15 @@ class PoetryController extends Controller
                 'end_time_semeter.after' => 'Thời gian kết thúc phải lớn hơn thời gian bắt đầu',
             ]
         );
-        if($validator->fails() == 1){
+        if ($validator->fails() == 1) {
             $errors = $validator->errors();
-            $fields = ['semeter_id', 'subject_id','examination_id_update','class_id_update','campus_id_update','status', 'start_time_semeter','end_time_semeter'];
+            $fields = ['semeter_id', 'subject_id', 'examination_id_update', 'class_id_update', 'campus_id_update', 'status', 'start_time_semeter', 'end_time_semeter'];
             foreach ($fields as $field) {
                 $fieldErrors = $errors->get($field);
 
                 if ($fieldErrors) {
                     foreach ($fieldErrors as $error) {
-                        return response($error,404);
+                        return response($error, 404);
                     }
                 }
             }
@@ -206,10 +230,10 @@ class PoetryController extends Controller
             return response()->json(['message' => 'Không tìm thấy'], 404);
         }
         $poetry->id_semeter = $request->semeter_id_update;
-        $poetry->id_subject	 =  $request->subject_id_update;
-        $poetry->id_class	 =  $request->class_id_update;
-        $poetry->id_examination	 =  $request->examination_id_update;
-        $poetry->id_campus	 =  $request->campus_id_update;
+        $poetry->id_subject = $request->subject_id_update;
+        $poetry->id_class = $request->class_id_update;
+        $poetry->id_examination = $request->examination_id_update;
+        $poetry->id_campus = $request->campus_id_update;
         $poetry->status = $request->status_update;
         $poetry->start_time = $request->start_time_semeter;
         $poetry->end_time = $request->end_time_semeter;
@@ -218,11 +242,12 @@ class PoetryController extends Controller
         $poetry->save();
         $data = $request->all();
         $data['id'] = $id;
-        $data =array_merge($data,$this->poetry->getItem($id))   ;
-        return response( ['message' => "Cập nhật thành công",'data' => $data],200);
+        $data = array_merge($data, $this->poetry->getItem($id));
+        return response(['message' => "Cập nhật thành công", 'data' => $data], 200);
     }
 
-    function formatdate($dateformat){
+    function formatdate($dateformat)
+    {
         $date_start = $dateformat;
         $timestamp = strtotime($date_start);
         return date('d-m-Y', $timestamp);

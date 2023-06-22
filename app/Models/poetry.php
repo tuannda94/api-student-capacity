@@ -33,4 +33,9 @@ class poetry extends Model
         return $this->hasOne(Campus::class,'id','id_campus');
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'assigned_user_id', 'id');
+    }
+
 }

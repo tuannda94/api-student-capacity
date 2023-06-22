@@ -150,7 +150,7 @@ class studentPoetryController extends Controller
                 $query->where('id_poetry', $id_poetry);
             });
         if (!auth()->user()->hasRole('super admin')) {
-            $studentsQuery->where('campus_code', auth()->user()->campus_code);
+            $studentsQuery->where('campus_id', auth()->user()->campus_id);
         }
         $students = $studentsQuery->get();
         $emailFiltered = $students->pluck('email')->toArray();

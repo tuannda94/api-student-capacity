@@ -12,14 +12,25 @@ class poetry implements MPoetryInterface
     {
     }
 
-    public function ListPoetry($id,$idblock){
+    public function ListPoetry($id, $idblock)
+    {
         try {
-            $records = $this->modelPoetry->where('id_semeter',$id)
-                ->whereHas('subject',function($q) use ($idblock){
-                    $q->where('id_block',$idblock);
-                })->paginate(10);
-            return $records;
-        }catch (\Exception $e) {
+            $records = $this->modelPoetry
+                ->with([
+                    'semeter',
+                    'classsubject',
+                    'user',
+                    'campus',
+                ])
+                ->where('id_semeter', $id)
+                ->withWhereHas('subject', function ($q) use ($idblock) {
+                    $q->where('id_block', $idblock);
+                });
+            if (!auth()->user()->hasRole('super admin')) {
+                $records->where('id_campus', auth()->user()->campus->id);
+            }
+            return $records->paginate(10);
+        } catch (\Exception $e) {
             return false;
         }
     }
@@ -37,7 +48,8 @@ class poetry implements MPoetryInterface
         }
     }
 
-    public function ListPoetryDetail($idSemeter,$idBlock,$id_subject,$id_class){
+    public function ListPoetryDetail($idSemeter, $idBlock, $id_subject, $id_class)
+    {
         try {
             $records = $this->modelPoetry->when(!empty($idSemeter), function ($query) use ($idSemeter) {
                 $query->where('id_semeter', $idSemeter);
@@ -55,14 +67,14 @@ class poetry implements MPoetryInterface
                         ->where('id_class', $id_class);
                 })
                 ->get();
-            $records->load(['classsubject'  => function ($q) {
-                return $q->select('id','name','code_class');
+            $records->load(['classsubject' => function ($q) {
+                return $q->select('id', 'name', 'code_class');
             }]);
             $records->load(['subject' => function ($q) {
-                return $q->select('subject.id','subject.name');
+                return $q->select('subject.id', 'subject.name');
             }]);
             $records->load(['subject.block' => function ($q) {
-                return $q->select('id','name');
+                return $q->select('id', 'name');
             }]);
             $records->load(['examination' => function ($q) {
                 return $q->select('id', 'name');

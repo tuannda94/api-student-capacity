@@ -24,7 +24,7 @@ class User extends Authenticatable
         'status',
         'avatar',
         'mssv',
-        'campus_code'
+        'campus_id'
     ];
 
     protected $hidden = [
@@ -69,7 +69,7 @@ class User extends Authenticatable
 
     public function campus()
     {
-        return $this->belongsTo(Campus::class, 'campus_code', 'code');
+        return $this->belongsTo(Campus::class, 'campus_id', 'id');
     }
 
     // public function wishlistContests()
@@ -90,5 +90,10 @@ class User extends Authenticatable
     public function poetry_student()
     {
         return $this->hasMany(studentPoetry::class, 'id_student', 'id');
+    }
+
+    public function getUserName()
+    {
+        return rtrim($this->email, config('util.END_EMAIL_FPT'));
     }
 }

@@ -118,7 +118,7 @@ class UserController extends Controller
     {
         $user = DB::table('users')->find($id);
         $subjectIdToSubjectName = DB::table('subject')->select('id', 'name')->pluck('name', 'id')->toArray();
-        $campusCodeToCampusName = DB::table('campuses')->select('code', 'name')->pluck('name', 'code')->toArray();
+        $campusIdToCampusName = DB::table('campuses')->select('id', 'name')->pluck('name', 'id')->toArray();
         $examinationIdToExaminationName = DB::table('examination')->select('id', 'name')->pluck('name', 'id')->toArray();
         $classIdToClassName = DB::table('class')->select('id', 'name')->pluck('name', 'id')->toArray();
         $semesterIdToSemesterName = DB::table('semester')->select('id', 'name')->pluck('name', 'id')->toArray();
@@ -141,7 +141,7 @@ class UserController extends Controller
             ->get();
         foreach ($point as $item) {
             $item->semester_name = $semesterIdToSemesterName[$item->id_semeter];
-            $item->campus_name = $campusCodeToCampusName[$user->campus_code];
+            $item->campus_name = $campusIdToCampusName[$user->campus_id];
             $item->class_name = $classIdToClassName[$item->id_class];
             $item->examination_name = $examinationIdToExaminationName[$item->id_examination];
             $item->subject_name = $subjectIdToSubjectName[$item->id_subject];
@@ -154,7 +154,7 @@ class UserController extends Controller
     public function Exportpoint($id_user)
     {
         $subjectIdToSubjectName = DB::table('subject')->select('id', 'name')->pluck('name', 'id')->toArray();
-        $campusCodeToCampusName = DB::table('campuses')->select('code', 'name')->pluck('name', 'code')->toArray();
+        $campusIdToCampusName = DB::table('campuses')->select('id', 'name')->pluck('name', 'id')->toArray();
         $examinationIdToExaminationName = DB::table('examination')->select('id', 'name')->pluck('name', 'id')->toArray();
         $classIdToClassName = DB::table('class')->select('id', 'name')->pluck('name', 'id')->toArray();
         $semesterIdToSemesterName = DB::table('semester')->select('id', 'name')->pluck('name', 'id')->toArray();
@@ -185,7 +185,7 @@ class UserController extends Controller
                 $data[] = [
                     $value->exam_name,
                     $semesterIdToSemesterName[$value->id_semeter],
-                    $campusCodeToCampusName[$user->campus_code],
+                    $campusIdToCampusName[$user->campus_id],
                     $classIdToClassName[$value->id_class],
                     $examinationIdToExaminationName[$value->id_examination],
                     $subjectIdToSubjectName[$value->id_subject],
@@ -277,7 +277,7 @@ class UserController extends Controller
                 });
             if (!auth()->user()->hasRole('super admin')) {
                 $usersQuery
-                    ->where('campus_code', auth()->user()->campus_code)
+                    ->where('campus_id', auth()->user()->campus_id)
                     ->whereDoesntHave('roles', function ($query) {
                         $query->where('name', 'super admin');
                     });
@@ -373,7 +373,7 @@ class UserController extends Controller
 
         }
         if (!auth()->user()->hasRole('super admin')) {
-            if ($request->campus_id !== auth()->user()->campus_code) {
+            if ($request->campus_id !== auth()->user()->campus_id) {
                 return response('Bạn không có quyền thêm tài khoản vào cơ sở này', 404);
             }
             if ($request->roles_id <= auth()->user()->roles[0]->id) {
@@ -387,7 +387,7 @@ class UserController extends Controller
             'status' => $request->status,
             'mssv' => NULL,
             'branch_id' => $request->branches_id,
-            'campus_code' => $request->campus_id
+            'campus_id' => $request->campus_id
         ];
         DB::table('users')->insert($data);
         $id = DB::getPdo()->lastInsertId();
@@ -439,7 +439,7 @@ class UserController extends Controller
 
         }
         if (!auth()->user()->hasRole('super admin')) {
-            if ($request->campus_id_update !== auth()->user()->campus_code) {
+            if ($request->campus_id_update !== auth()->user()->campus_id) {
                 return response('Bạn không có quyền thêm tài khoản vào cơ sở này', 404);
             }
             if ($request->roles_id_update <= auth()->user()->roles[0]->id) {
@@ -451,7 +451,7 @@ class UserController extends Controller
         $user->email = $request->email_update;
         $user->status = $request->status_update_update;
         $user->branch_id = $request->branches_id_update;
-        $user->campus_code = $request->campus_id_update;
+        $user->campus_id = $request->campus_id_update;
         $user->save();
 
         $role = modelroles::where('model_id', $id)->update(['role_id' => $request->roles_id_update]);;
@@ -485,14 +485,14 @@ class UserController extends Controller
         $CampusModel = $this->campus->query();
         if (!auth()->user()->hasRole('super admin')) {
             $rolesModel->where('id', '<>', config('util.SUPER_ADMIN_ROLE'));
-            $CampusModel->where('code', auth()->user()->campus_code);
+            $CampusModel->where('id', auth()->user()->campus_id);
         }
         $roles = $rolesModel->get();
         $Campus = $CampusModel->get();
-        $campusCodeToCampusName = $Campus->mapWithKeys(function ($item) {
-            return [$item['code'] => $item['name']];
+        $campusIdToCampusName = $Campus->mapWithKeys(function ($item) {
+            return [$item['id'] => $item['name']];
         })->all();
-        return view('pages.auth.index', ['users' => $users, 'roles' => $roles, 'branches' => $branches, 'campus' => $Campus, 'campusCodeToCampusName' => $campusCodeToCampusName,]);
+        return view('pages.auth.index', ['users' => $users, 'roles' => $roles, 'branches' => $branches, 'campus' => $Campus, 'campusIdToCampusName' => $campusIdToCampusName,]);
     }
 
     public function stdManagement()

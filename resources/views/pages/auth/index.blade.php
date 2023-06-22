@@ -140,7 +140,7 @@
                             {{ $user->email }}
                         </td>
                         <td>
-                            {{ $campusCodeToCampusName[$user->campus_code] }}
+                            {{ $campusIdToCampusName[$user->campus_id] }}
                         </td>
                         {{-- @if (count($user->roles) > 0) --}}
                         <td>
@@ -339,7 +339,7 @@
                         <select class="form-select" name="subject" id="campus_id">
                             <option selected value="">--Cơ sở--</option>
                             @foreach($campus as $value)
-                                <option value="{{ $value->code }}">{{ $value->name }}</option>
+                                <option value="{{ $value->id }}">{{ $value->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -402,7 +402,7 @@
                         <select class="form-select" name="subject" id="campus_id_update">
                             <option selected value="">--Cơ sở--</option>
                             @foreach($campus as $value)
-                                <option value="{{ $value->code }}">{{ $value->name }}</option>
+                                <option value="{{ $value->id }}">{{ $value->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -572,7 +572,7 @@
                             $('#name_update').val(response.data.name);
                             $('#email_update').val(response.data.email);
                             $('#branches_id_update').val(response.data.branch_id);
-                            $('#campus_id_update').val(response.data.campus_code);
+                            $('#campus_id_update').val(response.data.campus_id);
                             $('#roles_id_update').val(response.data.roles?.[0]?.id ?? 0);
                             $('#status_update_update').val(response.data.status);
                             $('#id_update').val(response.data.id)

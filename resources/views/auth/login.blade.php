@@ -60,18 +60,18 @@
                     <form class="text-center" action="{{ route('google-auth.callback') }}" method="post">
                         @csrf
                         <div class="form-group mb-3">
-                            @error('campus_code')
+                            @error('campus_id')
                             <div class="alert-danger py-3 mb-2">{{ $message }}</div>
                             @enderror
                             @if(session('msg'))
                                 <div class="alert-danger py-3 mb-2">{{ session('msg') }}</div>
                             @endif
-                            <select name="campus_code" id="" class="form-select">
+                            <select name="campus_id" id="" class="form-select">
                                 <option value="">Chọn cơ sở</option>
                                 @foreach($campuses as $campus)
                                     <option
-                                        value="{{ $campus->code }}"
-                                        @if(old('campus_code') === $campus->code) selected @endif
+                                        value="{{ $campus->id }}"
+                                        @if(old('campus_id') === $campus->id) selected @endif
                                     >
                                         CĐ {{ $campus->name }}
                                     </option>
