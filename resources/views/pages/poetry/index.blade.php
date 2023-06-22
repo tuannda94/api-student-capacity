@@ -263,6 +263,7 @@
                 <form id="form-submit" action="{{ route('admin.poetry.create') }}" >
                     @csrf
                     <input type="hidden" id="semeter_id" value="{{ $id_poetry }}">
+                    <input type="hidden" id="id_block" value="{{ $idBlock }}">
 {{--                    <div class="form-group m-10">--}}
 {{--                        <select class="form-select" name="semeter" id="semeter_id">--}}
 {{--                            <option selected value="">--Chọn kỳ học--</option>--}}
@@ -280,7 +281,7 @@
                         </select>
                     </div>
                     <div class="form-group m-10">
-                        <select class="form-select" name="subject" id="subject_id">
+                        <select class="form-select" name="subject" id="campus_id">
                             <option selected value="">--Chọn cơ sở--</option>
                             @foreach($listcampus as $campus)
                                 <option value="{{ $campus->id }}">{{ $campus->name }}</option>
@@ -288,7 +289,7 @@
                         </select>
                     </div>
                     <div class="form-group m-10">
-                        <select class="form-select" name="subject" id="campus_id">
+                        <select class="form-select" name="subject" id="examination_id">
                             <option selected value="">--Chọn ca thi--</option>
                             @foreach($listExamination as $exam)
                                 <option value="{{ $exam->id }}">{{ $exam->name }}</option>
@@ -486,6 +487,7 @@
         $('#upload-basis').click(function (e){
             e.preventDefault();
             var url = $('#form-submit').attr("action");
+            var id_block = $('#id_block').val();
             var semeter_id = $('#semeter_id').val();
             var subject_id = $('#subject_id').val();
             var examination_id = $('#examination_id').val();
@@ -496,6 +498,7 @@
             var end_time_semeter = $('#end_time').val();
             var dataAll = {
                 '_token' : _token,
+                'id_block' : id_block,
                 'semeter_id' : semeter_id,
                 'subject_id' : subject_id,
                 'examination_id' : examination_id,
@@ -600,7 +603,7 @@
                         type: 'GET',
                         success: function(response) {
                             console.log(response);
-                            notify('Tải dữ liệu thành công !')
+                            // notify('Tải dữ liệu thành công !')
                             $('#semeter_id_update').val(response.data.poetry.id_semeter);
                             $('#subject_id_update').val(response.data.poetry.id_subject);
                             $('#examination_id_update').val(response.data.poetry.id_examination);
@@ -764,6 +767,9 @@
         }
 
     </script>
+    <script src="assets/js/system/formatlist/formatlis.js"></script>
+    <script src="assets/js/system/capacity/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js"></script>
     <script>
         $(document).ready(function () {
             $('.up-file').on("change", function () {

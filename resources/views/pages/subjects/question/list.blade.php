@@ -4,7 +4,9 @@
 @section('content')
 
 
-
+    <div class="mb-5">
+        {{ Breadcrumbs::render('Management.exam.question',$id_subject,$name,$id ) }}
+    </div>
     <div class="card card-flush p-4">
         <div class="row mb-4">
             <div class=" col-lg-6">

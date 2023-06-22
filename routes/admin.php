@@ -132,7 +132,7 @@ Route::prefix('subject')->group(function () {
 
     Route::prefix('exam')->group(function () {
         Route::get('/{id}', [ExamController::class, 'index'])->name('admin.exam.index');
-        Route::get('create/{id}', [ExamController::class, 'create'])->name('admin.exam.create');
+        Route::get('create/{id}/{name}', [ExamController::class, 'create'])->name('admin.exam.create');
         Route::post('store', [ExamController::class, 'store'])->name('admin.exam.store');
         Route::get('{id_exam}/edit', [ExamController::class, 'edit'])->name('admin.exam.edit');
         Route::post('{id_exam}/un-status', [ExamController::class, 'un_status'])->name('admin.exam.un_status');
@@ -140,7 +140,7 @@ Route::prefix('subject')->group(function () {
         Route::put('{id_exam}', [ExamController::class, 'update'])->name('admin.exam.update');
     });
     Route::prefix('question')->group(function () {
-        Route::get('/{id}', [QuestionController::class, 'indexSubject'])->name('admin.subject.question.index');
+        Route::get('/{id}/{id_subject}/{name}', [QuestionController::class, 'indexSubject'])->name('admin.subject.question.index');
         Route::get('edit/{id}', [QuestionController::class, 'editSubject'])->name('admin.subject.question.edit');
         Route::get('destroy/{id}/{id_exam}', [QuestionController::class, 'destroysubject'])->name('admin.subject.question.destroy');
         Route::post('un-status/{id}', [QuestionController::class, 'un_status'])->name('admin.subject.question.un.status');
@@ -209,7 +209,7 @@ Route::prefix('accountStudent')->group(function () {
     Route::get('GetPoetry/{id_subject}', [PoetryController::class, 'ListPoetryRespone'])->name('manage.semeter.list');
     Route::post('GetPoetryDetail', [PoetryController::class, 'ListPoetryResponedetail'])->name('manage.semeter.list');
     Route::get('ListUser/{id}', [studentPoetryController::class, 'listUser'])->name('admin.manage.semeter.index');
-    Route::get('viewpoint/{id_user}/{id_poetry}', [UserController::class, 'Listpoint'])->name('manage.student.view');
+    Route::get('viewpoint/{id_user}', [UserController::class, 'Listpoint'])->name('manage.student.view');
     Route::get('exportPoint/{id_user}', [UserController::class, 'Exportpoint'])->name('manage.student.export');
     Route::get('exportUserPoint/{id}', [studentPoetryController::class, 'UserExportpoint'])->name('manage.student.list.export');
 });

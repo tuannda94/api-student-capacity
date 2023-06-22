@@ -25,7 +25,7 @@
                             </span>
                             Tải Mẫu Đề</a>
                     </div>
-                    <a href="{{ route('admin.exam.create',$id) }}" class="btn btn-primary">Thêm mới
+                    <a href="{{ route('admin.exam.create',['id' => $id,'name' => $name->name]) }}" class="btn btn-primary">Thêm mới
                         đề</a>
                 </div>
             </div>
@@ -157,7 +157,7 @@
                                 <td>
                                     <div class="d-flex justify-content-between">
                                         <button type="button" class="btn btn-info btn-question"
-                                                onclick="location.href='{{ route('admin.subject.question.index',$exam->id) }}'">
+                                                onclick="location.href='{{ route('admin.subject.question.index',['id'=> $exam->id,'id_subject'=> $id, 'name' => $name->name,]) }}'">
                                             Câu Hỏi
                                         </button>
 {{--                                        <button--}}

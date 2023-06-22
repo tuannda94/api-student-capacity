@@ -3,6 +3,9 @@
 @section('page-title', 'Thêm mới Đề thi ')
 @section('content')
     <div class=" card card-flush  p-5">
+        <div class="mb-5">
+            {{ Breadcrumbs::render('Management.exam.create',$id,$name) }}
+        </div>
         <div class="row">
             <div class="col-lg-12">
                 <form id="myForm" action="{{ route('admin.exam.store', ['id' => $id]) }}" method="post"

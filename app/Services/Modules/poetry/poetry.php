@@ -2,8 +2,12 @@
 
 namespace App\Services\Modules\poetry;
 
+use App\Models\ClassModel;
 use App\Models\poetry as modelPoetry;
-
+use App\Models\semeter;
+use App\Models\studentPoetry;
+use App\Models\subject;
+use App\Models\User;
 class poetry implements MPoetryInterface
 {
     public function __construct(
@@ -15,7 +19,7 @@ class poetry implements MPoetryInterface
     public function ListPoetry($id,$idblock){
         try {
             $records = $this->modelPoetry->where('id_semeter',$id)
-                ->whereHas('subject',function($q) use ($idblock){
+                ->whereHas('block_subject',function($q) use ($idblock){
                     $q->where('id_block',$idblock);
                 })->paginate(10);
             return $records;
@@ -54,25 +58,29 @@ class poetry implements MPoetryInterface
                     $query->where('id_subject', $id_subject)
                         ->where('id_class', $id_class);
                 })
-                ->get();
-            $records->load(['classsubject'  => function ($q) {
-                return $q->select('id','name','code_class');
-            }]);
-            $records->load(['subject' => function ($q) {
-                return $q->select('subject.id','subject.name');
-            }]);
-            $records->load(['subject.block' => function ($q) {
-                return $q->select('id','name');
-            }]);
-            $records->load(['examination' => function ($q) {
-                return $q->select('id', 'name');
-            }]);
-            $records->load(['semeter' => function ($q) {
-                return $q->select('id', 'name');
-            }]);
-            return $records;
+                ->pluck('id');
+            $studentRecords = studentPoetry::whereIn('id_poetry', $records)
+                ->pluck('id_student')->unique()
+                ->values();
+            $student = User::whereIn('id',$studentRecords)->with('campus')->get();
+
+//            $records->load(['classsubject'  => function ($q) {
+//                return $q->select('id','name','code_class');
+//            }]);
+//            $records->load(['std_poetry'  => function ($q) {
+//                return $q->select('id_student');
+//            }]);
+//
+//            $records->load(['subject.block' => function ($q) {
+//                return $q->select('id','name');
+//            }]);
+//
+//            $records->load(['semeter' => function ($q) {
+//                return $q->select('id', 'name');
+//            }]);
+            return $student;
         } catch (\Exception $e) {
-            return false;
+            return $e;
         }
     }
     public function ListPoetryDetailChart($idSemeter,$idBlock,$id_subjects){

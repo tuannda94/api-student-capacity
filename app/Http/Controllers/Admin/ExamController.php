@@ -122,7 +122,7 @@ class ExamController extends Controller
 //        );
 //    }
 
-    public function create($id)
+    public function create($id,$name)
     {
         $campus = $this->campus->apiIndex();
 //        if ($round->contest->type != request('type') ?? 0) abort(404);
@@ -131,7 +131,8 @@ class ExamController extends Controller
             'pages.subjects.exam_subject.form-add',
             [
                 'campus' => $campus,
-                'id' => $id
+                'id' => $id,
+                'name' => $name
             ]
         );
     }

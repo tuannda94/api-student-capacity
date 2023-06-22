@@ -277,7 +277,6 @@
             return formattedDate;
         }
         const table = document.querySelectorAll('#table-data tbody tr');
-        let STT = parseInt(table[table.length - 1].childNodes[1].innerText) + 1;
         let btnDelete = document.querySelectorAll('.btn-delete');
         let btnEdit = document.querySelectorAll('.btn-edit');
         let btnUpdate = document.querySelector('#btn-update');

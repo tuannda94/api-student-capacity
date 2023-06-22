@@ -114,14 +114,18 @@ class UserController extends Controller
         ]);
     }
 
-    public function Listpoint($id, $id_poetry)
+    public function Listpoint($id)
     {
         $user = DB::table('users')->find($id);
-        $subjectIdToSubjectName = DB::table('subject')->select('id', 'name')->pluck('name', 'id')->toArray();
+        $subjectIdToSubjectInfo = DB::table('subject')->select('id', 'name', 'code_subject')->get()->keyBy('id')->toArray();
+        $subjectIdToSubjectName = collect($subjectIdToSubjectInfo)->pluck('name', 'id')->toArray();
+        $subjectIdToSubjectCode = collect($subjectIdToSubjectInfo)->pluck('code_subject', 'id')->toArray();
+
         $campusCodeToCampusName = DB::table('campuses')->select('code', 'name')->pluck('name', 'code')->toArray();
         $examinationIdToExaminationName = DB::table('examination')->select('id', 'name')->pluck('name', 'id')->toArray();
         $classIdToClassName = DB::table('class')->select('id', 'name')->pluck('name', 'id')->toArray();
         $semesterIdToSemesterName = DB::table('semester')->select('id', 'name')->pluck('name', 'id')->toArray();
+
         $point = $this->playtopic
             ->query()
             ->select([
@@ -139,25 +143,31 @@ class UserController extends Controller
             ->join('result_capacity', 'result_capacity.playtopic_id', '=', 'playtopic.id')
             ->where('student_poetry.id_student', $id)
             ->get();
+
         foreach ($point as $item) {
             $item->semester_name = $semesterIdToSemesterName[$item->id_semeter];
             $item->campus_name = $campusCodeToCampusName[$user->campus_code];
             $item->class_name = $classIdToClassName[$item->id_class];
             $item->examination_name = $examinationIdToExaminationName[$item->id_examination];
             $item->subject_name = $subjectIdToSubjectName[$item->id_subject];
+            $item->subject_code = $subjectIdToSubjectCode[$item->id_subject];
         }
 
 //        $point = $this->playtopic->where('id_user', $id)->get();
-        return view('pages.Students.accountStudent.viewpoint', ['point' => $point, 'user' => $user, 'id' => $id, 'id_poetry' => $id_poetry]);
+        return view('pages.Students.accountStudent.viewpoint', ['point' => $point, 'user' => $user, 'id' => $id]);
     }
 
     public function Exportpoint($id_user)
     {
-        $subjectIdToSubjectName = DB::table('subject')->select('id', 'name')->pluck('name', 'id')->toArray();
+        $subjectIdToSubjectInfo = DB::table('subject')->select('id', 'name', 'code_subject')->get()->keyBy('id')->toArray();
+        $subjectIdToSubjectName = collect($subjectIdToSubjectInfo)->pluck('name', 'id')->toArray();
+        $subjectIdToSubjectCode = collect($subjectIdToSubjectInfo)->pluck('code_subject', 'id')->toArray();
+
         $campusCodeToCampusName = DB::table('campuses')->select('code', 'name')->pluck('name', 'code')->toArray();
         $examinationIdToExaminationName = DB::table('examination')->select('id', 'name')->pluck('name', 'id')->toArray();
         $classIdToClassName = DB::table('class')->select('id', 'name')->pluck('name', 'id')->toArray();
         $semesterIdToSemesterName = DB::table('semester')->select('id', 'name')->pluck('name', 'id')->toArray();
+
         $point = $this->playtopic
             ->query()
             ->select([
@@ -183,30 +193,26 @@ class UserController extends Controller
 //            if(isset($resultCapacity->scores) && $resultCapacity->scores  !== null){
             if (isset($value->scores)) {
                 $data[] = [
-                    $value->exam_name,
+                    $key+1,
+                    $subjectIdToSubjectCode[$value->id_subject],
                     $semesterIdToSemesterName[$value->id_semeter],
-                    $campusCodeToCampusName[$user->campus_code],
                     $classIdToClassName[$value->id_class],
-                    $examinationIdToExaminationName[$value->id_examination],
-                    $subjectIdToSubjectName[$value->id_subject],
                     $value->scores,
-                    $value->created_at,
-                    $value->updated_at
+                    1,
+                    $value->scores > 5 ? 'Đạt' : 'Không đạt'
                 ];
             }
         }
         $spreadsheet = new Spreadsheet();
         // Thực hiện xử lý dữ liệu
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setCellValue('A1', 'Tên đề thi');
-        $sheet->setCellValue('B1', 'Học Kỳ');
-        $sheet->setCellValue('C1', 'Cơ Sở');
+        $sheet->setCellValue('A1', 'TT');
+        $sheet->setCellValue('B1', 'Mã Môn');
+        $sheet->setCellValue('C1', 'Môn Học');
         $sheet->setCellValue('D1', 'Lớp');
-        $sheet->setCellValue('E1', 'Ca Thi');
-        $sheet->setCellValue('F1', 'Môn Thi');
-        $sheet->setCellValue('G1', 'Điểm');
-        $sheet->setCellValue('H1', 'Thời gian bắt đầu');
-        $sheet->setCellValue('I1', 'Thời gian kết thúc');
+        $sheet->setCellValue('E1', 'Điểm');
+        $sheet->setCellValue('F1', 'Lần học');
+        $sheet->setCellValue('G1', 'Trạng thái');
         $borderStyle = [
             'borders' => [
                 'allBorders' => [
@@ -234,11 +240,9 @@ class UserController extends Controller
         $sheet->getColumnDimension('E')->setWidth(10);
         $sheet->getColumnDimension('F')->setWidth(10);
         $sheet->getColumnDimension('G')->setWidth(10);
-        $sheet->getColumnDimension('H')->setWidth(25);
-        $sheet->getColumnDimension('I')->setWidth(25);
         // Định dạng căn giữa và màu nền cho hàng tiêu đề
-        $sheet->getStyle('A1:I1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A1:I1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('DDDDDD');
+        $sheet->getStyle('A1:G1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A1:G1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('DDDDDD');
 
         $writer = new Xlsx($spreadsheet);
         $outputFileName = 'diem_thi_cua_sinh_vien_' . $user->name . '_' . $user->mssv . '.xlsx';

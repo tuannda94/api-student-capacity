@@ -124,6 +124,12 @@ class PoetryController extends Controller
             }
 
         }
+        DB::table('block_subject')->insert(
+            [
+                'id_subject' => $request->subject_id,
+                'id_block' => $request->id_block
+            ]
+        );
         $data = [
             'id_semeter' => $request->semeter_id,
             'id_subject' => $request->subject_id,
