@@ -142,7 +142,7 @@ Route::prefix('subject')->group(function () {
     Route::prefix('question')->group(function () {
         Route::get('/{id}', [QuestionController::class, 'indexSubject'])->name('admin.subject.question.index');
         Route::get('edit/{id}', [QuestionController::class, 'editSubject'])->name('admin.subject.question.edit');
-        Route::delete('destroy/{id}/{id_exam}', [QuestionController::class, 'destroysubject'])->name('admin.subject.question.destroy');
+        Route::get('destroy/{id}/{id_exam}', [QuestionController::class, 'destroysubject'])->name('admin.subject.question.destroy');
         Route::post('un-status/{id}', [QuestionController::class, 'un_status'])->name('admin.subject.question.un.status');
         Route::post('re-status/{id}', [QuestionController::class, 're_status'])->name('admin.subject.question.re.status');
         Route::delete('delete/{id}', [QuestionController::class, 'deletesubject'])->name('admin.subject.question.delete');
@@ -216,6 +216,8 @@ Route::prefix('accountStudent')->group(function () {
 
 Route::prefix('chart')->group(function(){
     Route::get('',[chartController::class, 'index'])->name('admin.chart');
+    Route::post('GetPoetryDetail', [PoetryController::class, 'ListPoetryResponedetailChart'])->name('manage.semeter.list');
+    Route::get('detail',[chartController::class, 'detail'])->name('admin.chart.detail');
 });
 //Ca học =>done
 Route::prefix('poetry')->group(function () {

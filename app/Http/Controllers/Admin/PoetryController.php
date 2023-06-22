@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\Modules\MClass\classModel;
 use App\Services\Modules\MClassSubject\ClassSubject;
 use App\Services\Modules\MExamination\Examination;
+use App\Services\Modules\MStudentManager\PoetryStudent;
 use App\Services\Modules\MSubjects\Subject;
 use App\Services\Traits\TResponse;
 use App\Services\Traits\TUploadImage;
@@ -24,7 +25,8 @@ class PoetryController extends Controller
         private Subject  $subject,
         private Examination $examination,
         private ClassSubject $classSubject,
-        private classModel $class
+        private classModel $class,
+        private PoetryStudent $PoetryStudent,
     )
     {
     }
@@ -52,6 +54,22 @@ class PoetryController extends Controller
     public function ListPoetryResponedetail(Request $request){
         $data = $this->poetry->ListPoetryDetail($request->semeter,$request->block,$request->subject,$request->class);
         return response()->json(['data' => $data], 200);
+    }
+
+    public function ListPoetryResponedetailChart(Request $request){
+        $dataResult = $this->poetry->ListPoetryDetailChart($request->semeter,$request->block,$request->subject);
+        $dataWithStudents = [];
+        foreach ($dataResult as $value){
+            $studentsDetail = $this->PoetryStudent->GetStudentsDetail( $value['id_poetry']);
+            $dataWithStudents['namePoetry'][] =$value['name'];
+            $dataWithStudents['student']['total'][] = $studentsDetail->count();
+            $dataWithStudents['student']['tookExam'][] = $studentsDetail->whereNotNull('scores')->count();
+            $dataWithStudents['student']['notExam'][] = $studentsDetail->whereNull('scores')->count();
+        }
+
+
+
+        return response()->json(['data' => $dataWithStudents], 200);
     }
 
     public function indexApi($id,$id_user){

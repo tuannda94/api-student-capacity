@@ -764,7 +764,49 @@
         }
 
     </script>
-
+    <script>
+        $(document).ready(function () {
+            $('.up-file').on("change", function () {
+                $('.show-name').html($(this)[0].files[0].name);
+            })
+            $('.form-submit').ajaxForm({
+                beforeSend: function () {
+                    $(".error_ex_file").html("");
+                    $(".upload-file").html("Đang tải dữ liệu ..")
+                    $(".progress").show();
+                    var percentage = '0';
+                },
+                uploadProgress: function (event, position, total, percentComplete) {
+                    var percentage = percentComplete;
+                    $('.progress .progress-bar').css("width", percentage + '%', function () {
+                        return $(this).attr("aria-valuenow", percentage) + "%";
+                    })
+                },
+                success: function () {
+                    $(".progress").hide();
+                    $(".upload-file").html("Tải lên")
+                    toastr.success("Tải lên thành công !");
+                    $('.up-file').val('');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                    setTimeout(() => {
+                        $('.modal').modal('hide');
+                    }, 500);
+                    // window.location.reload();
+                },
+                error: function (xhr, status, error) {
+                    $(".upload-file").html("Tải lên")
+                    $('.progress .progress-bar').css("width", 0 + '%', function () {
+                        return $(this).attr("aria-valuenow", 0) + "%";
+                    })
+                    $(".progress").hide();
+                    var err = JSON.parse(xhr.responseText);
+                    if (err.errors) $(".error_ex_file").html(err.errors.ex_file);
+                }
+            });
+        })
+    </script>
     {{--    Cập nhật trang thái nhanh--}}
 
 @endsection

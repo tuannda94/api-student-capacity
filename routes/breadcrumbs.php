@@ -12,7 +12,7 @@ Breadcrumbs::for('ManagementStudent', function (BreadcrumbTrail $trail) {
 // Quản lí Môn học > Quản lí đề thi
 Breadcrumbs::for('Management.exam', function (BreadcrumbTrail $trail,$id,$name) {
     $trail->parent('ManagementStudent');
-    $trail->push('Quản lí đề thi ' .$name, route('admin.exam.index',$id));
+    $trail->push('Ngân hàng đề thi môn ' .$name, route('admin.exam.index',$id));
 });
 
 // Quản lí Môn học > Quản Lí bộ câu hỏi

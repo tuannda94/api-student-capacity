@@ -1,5 +1,5 @@
 @extends('layouts.main')
-@section('page-title', 'Quản lý đề thi ' . $name->name)
+@section('page-title', 'Ngân hàng đề thi môn ' . $name->name)
 @section('content')
     <div class="mb-5">
         {{ Breadcrumbs::render('Management.exam',$id,$name->name ) }}
@@ -23,8 +23,7 @@
                                         fill="black"></path>
                                 </svg>
                             </span>
-                            Tải
-                            xuống mẫu</a>
+                            Tải Mẫu Đề</a>
                     </div>
                     <a href="{{ route('admin.exam.create',$id) }}" class="btn btn-primary">Thêm mới
                         đề</a>
@@ -38,8 +37,8 @@
                         <thead>
                         <tr class="fw-bolder fs-6 text-gray-800">
                             <th>#</th>
-                            <th>Tên</th>
-                            <th>Mô tả đề</th>
+                            <th>Tên đề thi</th>
+{{--                            <th>Mô tả đề</th>--}}
                             <th>Cơ sở ra đề</th>
                             <th>Số câu hỏi</th>
                             <th>Tải lên bộ câu hỏi</th>
@@ -58,37 +57,37 @@
 
                                 <td>{{ $exam->name }}</td>
 
-                                <td>
-                                    <button class="btn  btn-primary btn-sm" type="button" data-bs-toggle="modal"
-                                            data-bs-target="#exampleModal_{{ $exam->id }}">
-                                        Xem Thêm
-                                    </button>
-                                    <!-- Modal -->
-                                    <div style="margin: auto; display: none;" class="modal fade"
-                                         id="exampleModal_{{ $exam->id }}" tabindex="-1"
-                                         aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLabel">
-                                                        Mô tả đề thi
-                                                    </h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body  ">
-                                                    {{ $exam->description }}
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary"
-                                                            data-bs-dismiss="modal">Thoát
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+{{--                                <td>--}}
+{{--                                    <button class="btn  btn-primary btn-sm" type="button" data-bs-toggle="modal"--}}
+{{--                                            data-bs-target="#exampleModal_{{ $exam->id }}">--}}
+{{--                                        Xem Thêm--}}
+{{--                                    </button>--}}
+{{--                                    <!-- Modal -->--}}
+{{--                                    <div style="margin: auto; display: none;" class="modal fade"--}}
+{{--                                         id="exampleModal_{{ $exam->id }}" tabindex="-1"--}}
+{{--                                         aria-labelledby="exampleModalLabel" aria-hidden="true">--}}
+{{--                                        <div class="modal-dialog">--}}
+{{--                                            <div class="modal-content">--}}
+{{--                                                <div class="modal-header">--}}
+{{--                                                    <h5 class="modal-title" id="exampleModalLabel">--}}
+{{--                                                        Mô tả đề thi--}}
+{{--                                                    </h5>--}}
+{{--                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"--}}
+{{--                                                            aria-label="Close"></button>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="modal-body  ">--}}
+{{--                                                    {{ $exam->description }}--}}
+{{--                                                </div>--}}
+{{--                                                <div class="modal-footer">--}}
+{{--                                                    <button type="button" class="btn btn-secondary"--}}
+{{--                                                            data-bs-dismiss="modal">Thoát--}}
+{{--                                                    </button>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
 
-                                </td>
+{{--                                </td>--}}
 
                                 <td>{{ $exam->campus->name }}</td>
                                 <td>{{ $exam->total_questions }}</td>
@@ -161,12 +160,12 @@
                                                 onclick="location.href='{{ route('admin.subject.question.index',$exam->id) }}'">
                                             Câu Hỏi
                                         </button>
-                                        <button
-                                            data-href=""
-                                            data-date_time="{{ $name->created_at  }}"
-                                            class="edit_exam btn btn-primary btn-sm">
-                                            Chỉnh sửa đề
-                                        </button>
+{{--                                        <button--}}
+{{--                                            data-href=""--}}
+{{--                                            data-date_time="{{ $name->created_at  }}"--}}
+{{--                                            class="edit_exam btn btn-primary btn-sm">--}}
+{{--                                            Chỉnh sửa đề--}}
+{{--                                        </button>--}}
                                     </div>
                                 </td>
                             </tr>

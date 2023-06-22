@@ -102,7 +102,7 @@
                                 <td>{{ $value->end_time == null ? 'Chưa có thời gian kết thúc' :   date('d-m-Y', strtotime($value->end_time)) }}</td>
                                 <td>
                                     <button  class="btn btn-info" onclick="location.href='{{ route('admin.semeter.block',$value->id) }}'"   type="button">
-                                       Blocks
+                                       Block
                                     </button>
                                     <button  class="btn btn-info" onclick="location.href='{{ route('admin.semeter.subject.index',$value->id) }}'"   type="button">
                                         Chi tiết
@@ -330,7 +330,7 @@
                                 <td>${ formatDate(end_time_semeter)}</td>
                                 <td>
                                <button  class="btn btn-info" onclick="location.href='admin/semeter/block/${response.data.id}'"   type="button">
-                                                                             Blocks
+                                                                             Block
                                                                 </button>
                                   <button  class="btn btn-info" onclick="location.href='admin/subject/exam/${response.data.id}'"   type="button">
                                         Chi tiết

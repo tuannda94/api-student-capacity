@@ -75,7 +75,29 @@ class poetry implements MPoetryInterface
             return false;
         }
     }
+    public function ListPoetryDetailChart($idSemeter,$idBlock,$id_subjects){
+        try {
+            $records = $this->modelPoetry->when(!empty($idBlock), function ($query) use ($idBlock) {
+                $query->whereHas('subject', function ($subQuery) use ($idBlock) {
+                    $subQuery->where('id_block', $idBlock);
+                });
+            })
+                ->where('id_semeter', $idSemeter) // Thêm điều kiện 'id_semester' = $idSemester
+                ->where('id_subject', $id_subjects) // Thêm điều kiện 'id_subject' = $id_subject
+                ->get();
+            $data  = [];
+            foreach ($records as $value){
+                $data[]=[
+                    'name' =>  $value->examination->name . '-'. $value->subject->name ."-". $value->classsubject->name,
+                    'id_poetry' => $value->id
+                ];
+            }
 
+            return $data;
+        } catch (\Exception $e) {
+            return $e;
+        }
+    }
     public function ListPoetryApi($id, $id_user)
     {
         try {
