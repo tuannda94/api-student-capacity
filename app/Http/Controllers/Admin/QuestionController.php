@@ -14,6 +14,7 @@ use App\Models\subject;
 use App\Models\ClassModel;
 use App\Models\poetry;
 use App\Models\semeter_subject;
+use App\Models\User;
 use App\Services\Modules\MAnswer\MAnswerInterface;
 use App\Services\Modules\MExam\MExamInterface;
 use App\Services\Modules\MQuestion\MQuestionInterface;
@@ -21,6 +22,8 @@ use App\Services\Modules\MSkill\MSkillInterface;
 use App\Services\Traits\TStatus;
 use App\Services\Traits\TUploadImage;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
@@ -51,10 +54,10 @@ class QuestionController extends Controller
         Exam                       $exam,
         private MSkillInterface    $skillRepo,
         private MQuestionInterface $questionRepo,
-        subject                     $subject,
-        ClassModel $class,
-        poetry $poetry,
-        semeter_subject $semeter_subject
+        subject                    $subject,
+        ClassModel                 $class,
+        poetry                     $poetry,
+        semeter_subject            $semeter_subject
     )
     {
         $this->skillModel = $skill;
@@ -117,7 +120,7 @@ class QuestionController extends Controller
         return $data;
     }
 
-    public function indexSubject($id,$id_subject,$name)
+    public function indexSubject($id, $id_subject, $name)
     {
         $skills = $this->skillModel::all();
         if (!($questions = $this->getQuestion($id)->paginate(request('limit') ?? 10))) return abort(404);
@@ -146,7 +149,7 @@ class QuestionController extends Controller
     {
         try {
             if (!($questions = $this->getList()->take(request('take') ?? 10)->get()))
-                throw new \Exception("Question not found");
+                throw new Exception("Question not found");
             return response()->json([
                 'status' => true,
                 'payload' => $questions,
@@ -480,10 +483,22 @@ class QuestionController extends Controller
             ], 400);
         }
     }
-    public function importAndRunSemeter(ImportQuestion $request, $semeter_id,$idBlock)
+
+    public function importAndRunSemeter(ImportQuestion $request, $semeter_id, $idBlock)
     {
         try {
-            $this->readExClass($request->ex_file, $semeter_id,$idBlock);
+            $id_campus = auth()->user()->campus_id;
+            if (auth()->user()->hasRole('super admin')) {
+                if (empty($request->campus_id)) {
+                    return throw new HttpResponseException(response()->json([
+                        'errors' => ['campus_id' => "Vui lòng chọn cơ sở"],
+                        'status' => false
+                    ], 404));
+                } else {
+                    $id_campus = $request->campus_id;
+                }
+            }
+            $this->readExClass($request->ex_file, $semeter_id, $idBlock, $id_campus);
 //            $import = new QuestionsImport($exam_id);
 //            Excel::import($import, $request->ex_file);
 //            dd();
@@ -491,7 +506,7 @@ class QuestionController extends Controller
 //                "status" => true,
 //                "payload" => "Thành công "
 //            ]);
-            return redirect()->route('admin.poetry.index',['id' => $semeter_id,'id_block' => $idBlock]);
+            return redirect()->route('admin.poetry.index', ['id' => $semeter_id, 'id_block' => $idBlock]);
 
         } catch (\Throwable $th) {
             return response()->json([
@@ -502,6 +517,7 @@ class QuestionController extends Controller
             ], 400);
         }
     }
+
     public function readExcel($file, $exam_id)
     {
         $spreadsheet = IOFactory::load($file);
@@ -688,97 +704,288 @@ class QuestionController extends Controller
         $exams->save();
     }
 
-    public function readExClass($file, $id_semeter,$idBlock)
+    public function readExClass($file, $id_semeter, $idBlock, $id_campus)
     {
+        $campus_id = $id_campus;
         $spreadsheet = IOFactory::load($file);
         $sheetCount = $spreadsheet->getSheetCount();
         // Lấy ra sheet chứa câu hỏi
         $questionsSheet = $spreadsheet->getSheet(0);
-        $infoSubject= $questionsSheet->toArray();
+        $infoSubject = $questionsSheet->toArray();
         unset($infoSubject[0]);
         $infoSubject = array_values($infoSubject);
         $arrItem = [];
-        foreach ($infoSubject as $value){
-            $subjectFind = $this->subjectModel->where('code_subject',$value[4])->first();
-            $id_subject = $subjectFind != null ? $subjectFind->id : null;
-            if($subjectFind == null){
-                $id_subject = DB::table('subject')->insertGetId(
-                    [
-                        'name' => $value[3],
-                        'status' => 1,
-                        'created_at' => now(),
-                        'updated_at' => NULL,
-                        'code_subject' =>  $value[4]
-                    ]
-                );
-
-
-
+        $ngayThiArr = [];
+        $emails = [];
+        $subjects = [];
+        $classes = [];
+        $checkTrungArr = [];
+        foreach ($infoSubject as $value) {
+            $date = date('Y-m-d', strtotime($value[0]));
+            $key = implode('|', [
+                $value[0],
+                $value[2],
+                $value[4],
+                $value[8],
+                $value[9]
+            ]);
+            if (!empty($arrItem[$key])) {
+                $arrItem[$key]['examination_count']++;
+                continue;
             }
-            DB::table('block_subject')->insertGetId(
-                [
-                    'id_subject' => $id_subject,
-                    'id_block' => $idBlock
-                ]
-            );
+            $arrItem[$key] = [
+                'ngay_thi' => $date,
+                'ca_thi' => $value[1],
+                'room' => $value[2],
+                'subject_name' => $value[3],
+                'subject_code' => $value[4],
+                'start_examination_id' => $value[1],
+                'examination_count' => 1,
+                'class' => $value[8],
+                'assigned_user_email' => $value[9] . config('util.END_EMAIL_FPT'),
+            ];
+            $ngayThiArr[] = $date;
+            $emails[] = $value[9] . config('util.END_EMAIL_FPT');
+            $subjects[$value[4]] = $value[3];
+            $classes[] = $value[8];
+        }
 
-            $Classfind = $this->classModel->where('name',$value[5])->first();
-            $idClass = $Classfind != null ? $Classfind->id : null;
-            if($Classfind == null){
-                $idClass = DB::table('class')->insertGetId(
-                    [
-                        'name' => $value[5],
-                        'code_class' => NULL,
-                        'created_at' => now(),
-                        'updated_at' => NULL
-                    ]
-                );
+        $emails = array_unique($emails);
+        $classes = array_unique($classes);
+
+        $emailsDb = User::query()
+            ->select('id', 'email')
+            ->whereIn('email', $emails)
+            ->get();
+        $emailToUserId = $emailsDb->pluck('id', 'email')->toArray();
+        $emailDiff = array_diff($emails, array_keys($emailToUserId));
+        if (!empty($emailDiff)) {
+            $userInsertArr = [];
+            $rolesArr = [];
+            $maxUserId = DB::table('users')->max('id');
+            foreach ($emailDiff as $email) {
+                $userInsertArr[] = [
+                    'id' => ++$maxUserId,
+                    'name' => $email,
+                    'email' => $email,
+                    'status' => 1,
+                    'campus_id' => $campus_id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+                $rolesArr[] = [
+                    'role_id' => config('util.TEACHER_ROLE'),
+                    'model_type' => "App\Models\User",
+                    'model_id' => $maxUserId
+                ];
+                $emailToUserId[$email] = $maxUserId;
             }
-            $semeterSubjectFind =    $this->semeter_subject->where('id_semeter',$id_semeter)->where('id_subject',$id_subject)->first();
-            if($semeterSubjectFind == null){
-               DB::table('semester_subject')->insert(
-                    [
-                        'id_semeter' =>$id_semeter,
-                        'id_subject' => $id_subject,
-                        'status' => now(),
-                        'created_at' => Carbon::now(),
-                        'updated_at' => NULL,
-                        'deleted_at' => NULL
-                    ]
-                );
+            DB::table('users')->insert($userInsertArr);
+            DB::table('model_has_roles')->insert($rolesArr);
+        }
+
+        // Lấy ra các môn có trong excel và database theo idBlock
+        $subjectsDb = $this->subjectModel->query()
+            ->whereIn('code_subject', array_keys($subjects))
+            ->get();
+
+        // Subject Code To Subject ID
+        $subjectCodeToSubjectId = $subjectsDb->pluck('id', 'code_subject')->toArray();
+
+        // Lấy ra những môn chưa có trong database
+        $subjectsCodeDiff = array_diff(array_keys($subjects), array_keys($subjectCodeToSubjectId));
+        if (!empty($subjectsCodeDiff)) {
+            // Nếu có thì insert
+            $maxSubjectId = DB::table('subject')->max('id');
+            $subjectInsertArr = [];
+            foreach ($subjectsCodeDiff as $subject_code) {
+                $subjectInsertArr[] = [
+                    'id' => ++$maxSubjectId,
+                    'name' => $subjects[$subject_code],
+                    'status' => 1,
+                    'code_subject' => $subject_code,
+//                    'id_block' => $idBlock,
+                    'created_at' => now(),
+                ];
+                $subjectCodeToSubjectId[$subject_code] = $maxSubjectId;
             }
-            $time = $this->timeNow($value[1]);
-            $arrItem[] = [
+            DB::table('subject')->insert($subjectInsertArr);
+        }
+        $subjectIdToSubjectCode = array_flip($subjectCodeToSubjectId);
+        $subjectIdToBlockSubjectId = DB::table('block_subject')
+            ->select('id', 'id_subject')
+            ->where('id_block', $idBlock)
+            ->whereIn('id_subject', array_values($subjectCodeToSubjectId))
+            ->get()->pluck('id', 'id_subject')->toArray();
+        $blockSubjectIdDiff = array_diff(array_keys($subjectIdToSubjectCode), array_keys($subjectIdToBlockSubjectId));
+        if (!empty($blockSubjectIdDiff)) {
+            // Nếu có thì insert
+            $maxBlockSubjectId = DB::table('block_subject')->max('id');
+            $blockSubjectInsertArr = [];
+            foreach ($blockSubjectIdDiff as $subject_id) {
+                $blockSubjectInsertArr[] = [
+                    'id' => ++$maxBlockSubjectId,
+                    'id_subject' => $subject_id,
+                    'id_block' => $idBlock,
+                ];
+                $subjectIdToBlockSubjectId[$subject_id] = $maxBlockSubjectId;
+            }
+            DB::table('block_subject')->insert($blockSubjectInsertArr);
+        }
+        $subjectCodeToBlockSubjectId = [];
+        foreach ($subjectIdToSubjectCode as $subject_id => $subject_code) {
+            $subjectCodeToBlockSubjectId[$subject_code] = $subjectIdToBlockSubjectId[$subject_id];
+        }
+
+        // Lấy ra các lớp có trong excel và database
+        $classesDb = $this->classModel->query()
+            ->select('id', 'name')
+            ->whereIn('name', $classes)
+            ->get();
+
+        // Class Name To Class ID
+        $classNameToClassId = $classesDb->pluck('id', 'name')->toArray();
+
+        // Lấy ra những môn chưa có trong database
+        $classNameDiff = array_diff($classes, array_keys($classNameToClassId));
+        if (!empty($classNameDiff)) {
+            // Nếu có thì insert
+            $maxClassId = DB::table('class')->max('id');
+            $classInsertArr = [];
+            foreach ($classNameDiff as $class_name) {
+                $classInsertArr[] = [
+                    'id' => ++$maxClassId,
+                    'name' => $class_name,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+                $classNameToClassId[$class_name] = $maxClassId;
+            }
+            DB::table('class')->insert($classInsertArr);
+        }
+
+        // Lấy ra các lớp có trong excel và database
+        $semeterSubjectDb = $this->semeter_subject->query()
+            ->select('id_semeter', 'id_subject')
+            ->where('id_semeter', $id_semeter)
+            ->where('status', 1)
+            ->whereIn('id_subject', array_values($subjectCodeToSubjectId))
+            ->get()->map(function ($item) {
+                return $item->id_semeter . '|' . $item->id_subject;
+            })->toArray();
+
+        $semeterSubjectExcel = array_map(function ($item) use ($id_semeter) {
+            return $item . '|' . $id_semeter;
+        }, array_values($subjectCodeToSubjectId));
+
+        $semeterSubjectDiff = array_diff($semeterSubjectExcel, $semeterSubjectDb);
+
+        if (!empty($semeterSubjectDiff)) {
+            // Nếu có thì insert
+            $semeterSubjectInsertArr = [];
+            foreach ($semeterSubjectDiff as $semeter_subject) {
+                [$subject_id, $semeter_id] = explode('|', $semeter_subject);
+                $semeterSubjectInsertArr[] = [
+                    'id_semeter' => $semeter_id,
+                    'id_subject' => $subject_id,
+                    'status' => now(),
+                    'created_at' => Carbon::now(),
+                    'updated_at' => NULL,
+                    'deleted_at' => NULL
+                ];
+            }
+            DB::table('semester_subject')->insert($semeterSubjectInsertArr);
+        }
+        $poetryByDay = DB::table('poetry')
+            ->select([
+                'id_block_subject',
+                'id_class',
+                'examination_count',
+                'start_examination_id',
+                'finish_examination_id',
+                'room',
+                'assigned_user_id',
+                'id_campus',
+//                'status',
+            ])
+            ->whereIn('exam_date', $ngayThiArr)
+            ->where('id_campus', $campus_id)
+            ->where('id_semeter', $id_semeter)
+//            ->where('status', 1)
+            ->get()->map(function ($poetry_item) {
+                return implode('|', (array)$poetry_item);
+            })->toArray();
+//        dd($poetryByDay);
+        $poetryDataArr = [];
+        foreach ($arrItem as $item) {
+            $id_block_subject = $subjectCodeToBlockSubjectId[$item['subject_code']];
+            $id_class = $classNameToClassId[$item['class']];
+            $examination_count = $item['examination_count'];
+            $start_examination_id = $item['start_examination_id'];
+            $finish_examination_id = $start_examination_id + $examination_count - 1 >= 5 ? 10 : 5;
+            $room = $item['room'];
+            $assigned_user_id = $emailToUserId[$item['assigned_user_email']];
+            $id_campus = $campus_id;
+            $status = 1;
+            $exam_date = $item['ngay_thi'];
+            $key = implode('|', [
+                $id_block_subject,
+                $id_class,
+                $examination_count,
+                $start_examination_id,
+                $finish_examination_id,
+                $room,
+                $assigned_user_id,
+                $id_campus,
+//                $status
+            ]);
+            $poetryDataArr[$key] = [
                 'id_semeter' => $id_semeter,
-                'id_subject' => $id_subject,
-                'id_class' => $idClass,
-                'id_examination' => $value[2],
-                'id_campus' => $value[7],
-                'status' => 1,
-                'start_time' => $time,
-                'end_time' => $time,
-                'created_at' => Carbon::now(),
-                'updated_at' => null
+                'id_block_subject' => $id_block_subject,
+                'id_class' => $id_class,
+                'examination_count' => $examination_count,
+                'start_examination_id' => $start_examination_id,
+                'finish_examination_id' => $finish_examination_id,
+                'room' => $room,
+                'assigned_user_id' => $assigned_user_id,
+                'id_campus' => $id_campus,
+                'status' => $status,
+                'exam_date' => $exam_date,
             ];
         }
-//        dd($arrItem);
-        DB::table('poetry')->insert($arrItem);
+
+        $poetryValidArr = array_diff(array_keys($poetryDataArr), $poetryByDay);
+        $poetryInsertArr = array_map(function ($item) use ($poetryDataArr) {
+            return $poetryDataArr[$item];
+        }, $poetryValidArr);
+
+
+        DB::table('poetry')->insert($poetryInsertArr);
+        $poetryInsertCount = count($poetryInsertArr);
+        if ($poetryInsertCount !== 0) {
+            return response("Tạo thành công {$poetryInsertCount} ca thi, " . count($poetryDataArr) - $poetryInsertCount . " bị trùng", 201);
+        } else {
+            return response("Bạn đã nhập file ca thi này trước đây rồi", 404);
+        }
 
     }
-    public function catchError($data, $message)
+
+    public
+    function catchError($data, $message)
     {
         if (($data == null || trim($data) == "")) {
-            throw new \Exception($message);
+            throw new Exception($message);
         }
 //        return is_string($data) ? utf8_encode($data) : $data;
         return $data;
     }
 
-    public function storeQuestionAnswer($data, $exam_id, &$imgCodeToQuestionId)
+    public
+    function storeQuestionAnswer($data, $exam_id, &$imgCodeToQuestionId)
     {
         DB::transaction(function () use ($data, $exam_id, &$imgCodeToQuestionId) {
             $question = app(MQuestionInterface::class)->createQuestionsAndAttchSkill($data['questions'], $data['skill']);
-            if (!$question) throw new \Exception("Error create question ");
+            if (!$question) throw new Exception("Error create question ");
             if ($exam_id) app(MExamInterface::class)->attachQuestion($exam_id, $question->id);
             app(MAnswerInterface::class)->createAnswerByIdQuestion($data['answers'], $question->id);
             foreach ($data['imgCode'] as $imgCode) {
@@ -788,9 +995,10 @@ class QuestionController extends Controller
         });
     }
 
-    public function getImgCode($text, $arr = [])
+    public
+    function getImgCode($text, $arr = [])
     {
-        $regImgCode = '/\[anh\d\]/';
+        $regImgCode = '/\[anh\d+\]/';
         preg_match_all($regImgCode, $text, $imgCode);
         if (!empty($imgCode[0])) {
             $arr = array_merge($arr, $imgCode[0]);
@@ -798,7 +1006,8 @@ class QuestionController extends Controller
         return $arr;
     }
 
-    public function exportQe()
+    public
+    function exportQe()
     {
         $point = [
             [1, 2, 3],
@@ -813,17 +1022,20 @@ class QuestionController extends Controller
         // return Excel::download(new QuestionsExport, 'invoices.xlsx', true, ['X-Vapor-Base64-Encode' => 'True']);
     }
 
-    public function skillQuestionApi()
+    public
+    function skillQuestionApi()
     {
         $data = $this->questionRepo->getQuestionSkill();
         return $this->responseApi(true, $data);
     }
 
-    public function timeNow($timeFormat){
+    public
+    function timeNow($timeFormat)
+    {
         $dateString = $timeFormat;
         $date = Carbon::createFromFormat('d/m/Y', $dateString);
         $formattedDate = $date->format('Y-m-d');
         $currentDateTime = Carbon::now();
-        return  $formattedDate . ' ' . $currentDateTime->format('H:i:s');
+        return $formattedDate . ' ' . $currentDateTime->format('H:i:s');
     }
 }

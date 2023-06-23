@@ -56,22 +56,22 @@
                         <!--end::Title-->
                     </div>
                     <!--begin::Actions-->
-{{--                    <form class="text-center" action="{{ route('auth.redirect-google') }}" method="post">--}}
+                    {{--                    <form class="text-center" action="{{ route('auth.redirect-google') }}" method="post">--}}
                     <form class="text-center" action="{{ route('google-auth.callback') }}" method="post">
                         @csrf
                         <div class="form-group mb-3">
-                            @error('campus_code')
+                            @error('campus_id')
                             <div class="alert-danger py-3 mb-2">{{ $message }}</div>
                             @enderror
                             @if(session('msg'))
                                 <div class="alert-danger py-3 mb-2">{{ session('msg') }}</div>
                             @endif
-                            <select name="campus_code" id="" class="form-select">
+                            <select name="campus_id" id="" class="form-select">
                                 <option value="">Chọn cơ sở</option>
                                 @foreach($campuses as $campus)
                                     <option
-                                        value="{{ $campus->code }}"
-                                        @if(old('campus_code') === $campus->code) selected @endif
+                                        value="{{ $campus->id }}"
+                                        @if(old('campus_id') === $campus->id) selected @endif
                                     >
                                         CĐ {{ $campus->name }}
                                     </option>
@@ -89,8 +89,10 @@
                                         value="{{ $user->email }}"
                                         @if(old('email') === $user->email) selected @endif
                                     >
-                                        {{ $user->email }} - {{ $user->roles[0]->name }} - Cơ
-                                        sở {{ $user->campus->name }}
+                                        {{ $user->email }} - {{ $user->roles[0]->name == 'super admin' ? "Admin HO" : $user->roles[0]->name }} @if($user->roles[0]->name !== 'super admin')
+                                            - Cơ
+                                            sở {{ $user->campus->name }}
+                                        @endif
                                     </option>
                                 @endforeach
                             </select>

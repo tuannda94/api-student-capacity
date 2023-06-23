@@ -14,7 +14,7 @@ class Campus extends Model
     protected $fillable = ["name","	code","created_at","updated_at"];
     public function users()
     {
-        return $this->hasMany(User::class, 'campus_code', 'code');
+        return $this->hasMany(User::class, 'campus_id', 'code');
     }
 
     public function newEloquentBuilder($query)
