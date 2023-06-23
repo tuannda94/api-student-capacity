@@ -5,6 +5,7 @@ namespace App\Services\Modules\MSubjects;
 use App\Models\subject as SubjectModel;
 use Illuminate\Support\Facades\DB;
 use App\Models\semeter_subject;
+
 class Subject
 {
     public function __construct(private SubjectModel $mSubject)
@@ -15,6 +16,7 @@ class Subject
     {
         return $this->mSubject;
     }
+
     public function List($id)
     {
         try {
@@ -33,7 +35,8 @@ class Subject
         }
     }
 
-    public function ListSubjectRespone($id){
+    public function ListSubjectRespone($id)
+    {
         try {
             $records = $this->mSubject->whereHas('block_subject',function($q) use ($id){
                 return $q->where('id_block',$id);
@@ -43,6 +46,7 @@ class Subject
             return false;
         }
     }
+
     public function ListSubject()
     {
         try {
@@ -52,6 +56,7 @@ class Subject
             return false;
         }
     }
+
     public function ListSubjectApi()
     {
         try {
@@ -80,8 +85,8 @@ class Subject
                 $subjects = $this->mSubject::whereHas('semester_subject', function ($query) use ($id) {
                     $query->where('semester_subject.id_semeter', $id);
                 })->paginate(5);
-                foreach ($subjects as $value){
-                    $semeterSubject = semeter_subject::where('id_semeter','=',$id)->where('id_subject','=',$value->id)->first();
+                foreach ($subjects as $value) {
+                    $semeterSubject = semeter_subject::where('id_semeter', '=', $id)->where('id_subject', '=', $value->id)->first();
                     $value->id_subject_semeter = $semeterSubject->id;
                     $value->statusSubject = $semeterSubject->status;
                 }
@@ -92,13 +97,16 @@ class Subject
             }
         }
     }
+
     public function getItemSubjectSetemerReponse($id)
     {
         {
             try {
-                $subjects = $this->mSubject::whereHas('semester_subject', function ($query) use ($id) {
-                    $query->where('id_semeter', $id);
-                })->orderBy('created_at', 'desc')->get();
+                $subjects = $this->mSubject::query()
+                    ->select('block_subject.id', 'subject.name')
+                    ->where('block_subject.id_block', $id)
+                    ->join('block_subject', 'block_subject.id_subject', '=', 'subject.id')
+                    ->orderBy('created_at', 'desc')->get();
 //                $subjects1 = $this->mSubject::with('semester_subject')
 //                    ->whereHas('semester_subject', function ($query) use ($id) {
 //                        return $query->where('id_semeter', $id)->get();
@@ -111,7 +119,7 @@ class Subject
         }
     }
 
-    public function createSubjectSemater($idSubject,$idSemeter)
+    public function createSubjectSemater($idSubject, $idSemeter)
     {
         {
             try {
@@ -123,13 +131,13 @@ class Subject
         }
     }
 
-    public function updateStatusSemeter($idSemeterSubject,$status)
+    public function updateStatusSemeter($idSemeterSubject, $status)
     {
         {
             try {
                 $semetersubject = semeter_subject::find($idSemeterSubject);
                 $semetersubject->status = $status;
-                $semetersubject->updated_at	 = now();
+                $semetersubject->updated_at = now();
                 $semetersubject->save();
             } catch (\Exception $e) {
                 return $e;
@@ -137,7 +145,7 @@ class Subject
         }
     }
 
-    public function removeSubjectSemater($idSubject,$idSemeter)
+    public function removeSubjectSemater($idSubject, $idSemeter)
     {
         {
             try {

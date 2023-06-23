@@ -264,7 +264,7 @@ Route::group([
 //        Route::post('change-role', [UserController::class, 'changeRole'])->name('admin.acount.change.role');
     });
 
-    Route::prefix('basis')->group(function () {
+    Route::prefix('basis')->middleware(['role_super_admin'])->group(function () {
         Route::get('', [CampusController::class, 'index'])->name('admin.basis.list');
         Route::post('add', [CampusController::class, 'store'])->name('admin.basis.store');
         Route::get('edit/{id}', [CampusController::class, 'edit'])->name('admin.basis.edit');

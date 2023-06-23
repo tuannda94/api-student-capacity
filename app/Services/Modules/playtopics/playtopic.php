@@ -20,7 +20,7 @@ class playtopic
         }
     }
 
-    public function getExamApi($id_user,$id_poetry,$id_campus,$id_subject){
+    public function getExamApi($id_user,$id_poetry,$id_campus,$id_block_subject){
         try {
             $records = $this->modelPlayTopic
                 ->query()
@@ -32,10 +32,11 @@ class playtopic
                 ])
                 ->leftJoin('student_poetry', 'student_poetry.id', '=', 'playtopic.student_poetry_id')
                 ->leftJoin('poetry', 'poetry.id', '=', 'student_poetry.id_poetry')
-                ->leftJoin('subject', 'subject.id', '=', 'poetry.id_subject')
+                ->leftJoin('block_subject', 'block_subject.id', '=', 'poetry.id_block_subject')
+                ->leftJoin('subject', 'subject.id', '=', 'block_subject.id_subject')
                 ->where('student_poetry.id_student','=',$id_user)
                 ->where('student_poetry.id_poetry','=',$id_poetry)
-                ->where('poetry.id_subject','=',$id_subject)->first();
+                ->where('poetry.id_block_subject','=',$id_block_subject)->first();
 //            $records['name_campus'] = $records->campusName;
 //            foreach ($records as $value){
 //                $data[] = [

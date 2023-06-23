@@ -129,6 +129,8 @@ class Exam implements MExamInterface
         return $this->model::query()
             ->select(['id', 'name', 'time'])
             ->where('subject_id', $idsubject)
+            ->where('total_questions', '>', 0)
+            ->where('status', 1)
             ->get();
     }
 }
