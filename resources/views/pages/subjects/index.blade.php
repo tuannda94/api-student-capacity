@@ -107,9 +107,9 @@
                                         Chỉnh sửa
                                     </button>
 
-                                    <button  class="btn-delete btn btn-danger" data-id="{{ $value->id }}">
-                                        Xóa
-                                    </button>
+{{--                                    <button  class="btn-delete btn btn-danger" data-id="{{ $value->id }}">--}}
+{{--                                        Xóa--}}
+{{--                                    </button>--}}
                                 </td>
                             </tr>
                         @endforeach
