@@ -83,7 +83,7 @@ class AuthController extends Controller
                 $token = auth()->user()->createToken("token_admin")->plainTextToken;
                 session()->put('token', $token);
             }
-            return redirect(route('dashboard'));
+            return redirect(route('admin.chart'));
         }
 //        return redirect(route('login'))->with('msg', "Tài khoản của bạn không có quyền truy cập!");
         return redirect(route('login'))->with('msg', "Tài khoản của bạn không có quyền truy cập!");

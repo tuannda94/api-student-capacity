@@ -168,6 +168,7 @@ class PoetryController extends Controller
     public function delete($id){
         try {
             $this->poetry->getItempoetry($id)->delete();
+            DB::table('student_poetry')->where('id_poetry',$id)->delete();
             return response( ['message' => "Xóa Thành công"],200);
         } catch (\Throwable $th) {
             return response( ['message' => 'Xóa thất bại'],404);
