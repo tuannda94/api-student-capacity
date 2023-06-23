@@ -89,7 +89,7 @@
                                         value="{{ $user->email }}"
                                         @if(old('email') === $user->email) selected @endif
                                     >
-                                        {{ $user->email }} - {{ $user->roles[0]->name }} @if($user->roles[0]->name !== 'super admin')
+                                        {{ $user->email }} - {{ $user->roles[0]->name == 'super admin' ? "Admin HO" : $user->roles[0]->name }} @if($user->roles[0]->name !== 'super admin')
                                             - Cơ
                                             sở {{ $user->campus->name }}
                                         @endif

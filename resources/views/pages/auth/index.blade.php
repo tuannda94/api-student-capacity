@@ -10,7 +10,7 @@
         <div>
             <div class="alert alert-primary">
                 Xin chào {{ auth()->user()->name }} , bạn thuộc quyền
-                {{ \Str::ucfirst(auth()->user()->roles[0]->name) }}
+                {{ \Str::ucfirst(auth()->user()->roles[0]->name == 'super admin' ? 'Admin HO' : auth()->user()->roles[0]->name)  }}
                 @if (!auth()->user()->hasRole('super admin'))
                     cơ sở {{ auth()->user()->campus->name }}
                 @endif
@@ -191,7 +191,7 @@
                                                 </svg>
                                     <!--end::Svg Icon-->
                                             </span>
-                                {{ $user->roles[0]->name }}
+                                {{ $user->roles[0]->name == 'super admin' ? "Admin HO" : $user->roles[0]->name }}
                             @else
                                 @if (count($user->roles) == 0)
                                     Không có quyền
