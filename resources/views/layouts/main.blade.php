@@ -35,7 +35,7 @@
                 <!--begin::Brand-->
                 <div class="aside-logo flex-column-auto" id="kt_aside_logo">
                     <!--begin::Logo-->
-                    <a href="{{ route('dashboard') }}">
+                    <a href="{{ route('admin.chart') }}">
                         <img alt="Logo" src="{{ asset('assets/media/logos/logo-poly.png') }}" class="h-25px logo" />
                     </a>
                     <!--end::Logo-->

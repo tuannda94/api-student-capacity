@@ -35,7 +35,10 @@ class Subject
 
     public function ListSubjectRespone($id){
         try {
-            return $this->mSubject->where('id_block',$id)->get();
+            $records = $this->mSubject->whereHas('block_subject',function($q) use ($id){
+                return $q->where('id_block',$id);
+            })->get();
+            return $records;
         } catch (\Exception $e) {
             return false;
         }

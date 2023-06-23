@@ -143,7 +143,6 @@ class UserController extends Controller
             ->join('result_capacity', 'result_capacity.playtopic_id', '=', 'playtopic.id')
             ->where('student_poetry.id_student', $id)
             ->get();
-
         foreach ($point as $item) {
             $item->semester_name = $semesterIdToSemesterName[$item->id_semeter];
             $item->campus_name = $campusCodeToCampusName[$user->campus_code];
@@ -152,6 +151,8 @@ class UserController extends Controller
             $item->subject_name = $subjectIdToSubjectName[$item->id_subject];
             $item->subject_code = $subjectIdToSubjectCode[$item->id_subject];
         }
+
+
 
 //        $point = $this->playtopic->where('id_user', $id)->get();
         return view('pages.Students.accountStudent.viewpoint', ['point' => $point, 'user' => $user, 'id' => $id]);

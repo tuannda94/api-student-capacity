@@ -47,8 +47,8 @@ class poetry implements MPoetryInterface
                 $query->where('id_semeter', $idSemeter);
             })
                 ->when(!empty($idBlock), function ($query) use ($idBlock) {
-                    $query->whereHas('subject', function ($subQuery) use ($idBlock) {
-                        $subQuery->where('id_block', $idBlock);
+                    $query->whereHas('block_subject', function ($subQuery) use ($idBlock) {
+                        $subQuery->where('id_block',$idBlock);
                     });
                 })
                 ->when(!empty($id_subject) && empty($id_class), function ($query) use ($id_subject) {
@@ -57,8 +57,7 @@ class poetry implements MPoetryInterface
                 ->when(!empty($id_subject) && !empty($id_class), function ($query) use ($id_subject, $id_class) {
                     $query->where('id_subject', $id_subject)
                         ->where('id_class', $id_class);
-                })
-                ->pluck('id');
+                })->pluck('id');
             $studentRecords = studentPoetry::whereIn('id_poetry', $records)
                 ->pluck('id_student')->unique()
                 ->values();
@@ -86,7 +85,7 @@ class poetry implements MPoetryInterface
     public function ListPoetryDetailChart($idSemeter,$idBlock,$id_subjects){
         try {
             $records = $this->modelPoetry->when(!empty($idBlock), function ($query) use ($idBlock) {
-                $query->whereHas('subject', function ($subQuery) use ($idBlock) {
+                $query->whereHas('block_subject', function ($subQuery) use ($idBlock) {
                     $subQuery->where('id_block', $idBlock);
                 });
             })
