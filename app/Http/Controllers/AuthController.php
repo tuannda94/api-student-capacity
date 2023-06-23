@@ -36,16 +36,16 @@ class AuthController extends Controller
         Validator::make(
             $request->all(),
             [
-                'campus_code' => ['required'],
+                'campus_id' => ['required'],
                 'email' => ['required'],
             ],
             [
-                'campus_code.required' => 'Vui lòng chọn cơ sở',
+                'campus_id.required' => 'Vui lòng chọn cơ sở',
                 'email.required' => 'Vui lòng chọn tài khoản',
             ],
         )->validate();
         $dataPut = [
-            'campus_code' => $request->campus_code,
+            'campus_id' => $request->campus_id,
             'email' => $request->email,
         ];
 //        Session::put($dataPut);
@@ -62,21 +62,21 @@ class AuthController extends Controller
         Validator::make(
             $request->all(),
             [
-                'campus_code' => ['required'],
+                'campus_id' => ['required'],
                 'email' => ['required'],
             ],
             [
-                'campus_code.required' => 'Vui lòng chọn cơ sở',
+                'campus_id.required' => 'Vui lòng chọn cơ sở',
                 'email.required' => 'Vui lòng chọn tài khoản',
             ],
         )->validate();
-//        $user = User::where('email', $ggUser->email)->where('campus_code', session('campus_code'))->first();
+//        $user = User::where('email', $ggUser->email)->where('campus_id', session('campus_id'))->first();
         $user = User::where([
             'email' => $request->email,
-            'campus_code' => $request->campus_code,
+            'campus_id' => $request->campus_id,
         ])->first();
         // dd($user->hasRole(config('util.ADMIN_ROLE')));
-        if ($user && $user->hasRole([config('util.SUPER_ADMIN_ROLE'), config('util.ADMIN_ROLE'), config('util.JUDGE_ROLE'), config('util.TEACHER_ROLE')])) {
+        if ($user && $user->hasRole([config('util.SUPER_ADMIN_ROLE'), config('util.ADMIN_ROLE'), config('util.TEACHER_ROLE')])) {
             Auth::login($user);
             if (!session()->has('token')) {
                 auth()->user()->tokens()->delete();
@@ -110,7 +110,7 @@ class AuthController extends Controller
         // ]);
 
         $user = User::with(['roles', 'campus'])->where('email', $googleUser->email)->first();
-        if ($user && $user->campus_code === $request->campus_code) {
+        if ($user && $user->campus_id === $request->campus_id) {
             if ($user->status == 0) return response()->json(
                 [
                     'status' => false,
@@ -130,28 +130,29 @@ class AuthController extends Controller
         }
         $flagRoleAdmin = false;
         $MSSV = null;
-        $campus_code = null;
         if (strlen($googleUser->email) < 8) $flagRoleAdmin = true;
+        $campus_code = Campus::find($request->campus_id)->code;
+        $campus_id = $request->campus_id;
         if (!$flagRoleAdmin) foreach (config('util.MS_SV') as $ks) {
-            $MSSV = \Str::lower($request->campus_code) . \Str::afterLast(
+            $MSSV = \Str::lower($campus_code) . \Str::afterLast(
                     \Str::of($googleUser->email)
                         ->before(config('util.END_EMAIL_FPT'))
                         ->toString(),
                     \Str::lower($ks)
                 );
-            $campus_code = \Str::lower($request->campus_code);
+            $campus_code = \Str::lower($campus_code);
         }
 //        return $campus_code;
         try {
             $user = null;
-            DB::transaction(function () use ($MSSV, $googleUser, &$user, $campus_code) {
+            DB::transaction(function () use ($MSSV, $googleUser, &$user, $campus_id) {
                 $user = User::create([
                     'mssv' => $MSSV,
                     'name' => $googleUser->name ?? 'no name',
                     'email' => $googleUser->email,
                     'status' => 1,
                     'avatar' => null,
-                    'campus_code' => $campus_code,
+                    'campus_id' => $campus_id,
                 ]);
             });
             $user->load('campus');

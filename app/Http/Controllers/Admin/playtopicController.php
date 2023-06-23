@@ -50,7 +50,7 @@ class playtopicController extends Controller
             ->leftJoin('student_poetry', 'student_poetry.id', '=', 'playtopic.student_poetry_id')
             ->leftJoin('poetry', 'poetry.id', '=', 'student_poetry.id_poetry')
             ->leftJoin('subject', 'subject.id', '=', 'poetry.id_subject')
-            ->where('playtopic.id','=',$id)->first();
+            ->where('playtopic.id', '=', $id)->first();
 //        return $round;
         if (is_null($round)) {
             return $this->responseApi(false, 'Không tồn tại trong hệ thống !');
@@ -87,9 +87,9 @@ class playtopicController extends Controller
 //        }
     }
 
-    public function indexApi($id_user, $id_poetry, $id_campus, $id_subject)
+    public function indexApi($id_user, $id_poetry, $id_campus, $id_block_subject)
     {
-        if (!($data = $this->playtopicModel->getExamApi($id_user, $id_poetry, $id_campus, $id_subject))) return $this->responseApi(false);
+        if (!($data = $this->playtopicModel->getExamApi($id_user, $id_poetry, $id_campus, $id_block_subject))) return $this->responseApi(false);
         return $this->responseApi(true, $data);
     }
 
@@ -149,7 +149,6 @@ class playtopicController extends Controller
 
         }
         $dataInsertArr = [];
-        $studentPoetryInstance = new studentPoetry();
         if (!empty($request->poetry_student_id)) {
             $poetriesId = $request->poetry_student_id;
         } else {
@@ -174,11 +173,14 @@ class playtopicController extends Controller
                 ];
             }
         } else {
+            if (($request->diff_per_ques + $request->me_per_ques + $request->ez_per_ques) != 100) {
+                return response("Tổng % câu hỏi 3 mức độ phải bằng 100%", 404);
+            }
             $questions = DB::table('exam_questions')
-                ->select(['exam_questions.question_id', 'questions.rank'])
+                ->select(['exam_questions.question_id', 'exam_questions.id', 'questions.rank'])
                 ->leftJoin('questions', 'questions.id', '=', 'exam_questions.question_id')
                 ->leftJoin('exams', 'exams.id', '=', 'exam_questions.exam_id')
-                ->where('subject_id', $request->id_subject)
+                ->where('exams.subject_id', $request->id_subject)
                 ->get()
                 ->groupBy('rank')
                 ->map(function ($item) {
@@ -187,11 +189,26 @@ class playtopicController extends Controller
             $diffQuesNum = round(($request->diff_per_ques / 100) * $request->questions_quantity);
             $meQuesNum = round(($request->me_per_ques / 100) * $request->questions_quantity);
             $ezQuesNum = $request->questions_quantity - $diffQuesNum - $meQuesNum;
+//            dd($questions);
             $quesNumArr = [
-                config('util.RANK_QUESTION_EASY') => $ezQuesNum,
-                config('util.RANK_QUESTION_MEDIUM') => $meQuesNum,
-                config('util.RANK_QUESTION_DIFFICULT') => $diffQuesNum,
+                config('util.RANK_QUESTION_EASY') => [
+                    'rank' => 'dễ',
+                    'num' => $ezQuesNum
+                ],
+                config('util.RANK_QUESTION_MEDIUM') => [
+                    'rank' => 'trung bình',
+                    'num' => $meQuesNum
+                ],
+                config('util.RANK_QUESTION_DIFFICULT') => [
+                    'rank' => 'khó',
+                    'num' => $diffQuesNum
+                ],
             ];
+            foreach ($quesNumArr as $rank => $ques) {
+                if ($ques['num'] > count($questions[$rank])) {
+                    return response("Số lượng câu mức độ {$ques['rank']} không đủ, vui lòng điều chỉnh lại", 404);
+                }
+            }
             foreach ($poetriesId as $poetry_id) {
                 $dataInsertArr[] = [
                     'student_poetry_id' => $poetry_id,
@@ -212,9 +229,10 @@ class playtopicController extends Controller
     public function getRandomQuestionsOrder($quesNumArr, $questions)
     {
         $questionsOrder = [];
-        foreach ($quesNumArr as $type => $quesNum) {
-            $randomKeys = array_rand($questions[$type], $quesNum);
-            $randomElements = array_intersect_key($questions[$type], array_flip($randomKeys));
+        foreach ($quesNumArr as $rank => $quesNum) {
+            $num = $quesNum['num'];
+            $randomKeys = array_rand($questions[$rank], $quesNum['num']);
+            $randomElements = array_intersect_key($questions[$rank], array_flip($randomKeys));
             array_push($questionsOrder, ...$randomElements);
         }
         shuffle($questionsOrder);

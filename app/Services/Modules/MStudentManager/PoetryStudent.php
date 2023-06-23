@@ -22,7 +22,6 @@ class PoetryStudent implements MPoetryStudentsInterface
 
     public function GetStudents($id_poetry)
     {
-        try {
             $user = (new User())->getTable();
             $poetry = (new poetry())->getTable();
             $data = $this->model::query()
@@ -37,7 +36,7 @@ class PoetryStudent implements MPoetryStudentsInterface
                         "{$user}.name as nameStudent",
                         "{$user}.email as emailStudent",
                         "{$user}.mssv",
-                        "{$poetry}.id_subject",
+                        "{$poetry}.id_block_subject",
                         'result_capacity.scores'
                     ]
                 )
@@ -49,6 +48,7 @@ class PoetryStudent implements MPoetryStudentsInterface
                 ->orderBy("{$this->table}.id")
                 ->paginate(10);
             return $data;
+        try {
 
         } catch (\Exception $e) {
             return false;

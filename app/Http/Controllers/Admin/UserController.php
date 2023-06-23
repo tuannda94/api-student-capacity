@@ -145,7 +145,7 @@ class UserController extends Controller
             ->get();
         foreach ($point as $item) {
             $item->semester_name = $semesterIdToSemesterName[$item->id_semeter];
-            $item->campus_name = $campusCodeToCampusName[$user->campus_code];
+            $item->campus_name = $campusIdToCampusName[$user->campus_id];
             $item->class_name = $classIdToClassName[$item->id_class];
             $item->examination_name = $examinationIdToExaminationName[$item->id_examination];
             $item->subject_name = $subjectIdToSubjectName[$item->id_subject];
@@ -164,7 +164,7 @@ class UserController extends Controller
         $subjectIdToSubjectName = collect($subjectIdToSubjectInfo)->pluck('name', 'id')->toArray();
         $subjectIdToSubjectCode = collect($subjectIdToSubjectInfo)->pluck('code_subject', 'id')->toArray();
 
-        $campusCodeToCampusName = DB::table('campuses')->select('code', 'name')->pluck('name', 'code')->toArray();
+        $campusIdToCampusName = DB::table('campuses')->select('id', 'name')->pluck('name', 'id')->toArray();
         $examinationIdToExaminationName = DB::table('examination')->select('id', 'name')->pluck('name', 'id')->toArray();
         $classIdToClassName = DB::table('class')->select('id', 'name')->pluck('name', 'id')->toArray();
         $semesterIdToSemesterName = DB::table('semester')->select('id', 'name')->pluck('name', 'id')->toArray();
@@ -194,9 +194,10 @@ class UserController extends Controller
 //            if(isset($resultCapacity->scores) && $resultCapacity->scores  !== null){
             if (isset($value->scores)) {
                 $data[] = [
-                    $key+1,
+                    $key + 1,
                     $subjectIdToSubjectCode[$value->id_subject],
                     $semesterIdToSemesterName[$value->id_semeter],
+                    $campusIdToCampusName[$user->campus_id],
                     $classIdToClassName[$value->id_class],
                     $value->scores,
                     1,
@@ -271,14 +272,25 @@ class UserController extends Controller
     {
         try {
             $limit = 10;
-            $users = $this->modeluser::status(request('status') ?? null)
+            $usersQuery = $this->modeluser::status(request('status') ?? null)
                 ->sort(request('sort') == 'asc' ? 'asc' : 'desc', request('sort_by') ?? null, 'users')
+                ->with('roles', function ($query) {
+                    $query->orderBy('id', 'asc');
+                })
                 ->search(request('q') ?? null, ['name', 'email'])
                 ->has_role(request('role') ?? null)
+                ->where('id', '<>', auth()->user()->id)
                 ->whereDoesntHave('roles', function ($query) {
                     $query->where('name', 'student');
-                })
-                ->paginate(request('limit') ?? $limit);
+                });
+            if (!auth()->user()->hasRole('super admin')) {
+                $usersQuery
+                    ->where('campus_id', auth()->user()->campus_id)
+                    ->whereDoesntHave('roles', function ($query) {
+                        $query->where('name', 'super admin');
+                    });
+            }
+            $users = $usersQuery->paginate(request('limit') ?? $limit);
 
             return $users;
         } catch (\Throwable $e) {
@@ -341,7 +353,7 @@ class UserController extends Controller
                 'branches_id' => 'required',
                 'campus_id' => 'required',
                 'status' => 'required',
-                'roles_id' => 'required'
+                'roles_id' => 'required|numeric|min:1',
             ],
             [
                 'name_add.required' => 'Không để trống tên tài khoản!',
@@ -350,10 +362,10 @@ class UserController extends Controller
                 'branches_id.required' => 'Vui lòng chọn Chi nhánh!',
                 'campus_id.required' => 'Vui lòng chọn cơ sở!',
                 'roles_id.required' => 'Vui lòng chọn chức vụ cho tài khoản!',
-                'status.required' => 'Vui lòng chọn trạng thái!'
+                'status.required' => 'Vui lòng chọn trạng thái!',
+                'roles_id.min' => 'Vui lòng chọn chức vụ',
             ]
         );
-
         if ($validator->fails() == 1) {
             $errors = $validator->errors();
             $fields = ['name_add', 'email_add', 'branches_id', 'campus_id', 'roles_id', 'status'];
@@ -368,6 +380,14 @@ class UserController extends Controller
             }
 
         }
+        if (!auth()->user()->hasRole('super admin')) {
+            if ($request->campus_id !== auth()->user()->campus_id) {
+                return response('Bạn không có quyền thêm tài khoản vào cơ sở này', 404);
+            }
+            if ($request->roles_id <= auth()->user()->roles[0]->id) {
+                return response('Bạn không có quyền thêm tài khoản với chức vụ ngang hoặc lớn hơn mình', 404);
+            }
+        }
         $data = [
             'name' => $request->name_add,
             'email' => $request->email_add,
@@ -375,7 +395,7 @@ class UserController extends Controller
             'status' => $request->status,
             'mssv' => NULL,
             'branch_id' => $request->branches_id,
-            'campus_code' => $request->campus_id
+            'campus_id' => $request->campus_id
         ];
         DB::table('users')->insert($data);
         $id = DB::getPdo()->lastInsertId();
@@ -399,7 +419,7 @@ class UserController extends Controller
                 'branches_id_update' => 'required',
                 'campus_id_update' => 'required',
                 'status_update_update' => 'required',
-                'roles_id_update' => 'required'
+                'roles_id_update' => 'required|numeric|min:1',
             ],
             [
                 'name_update.required' => 'Không để trống tên tài khoản!',
@@ -407,7 +427,8 @@ class UserController extends Controller
                 'branches_id_update.required' => 'Vui lòng chọn Chi nhánh!',
                 'campus_id_update.required' => 'Vui lòng chọn cơ sở!',
                 'roles_id_update.required' => 'Vui lòng chọn chức vụ cho tài khoản!',
-                'status_update_update.required' => 'Vui lòng chọn trạng thái!'
+                'status_update_update.required' => 'Vui lòng chọn trạng thái!',
+                'roles_id_update.min' => 'Vui lòng chọn chức vụ',
             ]
         );
 
@@ -425,15 +446,31 @@ class UserController extends Controller
             }
 
         }
+        if (!auth()->user()->hasRole('super admin')) {
+            if ($request->campus_id_update != auth()->user()->campus_id) {
+                return response('Bạn không có quyền thêm tài khoản vào cơ sở này', 404);
+            }
+            if ($request->roles_id_update <= auth()->user()->roles[0]->id) {
+                return response('Bạn không có quyền thêm tài khoản với chức vụ ngang hoặc lớn hơn mình', 404);
+            }
+        }
         $user = User::find($id);
         $user->name = $request->name_update;
         $user->email = $request->email_update;
         $user->status = $request->status_update_update;
         $user->branch_id = $request->branches_id_update;
-        $user->campus_code = $request->campus_id_update;
+        $user->campus_id = $request->campus_id_update;
         $user->save();
 
-        $role = modelroles::where('model_id', $id)->update(['role_id' => $request->roles_id_update]);;
+        $role = modelroles::query()
+            ->updateOrCreate(
+                ['model_id' => $id],
+                [
+                    'role_id' => $request->roles_id_update,
+                    'model_type' => 'App\Models\User',
+                    'model_id' => $id,
+                ]
+            );
         return response(['message' => "Thành công <br>Vui lòng chờ 5s để làm mới dữ liệu"], 200);
     }
 
@@ -460,9 +497,18 @@ class UserController extends Controller
     {
         if (!$users = $this->getUser()) return abort(404);
         $branches = $this->branches::all();
-        $roles = $this->role::all();
-        $Campus = $this->campus::all();
-        return view('pages.auth.index', ['users' => $users, 'roles' => $roles, 'branches' => $branches, 'campus' => $Campus]);
+        $rolesModel = $this->role->query();
+        $CampusModel = $this->campus->query();
+        if (!auth()->user()->hasRole('super admin')) {
+            $rolesModel->where('id', '<>', config('util.SUPER_ADMIN_ROLE'));
+            $CampusModel->where('id', auth()->user()->campus_id);
+        }
+        $roles = $rolesModel->get();
+        $Campus = $CampusModel->get();
+        $campusIdToCampusName = $Campus->mapWithKeys(function ($item) {
+            return [$item['id'] => $item['name']];
+        })->all();
+        return view('pages.auth.index', ['users' => $users, 'roles' => $roles, 'branches' => $branches, 'campus' => $Campus, 'campusIdToCampusName' => $campusIdToCampusName,]);
     }
 
     public function stdManagement()
