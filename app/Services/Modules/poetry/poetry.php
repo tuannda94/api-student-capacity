@@ -2,12 +2,15 @@
 
 namespace App\Services\Modules\poetry;
 
+use App\Models\blockSubject;
 use App\Models\ClassModel;
+use App\Models\examination;
 use App\Models\poetry as modelPoetry;
 use App\Models\semeter;
 use App\Models\studentPoetry;
 use App\Models\subject;
 use App\Models\User;
+
 class poetry implements MPoetryInterface
 {
     public function __construct(
@@ -25,6 +28,7 @@ class poetry implements MPoetryInterface
                     'classsubject',
                     'user',
                     'campus',
+                    'block_subject'
                 ])
                 ->where('id_semeter', $id)
                 ->withWhereHas('block_subject', function ($q) use ($idblock) {
@@ -33,6 +37,13 @@ class poetry implements MPoetryInterface
             if (!auth()->user()->hasRole('super admin')) {
                 $records->where('id_campus', auth()->user()->campus->id);
             }
+            if (auth()->user()->hasRole('teacher')) {
+                $records->where('assigned_user_id', auth()->user()->id);
+            }
+//        foreach ($records->paginate(10) as $item) {
+//            dd($item->block_subject);
+//        }
+//        dd($records->paginate(10));
             return $records->paginate(10);
         } catch (\Exception $e) {
             return false;
@@ -74,7 +85,7 @@ class poetry implements MPoetryInterface
             $studentRecords = studentPoetry::whereIn('id_poetry', $records)
                 ->pluck('id_student')->unique()
                 ->values();
-            $student = User::whereIn('id',$studentRecords)->with('campus')->get();
+            $student = User::whereIn('id', $studentRecords)->with('campus')->get();
 
 //            $records->load(['classsubject'  => function ($q) {
 //                return $q->select('id','name','code_class');
@@ -95,7 +106,9 @@ class poetry implements MPoetryInterface
             return $e;
         }
     }
-    public function ListPoetryDetailChart($idSemeter,$idBlock,$id_subjects){
+
+    public function ListPoetryDetailChart($idSemeter, $idBlock, $id_subjects)
+    {
         try {
             $records = $this->modelPoetry->when(!empty($idBlock), function ($query) use ($idBlock) {
                 $query->whereHas('subject', function ($subQuery) use ($idBlock) {
@@ -105,10 +118,10 @@ class poetry implements MPoetryInterface
                 ->where('id_semeter', $idSemeter) // Thêm điều kiện 'id_semester' = $idSemester
                 ->where('id_subject', $id_subjects) // Thêm điều kiện 'id_subject' = $id_subject
                 ->get();
-            $data  = [];
-            foreach ($records as $value){
-                $data[]=[
-                    'name' =>  $value->examination->name . '-'. $value->subject->name ."-". $value->classsubject->name,
+            $data = [];
+            foreach ($records as $value) {
+                $data[] = [
+                    'name' => $value->examination->name . '-' . $value->subject->name . "-" . $value->classsubject->name,
                     'id_poetry' => $value->id
                 ];
             }
@@ -118,47 +131,74 @@ class poetry implements MPoetryInterface
             return $e;
         }
     }
+
     public function ListPoetryApi($id, $id_user)
     {
         try {
             $records = $this->modelPoetry
                 ->query()
-                ->select(
+                ->select([
                     'poetry.id',
-                    'poetry.id_subject',
-                    'poetry.start_time',
-                    'poetry.end_time',
-                    'poetry.end_time',
+                    'poetry.id_block_subject',
+                    'poetry.start_examination_id',
+                    'poetry.finish_examination_id',
+                    'poetry.room',
+                    'poetry.assigned_user_id',
+                    'poetry.id_campus',
+                    'poetry.exam_date',
                     'semester.name as name_semeter',
-                    'subject.name as name_subject',
                     'class.name as name_class',
-                    'examination.name as name_examination'
-                )
+                    'playtopic.exam_time',
+                    'playtopic.exam_name',
+                    'result_capacity.created_at',
+                    'result_capacity.status',
+                ])
                 ->join('semester', 'semester.id', '=', 'poetry.id_semeter')
-                ->join('subject', 'subject.id', '=', 'poetry.id_subject')
                 ->join('class', 'class.id', '=', 'poetry.id_class')
-                ->join('examination', 'examination.id', '=', 'poetry.id_examination')
                 ->join('student_poetry', 'student_poetry.id_poetry', '=', 'poetry.id')
                 ->join('playtopic', 'playtopic.student_poetry_id', '=', 'student_poetry.id')
-                ->where('poetry.id_semeter', $id)
-                ->where('student_poetry.id_student', $id_user)
-                ->where('playtopic.has_received_exam', 1)
+                ->leftJoin('result_capacity', 'result_capacity.playtopic_id', '=', 'playtopic.id')
+                ->where([
+                    ['poetry.id_semeter', $id],
+                    ['student_poetry.id_student', $id_user],
+                    ['playtopic.has_received_exam', 1],
+                    ['poetry.status', 1],
+                    ['exam_date', date('Y-m-d')],
+                ])
+                ->orderBy('playtopic.created_at', 'DESC')
+                ->orderBy('poetry.start_examination_id', 'DESC')
                 ->get();
+            $blockSubjectIds = $records->pluck('id_block_subject');
+            $blockSubjectIdToSubjectName = blockSubject::query()
+                ->select('subject.name', 'block_subject.id')
+                ->join('subject', 'subject.id', 'block_subject.id_subject')
+                ->whereIn('block_subject.id', $blockSubjectIds)->get()->pluck('name', 'id');
+            $poetryIdToPoetryTime = examination::query()
+                ->select('id', 'started_at', 'finished_at')
+                ->get()->mapWithKeys(function ($item) {
+                    return [$item['id'] => ['started_at' => $item['started_at'], 'finished_at' => $item['finished_at']]];
+                })->toArray();
+            $data = [];
             $data['name_item'] = $records[0]->name_semeter;
             foreach ($records as $value) {
 //                if ($value->playtopic === null) {
 //                    continue;
 //                }
-
+                $start_time = $value->exam_date . " " . $poetryIdToPoetryTime[$value->start_examination_id]['started_at'];
+                $finish_time = $value->exam_date . " " . $poetryIdToPoetryTime[$value->finish_examination_id]['finished_at'];
+                $is_in_time = !(time() < strtotime($start_time) || time() >= strtotime($finish_time));
+                $have_done = (!empty($value->created_at) && $value->status == 1);
                 $data['data'][] = [
                     "id" => $value->id,
-                    "id_subject" => $value->id_subject,
                     "name_semeter" => $value->name_semeter,
-                    "name_subject" => $value->name_subject,
+                    'id_block_subject' => $value->id_block_subject,
+                    "name_subject" => $blockSubjectIdToSubjectName[$value['id_block_subject']],
                     "name_class" => $value->name_class,
-                    "name_examtion" => $value->name_examination,
-                    "start_time" => $value->start_time,
-                    "end_time" => $value->end_time,
+                    "room_name" => $value->room,
+                    "exam_time" => $value->exam_time,
+                    "exam_type" => 0,
+                    'is_in_time' => $is_in_time,
+                    'have_done' => $have_done,
                 ];
             }
             return $data;
@@ -192,7 +232,7 @@ class poetry implements MPoetryInterface
     {
         {
             try {
-                return $this->modelPoetry->find($id);
+                return $this->modelPoetry->with('user')->find($id);
             } catch (\Exception $e) {
                 return false;
             }

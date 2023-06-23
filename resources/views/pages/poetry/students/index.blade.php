@@ -604,7 +604,7 @@
                 data: dataAll,
                 success: (response) => {
                     console.log(response)
-                    $('#form-submit')[0].reset();
+                    // $('#form-submit')[0].reset();
                     notify(response.message);
                     //                  var newRow = ` <tr>
                     //                              <td>

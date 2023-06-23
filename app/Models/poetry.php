@@ -10,7 +10,21 @@ class poetry extends Model
     use HasFactory;
 
     protected $table = 'poetry';
-    protected $fillable = ['id_semeter', 'id_subject', 'id_class', 'id_examination', 'status', 'start_time', 'end_time', 'created_at', 'updated_at'];
+    protected $fillable = [
+        'id_semeter',
+        'id_block_subject',
+        'room',
+        'id_campus',
+        'start_examination_id',
+        'finish_examination_id',
+        'examination_count',
+        'id_class',
+        'assigned_user_id',
+        'status',
+        'exam_date',
+        'created_at',
+        'updated_at',
+    ];
 
     public function semeter()
     {
@@ -32,9 +46,13 @@ class poetry extends Model
         return $this->hasOne(playtopic::class, 'id_poetry', 'id');
     }
 
+//    public function block_subject()
+//    {
+//        return $this->hasOne(blockSubject::class, 'id_block_subject', 'id');
+//    }
     public function block_subject()
     {
-        return $this->hasOne(blockSubject::class, 'id_subject', 'id_subject');
+        return $this->belongsTo(blockSubject::class, 'id_block_subject', 'id');
     }
 
     public function examination()

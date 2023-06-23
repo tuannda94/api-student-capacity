@@ -76,7 +76,7 @@ class AuthController extends Controller
             'campus_id' => $request->campus_id,
         ])->first();
         // dd($user->hasRole(config('util.ADMIN_ROLE')));
-        if ($user && $user->hasRole([config('util.SUPER_ADMIN_ROLE'), config('util.ADMIN_ROLE'), config('util.JUDGE_ROLE'), config('util.TEACHER_ROLE')])) {
+        if ($user && $user->hasRole([config('util.SUPER_ADMIN_ROLE'), config('util.ADMIN_ROLE'), config('util.TEACHER_ROLE')])) {
             Auth::login($user);
             if (!session()->has('token')) {
                 auth()->user()->tokens()->delete();

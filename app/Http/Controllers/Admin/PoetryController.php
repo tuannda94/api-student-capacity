@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Services\Modules\MClass\classModel;
 use App\Services\Modules\MClassSubject\ClassSubject;
 use App\Services\Modules\MExamination\Examination;
@@ -22,12 +23,12 @@ class PoetryController extends Controller
     use TUploadImage, TResponse;
 
     public function __construct(
-        private poetry       $poetry,
-        private Semeter      $semeter,
-        private Subject      $subject,
-        private Examination  $examination,
-        private ClassSubject $classSubject,
-        private classModel $class,
+        private poetry        $poetry,
+        private Semeter       $semeter,
+        private Subject       $subject,
+        private Examination   $examination,
+        private ClassSubject  $classSubject,
+        private classModel    $class,
         private PoetryStudent $PoetryStudent,
     )
     {
@@ -41,13 +42,23 @@ class PoetryController extends Controller
         $semeter = $this->semeter->ListSemeter();
         $name = $this->semeter->getName($id);
         $listExamination = $this->examination->getList();
-        $ListSubject = $this->subject->getItemSubjectSetemerReponse($id);
+        $ListSubject = $this->subject->getItemSubjectSetemerReponse($idblock);
+        $blockSubjectIdToName = $ListSubject->pluck('name', 'id');
         $listClass = $this->class->getClass();
+        $usersQuery = User::query()
+            ->with('campus')
+            ->withWhereHas('roles', function ($query) {
+                $query->where('id', config('util.TEACHER_ROLE'));
+            });
         $listCampusQuery = (new Campus())->query();
         if (!auth()->user()->hasRole('super admin')) {
             $listCampusQuery->where('id', auth()->user()->campus_id);
+            $usersQuery->where('campus_id', auth()->user()->campus_id);
         }
         $listCampus = $listCampusQuery->get();
+        $teachers = $usersQuery->get();
+//        dd($teachers);
+//        dd($teachers);
         return view('pages.poetry.index', [
             'poetry' => $data,
             'semeter' => $semeter,
@@ -57,7 +68,9 @@ class PoetryController extends Controller
             'idBlock' => $idblock,
             'name' => $name,
             'listExamination' => $listExamination,
-            'listClass' => $listClass
+            'listClass' => $listClass,
+            'blockSubjectIdToName' => $blockSubjectIdToName,
+            'teachers' => $teachers,
         ]);
     }
 
@@ -73,24 +86,25 @@ class PoetryController extends Controller
         return response()->json(['data' => $data], 200);
     }
 
-    public function ListPoetryResponedetailChart(Request $request){
-        $dataResult = $this->poetry->ListPoetryDetailChart($request->semeter,$request->block,$request->subject);
+    public function ListPoetryResponedetailChart(Request $request)
+    {
+        $dataResult = $this->poetry->ListPoetryDetailChart($request->semeter, $request->block, $request->subject);
         $dataWithStudents = [];
-        foreach ($dataResult as $value){
-            $studentsDetail = $this->PoetryStudent->GetStudentsDetail( $value['id_poetry']);
-            $dataWithStudents['namePoetry'][] =$value['name'];
+        foreach ($dataResult as $value) {
+            $studentsDetail = $this->PoetryStudent->GetStudentsDetail($value['id_poetry']);
+            $dataWithStudents['namePoetry'][] = $value['name'];
             $dataWithStudents['student']['total'][] = $studentsDetail->count();
             $dataWithStudents['student']['tookExam'][] = $studentsDetail->whereNotNull('scores')->count();
             $dataWithStudents['student']['notExam'][] = $studentsDetail->whereNull('scores')->count();
         }
 
 
-
         return response()->json(['data' => $dataWithStudents], 200);
     }
 
-    public function indexApi($id,$id_user){
-        if (!($data = $this->poetry->ListPoetryApi($id,$id_user)))  return $this->responseApi(false);
+    public function indexApi($id, $id_user)
+    {
+        if (!($data = $this->poetry->ListPoetryApi($id, $id_user))) return $this->responseApi(false);
         return $this->responseApi(true, $data);
     }
 
@@ -102,36 +116,44 @@ class PoetryController extends Controller
 
     public function create(Request $request)
     {
+        $rules = [
+            'semeter_id' => 'required',
+            'id_block' => 'required',
+            'block_subject_id' => 'required',
+            'room' => 'required',
+            'campus_id' => 'required',
+            'start_examination_id' => 'required|numeric',
+            'finish_examination_id' => 'required|numeric|gte:start_examination_id',
+            'examination_count' => 'required',
+            'class_id' => 'required',
+            'assigned_user' => 'required',
+            'status' => 'required',
+            'exam_date' => 'required|date|after:yesterday'
+        ];
         $validator = Validator::make(
             $request->all(),
-            [
-                'semeter_id' => 'required',
-                'id_block' => 'required',
-                'subject_id' => 'required',
-                'examination_id' => 'required',
-                'class_id' => 'required',
-                'campus_id' => 'required',
-                'status' => 'required',
-                'start_time_semeter' => 'nullable|date',
-                'end_time_semeter' => 'nullable|date|after:start_time_semeter'
-            ],
+            $rules,
             [
                 'semeter_id.required' => 'Thiếu id kỳ học !',
                 'id_block.required' => 'Thiếu id block !',
-                'subject_id.required' => 'Vui lòng chọn môn học !',
+                'block_subject_id.required' => 'Vui lòng chọn môn học !',
+                'room.required' => 'Vui lòng điền tên phòng !',
                 'campus_id.required' => 'Vui lòng chọn cơ sở !',
-                'examination_id.required' => 'Vui lòng chọn ca thi !',
-                'class_id.required' => 'Vui lòng chọn lớp !',
+                'start_examination_id.required' => 'Vui lòng chọn ca bắt đầu!',
+                'finish_examination_id.required' => 'Vui lòng chọn ca kết thúc!',
+                'finish_examination_id.gte' => 'Ca thi kết thúc không được nhỏ hơn ca thi bắt đầu!',
+                'examination_count.required' => 'Vui lòng chọn số ca thi liên tiếp!',
+                'class_id.required' => 'Vui lòng chọn lớp!',
+                'assigned_user.required' => 'Vui lòng chọn giáo viên!',
                 'status.required' => 'Vui lòng chọn trạng thái',
-                'start_time_semeter.nullable' => 'Vui lòng chọn thời gian bắt đầu',
-                'end_time_semeter.nullable' => 'Vui lòng chọn thời gian kết thúc',
-                'end_time_semeter.after' => 'Thời gian kết thúc phải lớn hơn thời gian bắt đầu',
+                'exam_date.required' => 'Vui lòng chọn ngày thi',
+                'exam_date.after' => 'Ngày thi không được nhỏ hơn ngày hôm nay',
             ]
         );
 
         if ($validator->fails() == 1) {
             $errors = $validator->errors();
-            $fields = ['semeter_id', 'id_block', 'subject_id', 'examination_id', 'class_id', 'campus_id', 'status', 'start_time_semeter', 'end_time_semeter'];
+            $fields = array_keys($rules);
             foreach ($fields as $field) {
                 $fieldErrors = $errors->get($field);
 
@@ -143,32 +165,47 @@ class PoetryController extends Controller
             }
 
         }
-        DB::table('block_subject')->insert(
-            [
-                'id_subject' => $request->subject_id,
-                'id_block' => $request->id_block
-            ]
-        );
+        if ($request->finish_examination_id < $request->start_examination_id + $request->examination_count) {
+            return response("Vui lòng chọn ca kết thúc sao cho hợp lý!", 404);
+        }
+        [$assigned_user_id, $assigned_user_campus_id] = explode('|', $request->assigned_user);
+        if ($request->campus_id != $assigned_user_campus_id) {
+            return response("Vui lòng chọn giáo viên phù hợp với cơ sở", 404);
+        }
+
+        $checkIsset = DB::table('poetry')->where([
+            ['id_block', '=', $request->id_block],
+            ['room', '=', $request->room],
+            ['id_campus', '=', $request->campus_id],
+            ['status', '=', $request->status],
+            ['exam_date', '=', $request->exam_date],
+        ])
+            ->whereBetween('start_examination_id', [$request->start_examination_id, $request->start_examination_id + $request->examination_count - 1])
+            ->join('block_subject', 'block_subject.id', '=', 'id_block_subject')
+            ->first();
+        if (!empty($checkIsset)) {
+            return response("Phòng thi này đã tồn tại ca thi bạn chọn, vui lòng chọn lựa chọn khác", 404);
+        }
         $data = [
             'id_semeter' => $request->semeter_id,
-            'id_subject' => $request->subject_id,
-            'id_class' => $request->class_id,
-            'id_examination' => $request->examination_id,
+            'id_block_subject' => $request->block_subject_id,
+            'room' => $request->room,
             'id_campus' => $request->campus_id,
+            'start_examination_id' => $request->start_examination_id,
+            'finish_examination_id' => $request->finish_examination_id,
+            'examination_count' => $request->examination_count,
+            'id_class' => $request->class_id,
+            'assigned_user_id' => $assigned_user_id,
             'status' => $request->status,
-            'start_time' => $request->start_time_semeter,
-            'end_time' => $request->end_time_semeter,
-            'created_at' => now(),
-            'updated_at' => null
+            'exam_date' => $request->exam_date,
         ];
 
-        DB::table('poetry')->insert($data);
-        $id = DB::getPdo()->lastInsertId();
-        $data = array_merge($data, $this->poetry->getItem($id));
-
+//        DB::table('poetry')->insert($data);
+//        $id = DB::getPdo()->lastInsertId();
+//        $data['id'] = array_merge($data, $this->poetry->getItem($id));
+        $poetry = \App\Models\poetry::create($data);
 //        $data = $request->all();
-        $data['id'] = $id;
-        return response(['message' => "Thêm thành công", 'data' => $data], 200);
+        return response(['message' => "Thêm thành công", 'data' => $poetry], 200);
     }
 
     public function now_status(Request $request, $id)
@@ -210,33 +247,44 @@ class PoetryController extends Controller
 
     public function update(Request $request, $id)
     {
+        $rules = [
+            'semeter_id_update' => 'required',
+            'id_block_update' => 'required',
+            'block_subject_id_update' => 'required',
+            'room_update' => 'required',
+            'campus_id_update' => 'required',
+            'start_examination_id_update' => 'required|numeric',
+            'finish_examination_id_update' => 'required|numeric|gte:start_examination_id_update',
+            'examination_count_update' => 'required',
+            'class_id_update' => 'required',
+            'assigned_user_update' => 'required',
+            'status_update' => 'required',
+            'exam_date_update' => 'required|date|after:yesterday'
+        ];
         $validator = Validator::make(
             $request->all(),
+            $rules,
             [
-                'semeter_id_update' => 'required',
-                'subject_id_update' => 'required',
-                'examination_id_update' => 'required',
-                'class_id_update' => 'required',
-                'campus_id_update' => 'required',
-                'status_update' => 'required',
-                'start_time_semeter' => 'nullable|date',
-                'end_time_semeter' => 'nullable|date|after:start_time_semeter'
-            ],
-            [
-                'semeter_id_update.required' => 'Vui lòng chọn tên kỳ học !',
-                'subject_id_update.required' => 'Vui lòng chọn môn học !',
-                'examination_id_update.required' => 'Vui lòng chọn ca thi !',
-                'class_id_update.required' => 'Vui lòng chọn lớp !',
-                'campus_id_update.required' => 'Không để trống cơ sở!',
+                'semeter_id_update.required' => 'Thiếu id kỳ học !',
+                'id_block_update' => "Thiếu block",
+                'block_subject_id_update.required' => 'Vui lòng chọn môn học !',
+                'room.required_update' => 'Vui lòng điền tên phòng !',
+                'campus_id_update.required' => 'Vui lòng chọn cơ sở !',
+                'start_examination_id_update.required' => 'Vui lòng chọn ca bắt đầu!',
+                'finish_examination_id_update.required' => 'Vui lòng chọn ca kết thúc!',
+                'finish_examination_id_update.gte' => 'Ca thi kết thúc không được nhỏ hơn ca thi bắt đầu!',
+                'examination_count_update.required' => 'Vui lòng chọn số ca thi liên tiếp!',
+                'class_id_update.required' => 'Vui lòng chọn lớp!',
+                'assigned_user_update.required' => 'Vui lòng chọn giáo viên!',
                 'status_update.required' => 'Vui lòng chọn trạng thái',
-                'start_time_semeter.nullable' => 'Vui lòng chọn thời gian bắt đầu',
-                'end_time_semeter.nullable' => 'Vui lòng chọn thời gian kết thúc',
-                'end_time_semeter.after' => 'Thời gian kết thúc phải lớn hơn thời gian bắt đầu',
+                'exam_date_update.required' => 'Vui lòng chọn ngày thi',
+                'exam_date_update.after' => 'Ngày thi không được nhỏ hơn ngày hôm nay',
             ]
         );
+
         if ($validator->fails() == 1) {
             $errors = $validator->errors();
-            $fields = ['semeter_id', 'subject_id', 'examination_id_update', 'class_id_update', 'campus_id_update', 'status', 'start_time_semeter', 'end_time_semeter'];
+            $fields = array_keys($rules);
             foreach ($fields as $field) {
                 $fieldErrors = $errors->get($field);
 
@@ -248,24 +296,61 @@ class PoetryController extends Controller
             }
 
         }
-        $poetry = $this->poetry->getItempoetry($id);
-        if (!$poetry) {
-            return response()->json(['message' => 'Không tìm thấy'], 404);
+        if ($request->finish_examination_id_update < $request->start_examination_id_update + $request->examination_count_update) {
+            return response("Vui lòng chọn ca kết thúc sao cho hợp lý!", 404);
         }
-        $poetry->id_semeter = $request->semeter_id_update;
-        $poetry->id_subject = $request->subject_id_update;
-        $poetry->id_class = $request->class_id_update;
-        $poetry->id_examination = $request->examination_id_update;
-        $poetry->id_campus = $request->campus_id_update;
-        $poetry->status = $request->status_update;
-        $poetry->start_time = $request->start_time_semeter;
-        $poetry->end_time = $request->end_time_semeter;
-        $poetry->updated_at = now();
+        [$assigned_user_id_update, $assigned_user_campus_id_update] = explode('|', $request->assigned_user_update);
+        if ($request->campus_id_update != $assigned_user_campus_id_update) {
+            return response("Vui lòng chọn giáo viên phù hợp với cơ sở", 404);
+        }
 
-        $poetry->save();
-        $data = $request->all();
-        $data['id'] = $id;
-        $data = array_merge($data, $this->poetry->getItem($id));
+        $checkIsset = DB::table('poetry')->where([
+            ['id_block', '=', $request->id_block_update],
+            ['room', '=', $request->room_update],
+            ['id_campus', '=', $request->campus_id_update],
+            ['status', '=', $request->status_update],
+            ['exam_date', '=', $request->exam_date_update],
+            ['poetry.id', '<>', $id]
+        ])
+            ->whereBetween('start_examination_id', [$request->start_examination_id_update, $request->start_examination_id_update + $request->examination_count_update - 1])
+            ->join('block_subject', 'block_subject.id', '=', 'id_block_subject')
+            ->first();
+        if (!empty($checkIsset)) {
+            return response("Phòng thi này đã tồn tại ca thi bạn chọn, vui lòng chọn lựa chọn khác", 404);
+        }
+        $data = [
+            'id_semeter' => $request->semeter_id_update,
+            'id_block_subject' => $request->block_subject_id_update,
+            'room' => $request->room_update,
+            'id_campus' => $request->campus_id_update,
+            'start_examination_id' => $request->start_examination_id_update,
+            'finish_examination_id' => $request->finish_examination_id_update,
+            'examination_count' => $request->examination_count_update,
+            'id_class' => $request->class_id_update,
+            'assigned_user_id' => $assigned_user_id_update,
+            'status' => $request->status_update,
+            'exam_date' => $request->exam_date_update,
+        ];
+        \App\Models\poetry::query()->where('id', $id)->update($data);
+//        dd($data);
+//        $poetry = $this->poetry->getItempoetry($id);
+//        if (!$poetry) {
+//            return response()->json(['message' => 'Không tìm thấy'], 404);
+//        }
+//        $poetry->id_semeter = $request->semeter_id_update;
+//        $poetry->id_subject = $request->subject_id_update;
+//        $poetry->id_class = $request->class_id_update;
+//        $poetry->id_examination = $request->examination_id_update;
+//        $poetry->id_campus = $request->campus_id_update;
+//        $poetry->status = $request->status_update;
+//        $poetry->start_time = $request->start_time_semeter;
+//        $poetry->end_time = $request->end_time_semeter;
+//        $poetry->updated_at = now();
+
+//        $poetry->save();
+//        $data = $request->all();
+//        $data['id'] = $id;
+//        $data = array_merge($data, $this->poetry->getItem($id));
         return response(['message' => "Cập nhật thành công", 'data' => $data], 200);
     }
 

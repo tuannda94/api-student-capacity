@@ -294,8 +294,6 @@ class TakeExamController extends Controller
     {
         $user_id = auth('sanctum')->user()->id;
         $dB::beginTransaction();
-        try {
-//            $exam = $this->exam->whereGet(['id' => $request->id])->pluck('id');
             $playtopic = $this->playtopic->query()->where('id', $request->id)->pluck('id');
 //            if (is_null($exam)) return $this->responseApi(false, 'Lỗi truy cập hệ thống !!');
             if (is_null($playtopic)) return $this->responseApi(false, 'Lỗi truy cập hệ thống !!');
@@ -317,9 +315,12 @@ class TakeExamController extends Controller
                 ]);
             }
             $string = $playtopic->questions_order;
-            $arrayOrder = json_decode($string, true);
+            $arrayOrder = json_decode($string);
+//            $arrayOrder = explode(',',trim($string, '[]'));
 //            $exam->test = $arrayOrder;
+//        return $string;
             $questions = $this->question->findInId($arrayOrder, ['answers', 'images']);
+//        $questions = \App\Models\Question::whereIn('id', $arrayOrder)->get();
 //            $exam->load(['questions' => function ($q) use ($arrayOrder) {
 //                $q->orderByRaw("FIELD(questions.id, " . implode(",", $arrayOrder) . ")");
 //                $q->with([
@@ -345,6 +346,8 @@ class TakeExamController extends Controller
             } else {
                 return $this->responseApi(true, $data, ['exam_at' => $resultCapacityNew->created_at]);
             }
+        try {
+//            $exam = $this->exam->whereGet(['id' => $request->id])->pluck('id');
         } catch (\Throwable $th) {
             $dB::rollBack();
 //            dd($th);

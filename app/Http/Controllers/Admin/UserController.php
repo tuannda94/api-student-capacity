@@ -193,7 +193,7 @@ class UserController extends Controller
 //            if(isset($resultCapacity->scores) && $resultCapacity->scores  !== null){
             if (isset($value->scores)) {
                 $data[] = [
-                    $key+1,
+                    $key + 1,
                     $subjectIdToSubjectCode[$value->id_subject],
                     $semesterIdToSemesterName[$value->id_semeter],
                     $campusIdToCampusName[$user->campus_id],
@@ -273,7 +273,9 @@ class UserController extends Controller
             $limit = 10;
             $usersQuery = $this->modeluser::status(request('status') ?? null)
                 ->sort(request('sort') == 'asc' ? 'asc' : 'desc', request('sort_by') ?? null, 'users')
-                ->with('roles')
+                ->with('roles', function ($query) {
+                    $query->orderBy('id', 'asc');
+                })
                 ->search(request('q') ?? null, ['name', 'email'])
                 ->has_role(request('role') ?? null)
                 ->where('id', '<>', auth()->user()->id)
@@ -444,7 +446,7 @@ class UserController extends Controller
 
         }
         if (!auth()->user()->hasRole('super admin')) {
-            if ($request->campus_id_update !== auth()->user()->campus_id) {
+            if ($request->campus_id_update != auth()->user()->campus_id) {
                 return response('Bạn không có quyền thêm tài khoản vào cơ sở này', 404);
             }
             if ($request->roles_id_update <= auth()->user()->roles[0]->id) {
@@ -459,7 +461,15 @@ class UserController extends Controller
         $user->campus_id = $request->campus_id_update;
         $user->save();
 
-        $role = modelroles::where('model_id', $id)->update(['role_id' => $request->roles_id_update]);;
+        $role = modelroles::query()
+            ->updateOrCreate(
+                ['model_id' => $id],
+                [
+                    'role_id' => $request->roles_id_update,
+                    'model_type' => 'App\Models\User',
+                    'model_id' => $id,
+                ]
+            );
         return response(['message' => "Thành công <br>Vui lòng chờ 5s để làm mới dữ liệu"], 200);
     }
 

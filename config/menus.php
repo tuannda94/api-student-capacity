@@ -1,7 +1,7 @@
 <?php
 $ROLE_SUPER_ADMIN = 'super admin';
 $ROLE_HAS_ADMINS = 'admin|super admin';
-$ROLE_JUDGE = 'admin|super admin|judge|teacher';
+$ROLE_JUDGE = 'admin|super admin|teacher';
 $TYPE_CAPACITY = 1;
 return [
     [
@@ -25,7 +25,7 @@ return [
         <!--end::Svg Icon-->
         ',
         "name" => "Quản lí môn học",
-        "role" => $ROLE_HAS_ADMINS,
+        "role" => $ROLE_JUDGE,
         "subs-menu" => [
             [
                 "name" => "Danh sách Môn học",
@@ -37,7 +37,7 @@ return [
                 "name" => "Quản Lí học kỳ",
                 "param" => '?type=' . $TYPE_CAPACITY,
                 "link" => "admin.semeter.index",
-                "role" => $ROLE_HAS_ADMINS
+                "role" => $ROLE_JUDGE
             ]
 //            ,
 //            [

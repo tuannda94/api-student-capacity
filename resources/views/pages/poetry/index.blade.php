@@ -19,11 +19,12 @@
                             Danh sách ca thi {{ $name }}
                         </h1>
                     </div>
-                    <div class=" col-lg-6">
-                        <div class=" d-flex flex-row-reverse bd-highlight">
-                            <div>
-                                <a class=" btn btn-primary me-2" target="_blank"
-                                   href="{{ route('admin.download.execel.poetry') }}">
+                    @if(!auth()->user()->hasRole('teacher'))
+                        <div class=" col-lg-6">
+                            <div class=" d-flex flex-row-reverse bd-highlight">
+                                <div>
+                                    <a class=" btn btn-primary me-2" target="_blank"
+                                       href="{{ route('admin.download.execel.poetry') }}">
                             <span class="svg-icon svg-icon-x svg-icon-primary   ">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                      fill="none">
@@ -35,23 +36,23 @@
                                         fill="black"></path>
                                 </svg>
                             </span>
-                                    Tải
-                                    xuống mẫu</a>
-                            </div>
-                            <label data-bs-toggle="modal" data-bs-target="#kt_modal_1" type="button"
-                                   class="btn btn-light-primary me-3" id="kt_file_manager_new_folder">
+                                        Tải
+                                        xuống mẫu</a>
+                                </div>
+                                <label data-bs-toggle="modal" data-bs-target="#kt_modal_1" type="button"
+                                       class="btn btn-light-primary me-3" id="kt_file_manager_new_folder">
 
-                                <!--end::Svg Icon-->Thêm ca thi
-                            </label>
-                            <button
-                                style="background: #ccc;
+                                    <!--end::Svg Icon-->Thêm ca thi
+                                </label>
+                                <button
+                                    style="background: #ccc;
                                                                                                                     padding: 1vh 1vh 1vh 2vh;
                                                                                                                     border-radius: 20px;"
-                                data-bs-toggle="modal"
-                                data-bs-target="#kt_modal_exc_poetry"
-                                type="button"
-                                class="btn   me-3"
-                                id="kt_file_manager_new_folder">
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#kt_modal_exc_poetry"
+                                    type="button"
+                                    class="btn   me-3"
+                                    id="kt_file_manager_new_folder">
                                                                                             <span
                                                                                                 class="svg-icon svg-icon-2">
                                                                                                 <svg
@@ -74,9 +75,10 @@
                                                                                                     </path>
                                                                                                 </svg>
                                                                                             </span>
-                            </button>
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
 
 
@@ -136,7 +138,7 @@
                                         {{ $value->exam_date }}
                                     </td>
                                     <td>
-                                        {{ $value->subject->name }}
+                                        {{ $blockSubjectIdToName[$value->id_block_subject] }}
                                     </td>
                                     <td>
                                         {{ $value->classsubject->name }}
@@ -163,7 +165,8 @@
                                         <div class="form-check form-switch">
                                             <input class="form-check-input" data-id="{{ $value->id }}" type="checkbox"
                                                    {{ $value->status == 1 ? 'checked' : '' }} role="switch"
-                                                   id="flexSwitchCheckDefault">
+                                                   id="flexSwitchCheckDefault"
+                                                   @if(auth()->user()->hasRole('teacher')) disabled @endif>
                                         </div>
                                     </td>
                                     {{--                                <td>{{ $value->start_time == null ? 'Chưa có thời gian bắt đầu' : $value->start_time	 }}</td>--}}
@@ -195,14 +198,16 @@
                                                         Chi tiết
                                                     </button>
                                                 </div>
-                                                <div class="menu-item px-3">
-                                                    <button
-                                                        class="btn-edit menu-link px-3 border border-0 bg-transparent"
-                                                        data-id="{{ $value->id }}"
-                                                        data-semeter="{{ $value->id_semeter }}">
-                                                        Chỉnh sửa
-                                                    </button>
-                                                </div>
+                                                @if(!auth()->user()->hasRole('teacher'))
+                                                    <div class="menu-item px-3">
+                                                        <button
+                                                            class="btn-edit menu-link px-3 border border-0 bg-transparent"
+                                                            data-id="{{ $value->id }}"
+                                                            data-semeter="{{ $value->id_semeter }}">
+                                                            Chỉnh sửa
+                                                        </button>
+                                                    </div>
+                                                @endif
                                                 <!--end::Menu item-->
                                                 <!--begin::Menu item-->
                                                 {{--                                        <div class="menu-item px-3">--}}
@@ -217,7 +222,7 @@
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="5">
+                                <td colspan="11">
                                     <h1 class="text-center">Không có ca thi nào</h1>
                                 </td>
                             </tr>
@@ -237,221 +242,276 @@
         </div>
         <!--end::Container-->
     </div>
-    <div class="modal fade" tabindex="-1"
-         id="kt_modal_exc_poetry">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        Tải lên
-                        excel
-                    </h5>
+    @if(!auth()->user()->hasRole('teacher'))
+        <div class="modal fade" tabindex="-1"
+             id="kt_modal_exc_poetry">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            Tải lên
+                            excel
+                        </h5>
 
-                    <!--begin::Close-->
-                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2"
-                         data-bs-dismiss="modal" aria-label="Close">
-                        <span class="svg-icon svg-icon-2x"></span>
-                        Thoát
-                    </div>
-                    <!--end::Close-->
-                </div>
-                <form class="form-submit"
-                      action="{{ route('admin.semeter.excel.import', ['semeter' => $id_poetry,'idBlock' => $idBlock]) }}"
-                      method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-body text-center">
-                        <div class="HDSD">
+                        <!--begin::Close-->
+                        <div class="btn btn-icon btn-sm btn-active-light-primary ms-2"
+                             data-bs-dismiss="modal" aria-label="Close">
+                            <span class="svg-icon svg-icon-2x"></span>
+                            Thoát
                         </div>
-                        <label for="up-file{{ $id_poetry }}"
-                               class="">
-                            <i data-bs-toggle="tooltip"
-                               title="Click để upload file"
-                               style="font-size: 100px;"
-                               role="button"
-                               class="bi bi-cloud-plus-fill"></i>
-                        </label>
-                        <input style="display: none" type="file"
-                               name="ex_file" class="up-file"
-                               id="up-file{{ $id_poetry }}">
-                        <div style="display: none"
-                             class="progress show-p mt-3 h-25px w-100">
-                            <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated"
-                                 role="progressbar" style="width: 0%"
-                                 aria-valuenow="0" aria-valuemin="0"
-                                 aria-valuemax="100">
+                        <!--end::Close-->
+                    </div>
+                    <form class="form-submit"
+                          action="{{ route('admin.semeter.excel.import', ['semeter' => $id_poetry,'idBlock' => $idBlock]) }}"
+                          method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="modal-body text-center">
+                            @if(auth()->user()->hasRole('super admin'))
+                                <div class="form-group">
+                                    <select name="campus_id" id="campus_id_excel" class="form-select">
+                                        <option value="">--Chọn cơ sở--</option>
+                                        @foreach($listcampus as $campus)
+                                            <option value="{{ $campus->id }}">{{ $campus->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
+                            <div class="HDSD">
                             </div>
+                            <label for="up-file{{ $id_poetry }}"
+                                   class="">
+                                <i data-bs-toggle="tooltip"
+                                   title="Click để upload file"
+                                   style="font-size: 100px;"
+                                   role="button"
+                                   class="bi bi-cloud-plus-fill"></i>
+                            </label>
+                            <input style="display: none" type="file"
+                                   name="ex_file" class="up-file"
+                                   id="up-file{{ $id_poetry }}">
+                            <div style="display: none"
+                                 class="progress show-p mt-3 h-25px w-100">
+                                <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated"
+                                     role="progressbar" style="width: 0%"
+                                     aria-valuenow="0" aria-valuemin="0"
+                                     aria-valuemax="100">
+                                </div>
+                            </div>
+                            <p class="show-name">
+                            </p>
+                            <p class="text-danger error_ex_file">
+                            </p>
                         </div>
-                        <p class="show-name">
-                        </p>
-                        <p class="text-danger error_ex_file">
-                        </p>
-                    </div>
 
-                    <div class="modal-footer">
-                        <button type="submit"
-                                class="upload-file btn btn-primary">Tải
-                            lên
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    {{--    form add--}}
-    <div class="modal fade" tabindex="-1" id="kt_modal_1" style="display: none;" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Thêm mới ca thi</h5>
-
-                    <!--begin::Close-->
-                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
-                         aria-label="Close">
-                        <span class="svg-icon svg-icon-2x"></span>
-                    </div>
-                    <!--end::Close-->
+                        <div class="modal-footer">
+                            <button type="submit"
+                                    class="upload-file btn btn-primary">Tải
+                                lên
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <form id="form-submit" action="{{ route('admin.poetry.create') }}">
-                    @csrf
-                    <input type="hidden" id="semeter_id" value="{{ $id_poetry }}">
-                    <input type="hidden" id="id_block" value="{{ $idBlock }}">
-{{--                    <div class="form-group m-10">--}}
-{{--                        <select class="form-select" name="semeter" id="semeter_id">--}}
-{{--                            <option selected value="">--Chọn kỳ học--</option>--}}
-{{--                            @foreach($semeter as $value)--}}
-{{--                                <option value="{{ $value->id }}">{{ $value->name }}</option>--}}
-{{--                            @endforeach--}}
-{{--                        </select>--}}
-{{--                    </div>--}}
-                    <div class="form-group m-10">
-                        <select class="form-select" name="subject" id="subject_id">
-                            <option selected value="">--Chọn môn học--</option>
-                            @foreach($listSubject as $subject)
-                                <option value="{{ $subject->id }}">{{ $subject->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group m-10">
-                        <select class="form-select" name="subject" id="campus_id">
-                            <option selected value="">--Chọn cơ sở--</option>
-                            @foreach($listcampus as $campus)
-                                <option value="{{ $campus->id }}">{{ $campus->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group m-10">
-                        <select class="form-select" name="subject" id="examination_id">
-                            <option selected value="">--Chọn ca thi--</option>
-                            @foreach($listExamination as $exam)
-                                <option value="{{ $exam->id }}">{{ $exam->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group m-10">
-                        <select class="form-select" name="subject" id="class_id">
-                            <option selected value="">--Chọn lớp thi--</option>
-                            @foreach($listClass as $exam)
-                                <option value="{{ $exam->id }}">{{ $exam->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group m-10">
-                        <select class="form-select" name="status" id="status_add">
-                            <option selected value="">Trạng thái</option>
-                            <option value="1">Kích hoạt</option>
-                            <option value="0">Chưa kích hoạt</option>
-                        </select>
-                    </div>
-                    <div class="form-group m-10">
-                        <label for="" class="form-label">Thời gian bắt đầu</label>
-                        <input type="date" name="start_time" id="start_time" class=" form-control"
-                        >
-                    </div>
-                    <div class="form-group m-10">
-                        <label for="" class="form-label">Thời gian kết thúc</label>
-                        <input type="date" name="end_time" id="end_time" class=" form-control"
-                        >
-                    </div>
+            </div>
+        </div>
+        {{--    form add--}}
 
-                    <div class="modal-footer">
-                        <button type="button" id="upload-basis" class=" btn btn-primary">Tải lên</button>
+        <div class="modal fade" tabindex="-1" id="kt_modal_1" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Thêm mới ca thi</h5>
+
+                        <!--begin::Close-->
+                        <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
+                             aria-label="Close">
+                            <span class="svg-icon svg-icon-2x"></span>
+                        </div>
+                        <!--end::Close-->
                     </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    {{--    form sửa--}}
-    <div class="modal fade" tabindex="-1" id="edit_modal" style="display: none;" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Sửa ca thi </h5>
-                    <!--begin::Close-->
-                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
-                         aria-label="Close">
-                        <span class="svg-icon svg-icon-2x"></span>
-                    </div>
-                    <!--end::Close-->
+                    <form id="form-submit" action="{{ route('admin.poetry.create') }}">
+                        @csrf
+                        <input type="hidden" id="semeter_id" value="{{ $id_poetry }}">
+                        <input type="hidden" id="id_block" value="{{ $idBlock }}">
+                        <div class="form-group m-10">
+                            <select class="form-select" name="subject" id="block_subject_id">
+                                <option selected value="">--Chọn môn học--</option>
+                                @foreach($listSubject as $subject)
+                                    <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group m-10">
+                            <input type="text" class="form-control" placeholder="Phòng thi" name="room" id="room">
+                        </div>
+                        <div class="form-group m-10">
+                            <select class="form-select" name="subject" id="campus_id">
+                                <option selected value="">--Chọn cơ sở--</option>
+                                @foreach($listcampus as $campus)
+                                    <option value="{{ $campus->id }}">{{ $campus->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group m-10">
+                            <select class="form-select" name="start_examination_id" id="start_examination_id">
+                                <option selected value="">--Chọn ca bắt đầu thi--</option>
+                                @foreach($listExamination as $exam)
+                                    <option value="{{ $exam->id }}">{{ $exam->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group m-10">
+                            <select class="form-select" name="examination_count" id="examination_count">
+                                <option selected value="">--Kéo dài trong--</option>
+                                @for($i=1; $i<=3; $i++)
+                                    <option value="{{ $i }}">{{ $i }} ca</option>
+                                @endfor
+                            </select>
+                        </div>
+                        <div class="form-group m-10">
+                            <select class="form-select" name="finish_examination_id" id="finish_examination_id">
+                                <option selected value="">--Chọn ca kết thúc thi--</option>
+                                @foreach($listExamination as $exam)
+                                    <option value="{{ $exam->id }}">{{ $exam->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group m-10">
+                            <select class="form-select" name="class_id" id="class_id">
+                                <option selected value="">--Chọn lớp thi--</option>
+                                @foreach($listClass as $exam)
+                                    <option value="{{ $exam->id }}">{{ $exam->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group m-10">
+                            <select class="form-select" name="assigned_user" id="assigned_user">
+                                <option selected value="">--Giáo viên--</option>
+                                @foreach($teachers as $teacher)
+                                    <option
+                                        value="{{ $teacher->id }}|{{ $teacher->campus_id }}">{{ $teacher->name }} - Cơ
+                                        sở {{ $teacher->campus->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group m-10">
+                            <select class="form-select" name="status" id="status_add">
+                                <option selected value="">Trạng thái</option>
+                                <option value="1">Kích hoạt</option>
+                                <option value="0">Chưa kích hoạt</option>
+                            </select>
+                        </div>
+                        <div class="form-group m-10">
+                            <label for="" class="form-label">Ngày thi</label>
+                            <input type="date" name="exam_date" id="exam_date" class=" form-control"
+                            >
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" id="upload-basis" class=" btn btn-primary">Tải lên</button>
+                        </div>
+                    </form>
                 </div>
-                <form id="form-update">
-                    @csrf
-                    <input type="hidden" name="id_update" id="id_update">
-                    <input type="hidden" id="semeter_id_update" value="{{ $id_poetry }}">
-                    <div class="form-group m-10">
-                        <select class="form-select" name="subject" id="subject_id_update">
-                            @foreach($listSubject as $subject)
-                                <option value="{{ $subject->id }}">{{ $subject->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group m-10">
-                        <select class="form-select" name="subject" id="campus_id_update">
-                            <option selected value="">--Chọn cơ sở--</option>
-                            @foreach($listcampus as $campus)
-                                <option value="{{ $campus->id }}">{{ $campus->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group m-10">
-                        <select class="form-select" name="subject" id="examination_id_update">
-                            <option selected value="">--Chọn ca thi--</option>
-                            @foreach($listExamination as $exam)
-                                <option value="{{ $exam->id }}">{{ $exam->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group m-10">
-                        <select class="form-select" name="subject" id="class_id_update">
-                            <option selected value="">--Chọn lớp thi--</option>
-                            @foreach($listClass as $exam)
-                                <option value="{{ $exam->id }}">{{ $exam->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group m-10">
-                        <select class="form-select" name="status" id="status_update">
-                            <option selected value="">Trạng thái</option>
-                            <option value="1">Kích hoạt</option>
-                            <option value="0">Chưa kích hoạt</option>
-                        </select>
-                    </div>
-                    <div class="form-group m-10">
-                        <label for="" class="form-label">Thời gian bắt đầu</label>
-                        <input type="date" name="start_time" id="start_time_update" class=" form-control"
-                        >
-                    </div>
-                    <div class="form-group m-10">
-                        <label for="" class="form-label">Thời gian kết thúc</label>
-                        <input type="date" name="end_time" id="end_time_update" class=" form-control"
-                        >
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" id="btn-update" class=" btn btn-primary">Cập nhật</button>
-                    </div>
-                </form>
             </div>
         </div>
-    </div>
+        {{--    form sửa--}}
+        <div class="modal fade" tabindex="-1" id="edit_modal" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Sửa ca thi </h5>
+                        <!--begin::Close-->
+                        <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
+                             aria-label="Close">
+                            <span class="svg-icon svg-icon-2x"></span>
+                        </div>
+                        <!--end::Close-->
+                    </div>
+                    <form id="form-update">
+                        @csrf
+                        <input type="hidden" name="id_update" id="id_update">
+                        <input type="hidden" id="semeter_id_update" value="{{ $id_poetry }}">
+                        <input type="hidden" id="id_block_update" value="{{ $idBlock }}">
+                        <div class="form-group m-10">
+                            <select class="form-select" name="subject" id="block_subject_id_update">
+                                @foreach($listSubject as $subject)
+                                    <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group m-10">
+                            <input type="text" class="form-control" placeholder="Phòng thi" name="room"
+                                   id="room_update">
+                        </div>
+                        <div class="form-group m-10">
+                            <select class="form-select" name="subject" id="campus_id_update">
+                                <option selected value="">--Chọn cơ sở--</option>
+                                @foreach($listcampus as $campus)
+                                    <option value="{{ $campus->id }}">{{ $campus->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group m-10">
+                            <select class="form-select" name="start_examination_id" id="start_examination_id_update">
+                                <option selected value="">--Chọn ca bắt đầu thi--</option>
+                                @foreach($listExamination as $exam)
+                                    <option value="{{ $exam->id }}">{{ $exam->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group m-10">
+                            <select class="form-select" name="examination_count" id="examination_count_update">
+                                <option selected value="">--Kéo dài trong--</option>
+                                @for($i=1; $i<=3; $i++)
+                                    <option value="{{ $i }}">{{ $i }} ca</option>
+                                @endfor
+                            </select>
+                        </div>
+                        <div class="form-group m-10">
+                            <select class="form-select" name="finish_examination_id" id="finish_examination_id_update">
+                                <option selected value="">--Chọn ca kết thúc thi--</option>
+                                @foreach($listExamination as $exam)
+                                    <option value="{{ $exam->id }}">{{ $exam->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group m-10">
+                            <select class="form-select" name="class_id" id="class_id_update">
+                                <option selected value="">--Chọn lớp thi--</option>
+                                @foreach($listClass as $exam)
+                                    <option value="{{ $exam->id }}">{{ $exam->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group m-10">
+                            <select class="form-select" name="assigned_user" id="assigned_user_update">
+                                <option selected value="">--Giáo viên--</option>
+                                @foreach($teachers as $teacher)
+                                    <option
+                                        value="{{ $teacher->id }}|{{ $teacher->campus_id }}">{{ $teacher->name }} - Cơ
+                                        sở {{ $teacher->campus->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group m-10">
+                            <select class="form-select" name="status" id="status_update">
+                                <option selected value="">Trạng thái</option>
+                                <option value="1">Kích hoạt</option>
+                                <option value="0">Chưa kích hoạt</option>
+                            </select>
+                        </div>
+                        <div class="form-group m-10">
+                            <label for="" class="form-label">Ngày thi</label>
+                            <input type="date" name="exam_date" id="exam_date_update" class=" form-control"
+                            >
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="btn-update" class=" btn btn-primary">Cập nhật</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection
 @section('page-script')
     <script>
@@ -542,27 +602,34 @@
     <script>
         $('#upload-basis').click(function (e) {
             e.preventDefault();
+            console.log($('#campus_id').val());
             var url = $('#form-submit').attr("action");
             var id_block = $('#id_block').val();
             var semeter_id = $('#semeter_id').val();
-            var subject_id = $('#subject_id').val();
-            var examination_id = $('#examination_id').val();
+            var block_subject_id = $('#block_subject_id').val();
+            var room = $('#room').val();
             var campus_id = $('#campus_id').val();
+            var start_examination_id = $('#start_examination_id').val();
+            var finish_examination_id = $('#finish_examination_id').val();
+            var examination_count = $('#examination_count').val();
             var class_id = $('#class_id').val();
+            var assigned_user = $('#assigned_user').val();
             var status = $('#status_add').val();
-            var start_time_semeter = $('#start_time').val();
-            var end_time_semeter = $('#end_time').val();
+            var exam_date = $('#exam_date').val();
             var dataAll = {
-                '_token' : _token,
-                'id_block' : id_block,
-                'semeter_id' : semeter_id,
-                'subject_id' : subject_id,
-                'examination_id' : examination_id,
+                '_token': _token,
+                'id_block': id_block,
+                'semeter_id': semeter_id,
+                'block_subject_id': block_subject_id,
+                'room': room,
                 'campus_id': campus_id,
+                'start_examination_id': start_examination_id,
+                'finish_examination_id': finish_examination_id,
+                'examination_count': examination_count,
                 'class_id': class_id,
+                'assigned_user': assigned_user,
                 'status': status,
-                'start_time_semeter': start_time_semeter,
-                'end_time_semeter': end_time_semeter,
+                'exam_date': exam_date,
             }
             $.ajax({
                 type: 'POST',
@@ -662,10 +729,16 @@
                             console.log(response);
                             // notify('Tải dữ liệu thành công !')
                             $('#semeter_id_update').val(response.data.poetry.id_semeter);
-                            $('#subject_id_update').val(response.data.poetry.id_subject);
-                            $('#examination_id_update').val(response.data.poetry.id_examination);
+                            $('#block_subject_id_update').val(response.data.poetry.id_block_subject);
                             $('#class_id_update').val(response.data.poetry.id_class);
+                            $('#examination_count_update').val(response.data.poetry.examination_count);
+                            $('#start_examination_id_update').val(response.data.poetry.start_examination_id);
+                            $('#finish_examination_id_update').val(response.data.poetry.finish_examination_id);
+                            $('#room_update').val(response.data.poetry.room);
                             $('#campus_id_update').val(response.data.poetry.id_campus);
+                            $('#assigned_user_update').val(response.data.poetry.user.id + '|' + response.data.poetry.user.campus_id);
+                            $('#status_update').val(response.data.poetry.status);
+                            $('#exam_date_update').val(response.data.poetry.exam_date);
                             console.log(response.data.poetry.id_subject);
                             // const selectSubject = document.getElementById("subject_id_update");
                             // let html = "";
@@ -681,12 +754,8 @@
                             // eventSubject(btnEnvent,selectSubject)
                             // $('#subject_id_update').val(response.data.id_subject);
 
-                            $('#status_update').val(response.data.poetry.status);
                             $('#id_update').val(response.data.poetry.id)
-                            const date_start = moment(response.data.poetry.start_time).format("YYYY-MM-DD");
-                            $('#start_time_update').val(date_start)
-                            const date_end = moment(response.data.poetry.end_time).format("YYYY-MM-DD");
-                            $('#end_time_update').val(date_end)
+                            console.log(response.data.poetry.user.id + '|' + response.data.poetry.user.campus_id);
                             // Gán các giá trị dữ liệu lấy được vào các trường tương ứng trong modal
                             $('#edit_modal').modal('show');
                         },
@@ -704,26 +773,35 @@
         function onupdate(btn) {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
-                var semeter_id_update = $('#semeter_id_update').val();
-                var subject_id_update = $('#subject_id_update').val();
-                var examination_id_update = $('#examination_id_update').val();
-                var class_id_update = $('#class_id_update').val();
-                var campus_id_update = $('#campus_id_update').val();
-                var status_update = $('#status_update').val();
-                var id = $('#id_update').val();
 
-                const date_start = $('#start_time_update').val();
-                const date_end = $('#end_time_update').val();
+                var id = $('#id_update').val();
+                var semeter_id_update = $('#semeter_id_update').val();
+                var id_block_update = $('#id_block_update').val();
+                var block_subject_id_update = $('#block_subject_id_update').val();
+                var room_update = $('#room_update').val();
+                var campus_id_update = $('#campus_id_update').val();
+                var start_examination_id_update = $('#start_examination_id_update').val();
+                var finish_examination_id_update = $('#finish_examination_id_update').val();
+                var examination_count_update = $('#examination_count_update').val();
+                var class_id_update = $('#class_id_update').val();
+                var assigned_user_update = $('#assigned_user_update').val();
+                var status_update = $('#status_update').val();
+                var exam_date_update = $('#exam_date_update').val();
+
                 var dataAll = {
                     '_token': _token,
                     'semeter_id_update': semeter_id_update,
-                    'subject_id_update': subject_id_update,
-                    'examination_id_update': examination_id_update,
-                    'class_id_update': class_id_update,
+                    'id_block_update': id_block_update,
+                    'block_subject_id_update': block_subject_id_update,
+                    'room_update': room_update,
                     'campus_id_update': campus_id_update,
+                    'start_examination_id_update': start_examination_id_update,
+                    'finish_examination_id_update': finish_examination_id_update,
+                    'examination_count_update': examination_count_update,
+                    'class_id_update': class_id_update,
+                    'assigned_user_update': assigned_user_update,
                     'status_update': status_update,
-                    'start_time_semeter': date_start,
-                    'end_time_semeter': date_end
+                    'exam_date_update': exam_date_update,
                 }
                 $.ajax({
                     type: 'PUT',
@@ -732,6 +810,9 @@
                     success: (response) => {
                         console.log(response)
                         $('#form-submit')[0].reset();
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
                         notify(response.message);
                         const idup = `data-id='${response.data.id}'`;
                         // console.log(idup);
@@ -751,7 +832,8 @@
                         update(btnEdit)
                         btnDelete = document.querySelectorAll('.btn-delete');
                         dele(btnDelete)
-                        $('#edit_modal').modal('hide');
+                        wanrning('Đang tải dữ liệu mới ...');
+                        $('#kt_modal_1').modal('hide');
                     },
                     error: function (response) {
                         // console.log(response.responseText)
@@ -827,7 +909,7 @@
         }
 
     </script>
-    <script src="assets/js/system/formatlist/formatlis.js"></script>
+    {{--    <script src="assets/js/system/formatlist/formatlis.js"></script>--}}
     <script src="assets/js/system/capacity/main.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js"></script>
     <script>

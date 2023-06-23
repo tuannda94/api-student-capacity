@@ -56,7 +56,7 @@
                         <!--end::Title-->
                     </div>
                     <!--begin::Actions-->
-{{--                    <form class="text-center" action="{{ route('auth.redirect-google') }}" method="post">--}}
+                    {{--                    <form class="text-center" action="{{ route('auth.redirect-google') }}" method="post">--}}
                     <form class="text-center" action="{{ route('google-auth.callback') }}" method="post">
                         @csrf
                         <div class="form-group mb-3">
@@ -89,8 +89,10 @@
                                         value="{{ $user->email }}"
                                         @if(old('email') === $user->email) selected @endif
                                     >
-                                        {{ $user->email }} - {{ $user->roles[0]->name }} - Cơ
-                                        sở {{ $user->campus->name }}
+                                        {{ $user->email }} - {{ $user->roles[0]->name }} @if($user->roles[0]->name !== 'super admin')
+                                            - Cơ
+                                            sở {{ $user->campus->name }}
+                                        @endif
                                     </option>
                                 @endforeach
                             </select>

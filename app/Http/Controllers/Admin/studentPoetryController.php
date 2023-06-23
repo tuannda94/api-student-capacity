@@ -34,7 +34,8 @@ class studentPoetryController extends Controller
     public function index($id, $id_poetry, $idBlock)
     {
         $liststudent = $this->PoetryStudent->GetStudents($id);
-        $id_subject = $this->poetry->query()->where('id', $id)->first()->id_subject;
+        $id_block_subject = $this->poetry->query()->where('id', $id)->first()->id_block_subject;
+        $id_subject = DB::table('block_subject')->where('id', $id_block_subject)->first()->id_subject;
 //        if (!$liststudent) return abort(404);
         $examsList = $this->exam->getListExam($id_subject);
 //        dd($liststudent);
@@ -44,7 +45,8 @@ class studentPoetryController extends Controller
             'id_subject' => $id_subject,
             'exams_list' => $examsList,
             'id_poetry' => $id_poetry,
-            'idBlock' => $idBlock
+            'idBlock' => $idBlock,
+            'id_block_subject' => $id_block_subject,
         ]);
     }
 

@@ -22,6 +22,8 @@ use App\Services\Modules\MSkill\MSkillInterface;
 use App\Services\Traits\TStatus;
 use App\Services\Traits\TUploadImage;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
@@ -118,7 +120,7 @@ class QuestionController extends Controller
         return $data;
     }
 
-    public function indexSubject($id,$id_subject,$name)
+    public function indexSubject($id, $id_subject, $name)
     {
         $skills = $this->skillModel::all();
         if (!($questions = $this->getQuestion($id)->paginate(request('limit') ?? 10))) return abort(404);
@@ -147,7 +149,7 @@ class QuestionController extends Controller
     {
         try {
             if (!($questions = $this->getList()->take(request('take') ?? 10)->get()))
-                throw new \Exception("Question not found");
+                throw new Exception("Question not found");
             return response()->json([
                 'status' => true,
                 'payload' => $questions,
@@ -485,7 +487,18 @@ class QuestionController extends Controller
     public function importAndRunSemeter(ImportQuestion $request, $semeter_id, $idBlock)
     {
         try {
-            $this->readExClass($request->ex_file, $semeter_id, $idBlock);
+            $id_campus = auth()->user()->campus_id;
+            if (auth()->user()->hasRole('super admin')) {
+                if (empty($request->campus_id)) {
+                    return throw new HttpResponseException(response()->json([
+                        'errors' => ['campus_id' => "Vui lòng chọn cơ sở"],
+                        'status' => false
+                    ], 404));
+                } else {
+                    $id_campus = $request->campus_id;
+                }
+            }
+            $this->readExClass($request->ex_file, $semeter_id, $idBlock, $id_campus);
 //            $import = new QuestionsImport($exam_id);
 //            Excel::import($import, $request->ex_file);
 //            dd();
@@ -691,11 +704,9 @@ class QuestionController extends Controller
         $exams->save();
     }
 
-    public function readExClass($file, $id_semeter, $idBlock)
+    public function readExClass($file, $id_semeter, $idBlock, $id_campus)
     {
-        if (!auth()->user()->hasRole('super admin')) {
-        }
-        $campus_id = auth()->user()->campus_id;
+        $campus_id = $id_campus;
         $spreadsheet = IOFactory::load($file);
         $sheetCount = $spreadsheet->getSheetCount();
         // Lấy ra sheet chứa câu hỏi
@@ -776,7 +787,6 @@ class QuestionController extends Controller
         // Lấy ra các môn có trong excel và database theo idBlock
         $subjectsDb = $this->subjectModel->query()
             ->whereIn('code_subject', array_keys($subjects))
-            ->where('id_block', $idBlock)
             ->get();
 
         // Subject Code To Subject ID
@@ -794,12 +804,37 @@ class QuestionController extends Controller
                     'name' => $subjects[$subject_code],
                     'status' => 1,
                     'code_subject' => $subject_code,
-                    'id_block' => $idBlock,
+//                    'id_block' => $idBlock,
                     'created_at' => now(),
                 ];
                 $subjectCodeToSubjectId[$subject_code] = $maxSubjectId;
             }
             DB::table('subject')->insert($subjectInsertArr);
+        }
+        $subjectIdToSubjectCode = array_flip($subjectCodeToSubjectId);
+        $subjectIdToBlockSubjectId = DB::table('block_subject')
+            ->select('id', 'id_subject')
+            ->where('id_block', $idBlock)
+            ->whereIn('id_subject', array_values($subjectCodeToSubjectId))
+            ->get()->pluck('id', 'id_subject')->toArray();
+        $blockSubjectIdDiff = array_diff(array_keys($subjectIdToSubjectCode), array_keys($subjectIdToBlockSubjectId));
+        if (!empty($blockSubjectIdDiff)) {
+            // Nếu có thì insert
+            $maxBlockSubjectId = DB::table('block_subject')->max('id');
+            $blockSubjectInsertArr = [];
+            foreach ($blockSubjectIdDiff as $subject_id) {
+                $blockSubjectInsertArr[] = [
+                    'id' => ++$maxBlockSubjectId,
+                    'id_subject' => $subject_id,
+                    'id_block' => $idBlock,
+                ];
+                $subjectIdToBlockSubjectId[$subject_id] = $maxBlockSubjectId;
+            }
+            DB::table('block_subject')->insert($blockSubjectInsertArr);
+        }
+        $subjectCodeToBlockSubjectId = [];
+        foreach ($subjectIdToSubjectCode as $subject_id => $subject_code) {
+            $subjectCodeToBlockSubjectId[$subject_code] = $subjectIdToBlockSubjectId[$subject_id];
         }
 
         // Lấy ra các lớp có trong excel và database
@@ -863,7 +898,7 @@ class QuestionController extends Controller
         }
         $poetryByDay = DB::table('poetry')
             ->select([
-                'id_subject',
+                'id_block_subject',
                 'id_class',
                 'examination_count',
                 'start_examination_id',
@@ -871,18 +906,19 @@ class QuestionController extends Controller
                 'room',
                 'assigned_user_id',
                 'id_campus',
-                'status',
+//                'status',
             ])
             ->whereIn('exam_date', $ngayThiArr)
             ->where('id_campus', $campus_id)
             ->where('id_semeter', $id_semeter)
-            ->where('status', 1)
+//            ->where('status', 1)
             ->get()->map(function ($poetry_item) {
                 return implode('|', (array)$poetry_item);
             })->toArray();
+//        dd($poetryByDay);
         $poetryDataArr = [];
         foreach ($arrItem as $item) {
-            $id_subject = $subjectCodeToSubjectId[$item['subject_code']];
+            $id_block_subject = $subjectCodeToBlockSubjectId[$item['subject_code']];
             $id_class = $classNameToClassId[$item['class']];
             $examination_count = $item['examination_count'];
             $start_examination_id = $item['start_examination_id'];
@@ -893,7 +929,7 @@ class QuestionController extends Controller
             $status = 1;
             $exam_date = $item['ngay_thi'];
             $key = implode('|', [
-                $id_subject,
+                $id_block_subject,
                 $id_class,
                 $examination_count,
                 $start_examination_id,
@@ -901,11 +937,11 @@ class QuestionController extends Controller
                 $room,
                 $assigned_user_id,
                 $id_campus,
-                $status
+//                $status
             ]);
             $poetryDataArr[$key] = [
                 'id_semeter' => $id_semeter,
-                'id_subject' => $id_subject,
+                'id_block_subject' => $id_block_subject,
                 'id_class' => $id_class,
                 'examination_count' => $examination_count,
                 'start_examination_id' => $start_examination_id,
@@ -916,7 +952,6 @@ class QuestionController extends Controller
                 'status' => $status,
                 'exam_date' => $exam_date,
             ];
-//            $id_class = $sub
         }
 
         $poetryValidArr = array_diff(array_keys($poetryDataArr), $poetryByDay);
@@ -926,6 +961,12 @@ class QuestionController extends Controller
 
 
         DB::table('poetry')->insert($poetryInsertArr);
+        $poetryInsertCount = count($poetryInsertArr);
+        if ($poetryInsertCount !== 0) {
+            return response("Tạo thành công {$poetryInsertCount} ca thi, " . count($poetryDataArr) - $poetryInsertCount . " bị trùng", 201);
+        } else {
+            return response("Bạn đã nhập file ca thi này trước đây rồi", 404);
+        }
 
     }
 
@@ -933,7 +974,7 @@ class QuestionController extends Controller
     function catchError($data, $message)
     {
         if (($data == null || trim($data) == "")) {
-            throw new \Exception($message);
+            throw new Exception($message);
         }
 //        return is_string($data) ? utf8_encode($data) : $data;
         return $data;
@@ -944,7 +985,7 @@ class QuestionController extends Controller
     {
         DB::transaction(function () use ($data, $exam_id, &$imgCodeToQuestionId) {
             $question = app(MQuestionInterface::class)->createQuestionsAndAttchSkill($data['questions'], $data['skill']);
-            if (!$question) throw new \Exception("Error create question ");
+            if (!$question) throw new Exception("Error create question ");
             if ($exam_id) app(MExamInterface::class)->attachQuestion($exam_id, $question->id);
             app(MAnswerInterface::class)->createAnswerByIdQuestion($data['answers'], $question->id);
             foreach ($data['imgCode'] as $imgCode) {

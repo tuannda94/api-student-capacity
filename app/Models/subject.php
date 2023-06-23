@@ -21,7 +21,7 @@ class subject extends Model
 
     public function block_subject()
     {
-        return $this->hasOne(blockSubject::class, 'id_subject', 'id');
+        return $this->hasMany(blockSubject::class, 'id_subject', 'id');
     }
 
 }
