@@ -7,6 +7,7 @@ use App\Models\studentPoetry;
 use App\Services\Modules\MStudentManager\PoetryStudent;
 use App\Services\Traits\TResponse;
 use App\Services\Traits\TUploadImage;
+use Exception;
 use Illuminate\Http\Request;
 use App\Services\Modules\playtopics\playtopic;
 use App\Services\Modules\MCampus\Campus;
@@ -103,13 +104,21 @@ class playtopicController extends Controller
 
     public function AddTopic(Request $request)
     {
-        $rules = ['receive_mode' => 'required', 'time' => 'required'];
+        $rules = ['receive_mode' => 'required', 'time' => 'required|numeric|min:1'];
         if (!isset($request->receive_mode)) {
-            $messages = ['receive_mode.required' => 'Vui lòng chọn cách thức phát đề!', 'time.required' => "Vui lòng nhập thời gian thi",];
+            $messages = [
+                'receive_mode.required' => 'Vui lòng chọn cách thức phát đề!',
+                'time.required' => "Vui lòng nhập thời gian thi",
+            ];
             $attributes = [];
         } elseif ($request->receive_mode == 0) {
             $rules = array_merge(['exam_id' => 'required',], $rules);
-            $messages = ['exam_id.required' => "Vui lòng chọn đề thi", 'time.required' => "Vui lòng nhập thời gian thi",];
+            $messages = [
+                'exam_id.required' => "Vui lòng chọn đề thi",
+                'time.required' => "Vui lòng nhập thời gian thi",
+                'time.numeric' => "Thời gian thi phải là số",
+                'time.min' => "Thời gian thi tối thiểu là :min",
+            ];
             $attributes = [];
         } elseif ($request->receive_mode == 1) {
             $rules = array_merge($rules, [
@@ -121,15 +130,16 @@ class playtopicController extends Controller
             ]);
             $messages = [
                 'required' => "Vui lòng nhập :attribute",
-                'min' => "Trường :attribute tối thiểu là :min",
-                'max' => "Trường :attribute tối đa là :max",
+                'numeric' => 'Thời gian thi',
+                'min' => ":attribute tối thiểu là :min",
+                'max' => ":attribute tối đa là :max",
             ];
             $attributes = [
                 'questions_quantity' => 'số lượng câu hỏi',
                 'ez_per_ques' => '% số câu dễ',
                 'me_per_ques' => '% số câu trung bình',
                 'diff_per_ques' => '% số câu khó',
-                'time' => 'thời gian thi',
+                'time' => 'Thời gian thi',
             ];
         }
         $fields = array_keys($rules);
@@ -193,15 +203,15 @@ class playtopicController extends Controller
             $quesNumArr = [
                 config('util.RANK_QUESTION_EASY') => [
                     'rank' => 'dễ',
-                    'num' => $ezQuesNum
+                    'num' => (int)$ezQuesNum
                 ],
                 config('util.RANK_QUESTION_MEDIUM') => [
                     'rank' => 'trung bình',
-                    'num' => $meQuesNum
+                    'num' => (int)$meQuesNum
                 ],
                 config('util.RANK_QUESTION_DIFFICULT') => [
                     'rank' => 'khó',
-                    'num' => $diffQuesNum
+                    'num' => (int)$diffQuesNum
                 ],
             ];
             foreach ($quesNumArr as $rank => $ques) {
@@ -214,7 +224,7 @@ class playtopicController extends Controller
                     'student_poetry_id' => $poetry_id,
                     'has_received_exam' => 1,
                     'exam_name' => "Ngẫu nhiên",
-                    'questions_order' => json_encode($this->getRandomQuestionsOrder($quesNumArr, $questions)),
+                    'questions_order' => json_encode($this->getRandomQuestionsOrder($quesNumArr, $questions, $request->questions_quantity)),
                     'exam_time' => $request->time,
                 ];
             }
@@ -226,17 +236,30 @@ class playtopicController extends Controller
         return response(['message' => "Thành công " . '<br>Vui lòng chờ 5s để làm mới dữ liệu'], 200);
     }
 
-    public function getRandomQuestionsOrder($quesNumArr, $questions)
+    public function getRandomQuestionsOrder($quesNumArr, $questions, $questions_quantity)
     {
-        $questionsOrder = [];
-        foreach ($quesNumArr as $rank => $quesNum) {
-            $num = $quesNum['num'];
-            $randomKeys = array_rand($questions[$rank], $quesNum['num']);
-            $randomElements = array_intersect_key($questions[$rank], array_flip($randomKeys));
-            array_push($questionsOrder, ...$randomElements);
+        try {
+            $questionsOrder = [];
+            foreach ($quesNumArr as $rank => $quesNum) {
+                $num = $quesNum['num'];
+                if ($num <= 0) {
+                    continue;
+                }
+                $randomKeys = array_rand($questions[$rank], $quesNum['num']);
+                $randomElements = array_intersect_key($questions[$rank], array_flip((array)$randomKeys));
+                array_push($questionsOrder, ...$randomElements);
+            }
+            $numQuesRandom = count($questionsOrder);
+            if ((int)$questions_quantity < $numQuesRandom) {
+                $keyRemoveRandom = array_rand($questionsOrder, $numQuesRandom - (int)$questions_quantity);
+                $keyKeeping = array_keys(array_diff_key($questionsOrder, array_flip((array)$keyRemoveRandom)));
+                $finalQuestionsOrder = array_intersect_key($questionsOrder, array_flip((array)$keyKeeping));
+            }
+            shuffle($finalQuestionsOrder);
+            return $finalQuestionsOrder;
+        } catch (Exception $e) {
+            return response("Có lỗi xảy ra khi trộn đề, vui lòng nhập giá trị khác");
         }
-        shuffle($questionsOrder);
-        return $questionsOrder;
     }
 
     public function AddTopicReload(Request $request)
