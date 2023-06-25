@@ -19,21 +19,37 @@ class poetry implements MPoetryInterface
     {
     }
 
-    public function ListPoetry($id, $idblock)
+    public function ListPoetry($id, $idblock, $request)
     {
         try {
             $records = $this->modelPoetry
                 ->with([
+                    'child_poetry',
                     'semeter',
                     'classsubject',
                     'user',
                     'campus',
                     'block_subject'
                 ])
-                ->where('id_semeter', $id)
+                ->where([
+                    ['id_semeter', $id],
+                    ['parent_poetry_id', 0]
+                ])
                 ->withWhereHas('block_subject', function ($q) use ($idblock) {
                     $q->where('id_block', $idblock);
                 });
+            if (!empty($request->gv)) {
+                $records->where('assigned_user_id', $request->gv);
+            }
+            if (!empty($request->ct)) {
+                $records->where('start_examination_id', $request->ct);
+            }
+            if (!empty($request->s)) {
+                $records->where('id_block_subject', $request->s);
+            }
+            if (!empty($request->c)) {
+                $records->where('id_class', $request->c);
+            }
             if (!auth()->user()->hasRole('super admin')) {
                 $records->where('id_campus', auth()->user()->campus->id);
             }
@@ -44,7 +60,17 @@ class poetry implements MPoetryInterface
 //            dd($item->block_subject);
 //        }
 //        dd($records->paginate(10));
-            return $records->paginate(10);
+            $data = $records->orderBy('id', 'desc')->paginate(10);
+            foreach ($data as $poetry) {
+//                dd($poetry->child_poetry);
+                $poetry->examination = 'Ca ' . $poetry->start_examination_id;
+                if ($poetry->child_poetry->count() > 0) {
+                    $examinationChildArr = $poetry->child_poetry->pluck('start_examination_id')->toArray();
+
+                    $poetry->examination .= ', ' . implode(',', $examinationChildArr);
+                }
+            }
+            return $data;
         } catch (\Exception $e) {
             return false;
         }
@@ -71,7 +97,7 @@ class poetry implements MPoetryInterface
             })
                 ->when(!empty($idBlock), function ($query) use ($idBlock) {
                     $query->whereHas('block_subject', function ($subQuery) use ($idBlock) {
-                        $subQuery->where('id_block',$idBlock);
+                        $subQuery->where('id_block', $idBlock);
                     });
                 })
                 ->when(!empty($id_subject) && empty($id_class), function ($query) use ($id_subject) {
@@ -185,7 +211,8 @@ class poetry implements MPoetryInterface
 //                }
                 $start_time = $value->exam_date . " " . $poetryIdToPoetryTime[$value->start_examination_id]['started_at'];
                 $finish_time = $value->exam_date . " " . $poetryIdToPoetryTime[$value->finish_examination_id]['finished_at'];
-                $is_in_time = !(time() < strtotime($start_time) || time() >= strtotime($finish_time));
+                $start_time_timestamp = strtotime($start_time);
+                $is_in_time = !(time() < $start_time_timestamp || time() >= strtotime("+15 minutes", $start_time_timestamp) || time() >= strtotime($finish_time));
                 $have_done = (!empty($value->created_at) && $value->status == 1);
                 $data['data'][] = [
                     "id" => $value->id,

@@ -50,7 +50,7 @@
                         <option value="0">Chọn quyền</option>
                         @foreach ($roles as $role)
                             <option
-                                @selected(request('role') == $role->name) value="{{ $role->name }}">{{ $role->name }} </option>
+                                @selected(request('role') == $role->name) value="{{ $role->name }}">{{ $role->name == "super admin" ? "Admin HO" : $role->name }} </option>
                         @endforeach
                     </select>
                 </div>

@@ -51,8 +51,11 @@ class playtopic
                 })->toArray();
             $start_time = $records->exam_date . " " . $poetryIdToPoetryTime[$records->start_examination_id]['started_at'];
             $finish_time = $records->exam_date . " " . $poetryIdToPoetryTime[$records->finish_examination_id]['finished_at'];
-            $records->is_in_time = !(time() < strtotime($start_time) || time() >= strtotime($finish_time));
+            $start_time_timestamp = strtotime($start_time);
+            $records->is_in_time = !(time() < $start_time_timestamp || time() >= strtotime("+15 minutes", $start_time_timestamp) || time() >= strtotime($finish_time));
             $records->have_done = (!empty($records->status) && $records->status == 1);
+            $records->start_time = $start_time;
+            $records->finish_time = $finish_time;
 //            $records['name_campus'] = $records->campusName;
 //            foreach ($records as $value){
 //                $data[] = [
