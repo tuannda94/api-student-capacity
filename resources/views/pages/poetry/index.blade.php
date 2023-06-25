@@ -12,6 +12,9 @@
             <div class="mb-5">
                 {{ Breadcrumbs::render('Management.poetry',$id_poetry,$idBlock ) }}
             </div>
+            <div class="my-5">
+
+            </div>
             <div class="card card-flush p-4">
                 <div class="row">
                     <div class=" col-lg-6">
@@ -81,6 +84,63 @@
                     @endif
                 </div>
 
+                <form method="get" class="row my-5">
+                    <div class="col-3">
+                        <select class="form-select" name="gv">
+                            <option value="">--Chọn giảng viên--</option>
+                            @foreach($teachers as $teacher)
+                                <option
+                                    value="{{ $teacher->id }}"
+                                    @if($teacher->id == request('gv'))
+                                        selected
+                                    @endif
+                                >{{ rtrim($teacher->email, config('util.END_EMAIL_FPT')) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-2">
+                        <select class="form-select" name="ct">
+                            <option value="">-- Ca thi --</option>
+                            @foreach($listExamination as $examination)
+                                <option
+                                    value="{{ $examination->id }}"
+                                    @if($examination->id == request('ct'))
+                                        selected
+                                    @endif
+                                >{{ $examination->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-2">
+                        <select class="form-select" name="s" id="">
+                            <option value="">-- Chọn Môn --</option>
+                            @foreach($blockSubjectIdToName as $id => $name)
+                                <option
+                                    value="{{ $id }}"
+                                    @if($id == request('s'))
+                                        selected
+                                    @endif
+                                >{{ $name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-2">
+                        <select class="form-select" name="c" id="">
+                            <option value="">Lớp học</option>
+                            @foreach($listClass as $class)
+                                <option
+                                    value="{{ $class->id }}"
+                                    @if($class->id == request('c'))
+                                        selected
+                                    @endif
+                                >{{ $class->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-2">
+                        <button class="btn btn-primary">Tìm kiếm</button>
+                    </div>
+                </form>
 
                 <div class="table-responsive table-responsive-md">
                     <table id="table-data" class="table table-row-bordered table-row-gray-300 gy-7  table-hover ">
@@ -118,9 +178,7 @@
                             <th scope="col">Môn thi</th>
                             <th scope="col">Lớp thi</th>
                             <th scope="col">Phòng</th>
-                            <th scope="col">Kéo dài trong</th>
-                            <th scope="col">Ca bắt đầu</th>
-                            <th scope="col">Ca kết thúc</th>
+                            <th scope="col">Ca thi</th>
                             <th scope="col">Giáo viên</th>
                             <th scope="col">Cơ sở</th>
                             <th scope="col">Trạng thái</th>
@@ -147,13 +205,7 @@
                                         {{ $value->room }}
                                     </td>
                                     <td>
-                                        {{ $value->examination_count }} ca
-                                    </td>
-                                    <td>
-                                        Ca {{ $value->start_examination_id }}
-                                    </td>
-                                    <td>
-                                        Ca {{ $value->finish_examination_id }}
+                                        {{ $value->examination }}
                                     </td>
                                     <td>
                                         {{ $value->user->getUserName() }}
@@ -360,14 +412,6 @@
                             </select>
                         </div>
                         <div class="form-group m-10">
-                            <select class="form-select" name="examination_count" id="examination_count">
-                                <option selected value="">--Kéo dài trong--</option>
-                                @for($i=1; $i<=3; $i++)
-                                    <option value="{{ $i }}">{{ $i }} ca</option>
-                                @endfor
-                            </select>
-                        </div>
-                        <div class="form-group m-10">
                             <select class="form-select" name="finish_examination_id" id="finish_examination_id">
                                 <option selected value="">--Chọn ca kết thúc thi--</option>
                                 @foreach($listExamination as $exam)
@@ -456,14 +500,6 @@
                                 @foreach($listExamination as $exam)
                                     <option value="{{ $exam->id }}">{{ $exam->name }}</option>
                                 @endforeach
-                            </select>
-                        </div>
-                        <div class="form-group m-10">
-                            <select class="form-select" name="examination_count" id="examination_count_update">
-                                <option selected value="">--Kéo dài trong--</option>
-                                @for($i=1; $i<=3; $i++)
-                                    <option value="{{ $i }}">{{ $i }} ca</option>
-                                @endfor
                             </select>
                         </div>
                         <div class="form-group m-10">
@@ -611,7 +647,6 @@
             var campus_id = $('#campus_id').val();
             var start_examination_id = $('#start_examination_id').val();
             var finish_examination_id = $('#finish_examination_id').val();
-            var examination_count = $('#examination_count').val();
             var class_id = $('#class_id').val();
             var assigned_user = $('#assigned_user').val();
             var status = $('#status_add').val();
@@ -625,7 +660,6 @@
                 'campus_id': campus_id,
                 'start_examination_id': start_examination_id,
                 'finish_examination_id': finish_examination_id,
-                'examination_count': examination_count,
                 'class_id': class_id,
                 'assigned_user': assigned_user,
                 'status': status,
@@ -731,7 +765,6 @@
                             $('#semeter_id_update').val(response.data.poetry.id_semeter);
                             $('#block_subject_id_update').val(response.data.poetry.id_block_subject);
                             $('#class_id_update').val(response.data.poetry.id_class);
-                            $('#examination_count_update').val(response.data.poetry.examination_count);
                             $('#start_examination_id_update').val(response.data.poetry.start_examination_id);
                             $('#finish_examination_id_update').val(response.data.poetry.finish_examination_id);
                             $('#room_update').val(response.data.poetry.room);
@@ -782,7 +815,6 @@
                 var campus_id_update = $('#campus_id_update').val();
                 var start_examination_id_update = $('#start_examination_id_update').val();
                 var finish_examination_id_update = $('#finish_examination_id_update').val();
-                var examination_count_update = $('#examination_count_update').val();
                 var class_id_update = $('#class_id_update').val();
                 var assigned_user_update = $('#assigned_user_update').val();
                 var status_update = $('#status_update').val();
@@ -797,7 +829,6 @@
                     'campus_id_update': campus_id_update,
                     'start_examination_id_update': start_examination_id_update,
                     'finish_examination_id_update': finish_examination_id_update,
-                    'examination_count_update': examination_count_update,
                     'class_id_update': class_id_update,
                     'assigned_user_update': assigned_user_update,
                     'status_update': status_update,

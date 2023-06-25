@@ -316,23 +316,23 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group m-10 d-flex flex-column align-items-start" id="time_form">
-                        <label for="" class="form-label">Thời gian thi</label>
-                        <select name="" id="time-select" class="form-select">
-                            <option value="15">15 phút</option>
-                            <option value="20">20 phút</option>
-                            <option value="30">30 phút</option>
-                            <option value="50">50 phút</option>
-                            <option value="60">60 phút</option>
-                            <option value="90">90 phút</option>
-                        </select>
-                        <input type="text" class="form-control" name="time" id="time-text"
-                               placeholder="Thời gian thi" style="display: none">
-                        <div class="form-group my-5">
-                            <input type="checkbox" name="custom-time-checkbox" id="custom-time-checkbox" class="form-check-input me-3">
-                            <label for="custom-time-checkbox" class="form-label" style="user-select: none;">Tùy chỉnh thời gian</label>
-                        </div>
-                    </div>
+{{--                    <div class="form-group m-10 d-flex flex-column align-items-start" id="time_form">--}}
+{{--                        <label for="" class="form-label">Thời gian thi</label>--}}
+{{--                        <select name="" id="time-select" class="form-select">--}}
+{{--                            <option value="15">15 phút</option>--}}
+{{--                            <option value="20">20 phút</option>--}}
+{{--                            <option value="30">30 phút</option>--}}
+{{--                            <option value="50">50 phút</option>--}}
+{{--                            <option value="60">60 phút</option>--}}
+{{--                            <option value="90">90 phút</option>--}}
+{{--                        </select>--}}
+{{--                        <input type="text" class="form-control" name="time" id="time-text"--}}
+{{--                               placeholder="Thời gian thi" style="display: none">--}}
+{{--                        <div class="form-group my-5">--}}
+{{--                            <input type="checkbox" name="custom-time-checkbox" id="custom-time-checkbox" class="form-check-input me-3">--}}
+{{--                            <label for="custom-time-checkbox" class="form-label" style="user-select: none;">Tùy chỉnh thời gian</label>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
                     <div class="modal-footer">
                         {{--                        @if($total >= 1)--}}
                         {{--                            <button type="button" id="reloadPlaytopic" class=" btn btn-primary">Phát Lại</button>--}}
@@ -606,7 +606,8 @@
             let me_per_ques = $('#me_per_ques').val();
             let diff_per_ques = $('#diff_per_ques').val();
             let id_subject = $('#id_subject').val();
-            let time = custom_time_checkbox.is(":checked") ? time_text_element.val() : time_select_element.val();
+            // let time = custom_time_checkbox.is(":checked") ? time_text_element.val() : time_select_element.val();
+            let time = 90;
             let exam_name = $('#exam_name').val();
             let poetryStudentId = $('.checkbox-student:checked').map(function () {
                 return $(this).attr('data-id');

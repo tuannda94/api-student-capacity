@@ -21,6 +21,7 @@ class poetry extends Model
         'id_class',
         'assigned_user_id',
         'status',
+        'parent_poetry_id',
         'exam_date',
         'created_at',
         'updated_at',
@@ -68,6 +69,11 @@ class poetry extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'assigned_user_id', 'id');
+    }
+
+    public function child_poetry()
+    {
+        return $this->hasMany(poetry::class, 'parent_poetry_id');
     }
 
 }
