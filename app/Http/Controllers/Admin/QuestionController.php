@@ -490,10 +490,7 @@ class QuestionController extends Controller
             $id_campus = auth()->user()->campus_id;
             if (auth()->user()->hasRole('super admin')) {
                 if (empty($request->campus_id)) {
-                    return throw new HttpResponseException(response()->json([
-                        'errors' => ['campus_id' => "Vui lòng chọn cơ sở"],
-                        'status' => false
-                    ], 404));
+                    throw new Exception("Vui lòng chọn cơ sở");
                 } else {
                     $id_campus = $request->campus_id;
                 }
@@ -722,6 +719,7 @@ class QuestionController extends Controller
         $checkTrungArr = [];
         foreach ($infoSubject as $value) {
             $date = date('Y-m-d', strtotime($value[0]));
+            $is_child_poetry = false;
             $key = implode('|', [
                 $value[0],
                 $value[2],
@@ -729,29 +727,32 @@ class QuestionController extends Controller
                 $value[8],
                 $value[9]
             ]);
+            $priKey = $key;
             if (!empty($arrItem[$key])) {
-                $arrItem[$key]['examination_count']++;
-                continue;
+                $priKey .= '/' . $value[1];
+                $is_child_poetry = true;
             }
-            $arrItem[$key] = [
+            $arrItem[$priKey] = [
                 'ngay_thi' => $date,
                 'ca_thi' => $value[1],
                 'room' => $value[2],
                 'subject_name' => $value[3],
                 'subject_code' => $value[4],
                 'start_examination_id' => $value[1],
-                'examination_count' => 1,
                 'class' => $value[8],
                 'assigned_user_email' => $value[9] . config('util.END_EMAIL_FPT'),
             ];
+            $arrItem[$priKey]['parent_poetry_examination'] = $is_child_poetry ? $arrItem[$key]['ca_thi'] : 0;
             $ngayThiArr[] = $date;
             $emails[] = $value[9] . config('util.END_EMAIL_FPT');
             $subjects[$value[4]] = $value[3];
             $classes[] = $value[8];
         }
+//        dd($arrItem);
 
         $emails = array_unique($emails);
         $classes = array_unique($classes);
+        $ngayThiArr = array_unique($ngayThiArr);
 
         $emailsDb = User::query()
             ->select('id', 'email')
@@ -766,7 +767,7 @@ class QuestionController extends Controller
             foreach ($emailDiff as $email) {
                 $userInsertArr[] = [
                     'id' => ++$maxUserId,
-                    'name' => $email,
+                    'name' => rtrim($email, config('util.END_EMAIL_FPT')),
                     'email' => $email,
                     'status' => 1,
                     'campus_id' => $campus_id,
@@ -898,13 +899,14 @@ class QuestionController extends Controller
         }
         $poetryByDay = DB::table('poetry')
             ->select([
-                'id_block_subject',
-                'id_class',
-                'examination_count',
+                'id',
+//                'id_block_subject',
+//                'id_class',
+//                'examination_count',
                 'start_examination_id',
-                'finish_examination_id',
+//                'finish_examination_id',
                 'room',
-                'assigned_user_id',
+//                'assigned_user_id',
                 'id_campus',
 //                'status',
             ])
@@ -912,30 +914,38 @@ class QuestionController extends Controller
             ->where('id_campus', $campus_id)
             ->where('id_semeter', $id_semeter)
 //            ->where('status', 1)
-            ->get()->map(function ($poetry_item) {
-                return implode('|', (array)$poetry_item);
-            })->toArray();
-//        dd($poetryByDay);
+            ->get()
+            ->mapWithKeys(function ($item) {
+                $itemArr = (array)$item;
+                $id = $itemArr['id'];
+                unset($itemArr['id']);
+                return [$id => implode('|', $itemArr)];
+            })->all();
+//            ->map(function ($poetry_item) {
+//                return implode('|', (array)$poetry_item);
+//            })->toArray();
         $poetryDataArr = [];
-        foreach ($arrItem as $item) {
+        foreach ($arrItem as $key => $item) {
             $id_block_subject = $subjectCodeToBlockSubjectId[$item['subject_code']];
             $id_class = $classNameToClassId[$item['class']];
-            $examination_count = $item['examination_count'];
+//            $examination_count = $item['examination_count'];
             $start_examination_id = $item['start_examination_id'];
-            $finish_examination_id = $start_examination_id + $examination_count - 1 >= 5 ? 10 : 5;
+            $finish_examination_id = ($item['parent_poetry_examination'] == 0) ? ($start_examination_id > 5 ? 10 : 5) : null;
+
+//            $finish_examination_id = $start_examination_id + $examination_count - 1 >= 5 ? 10 : 5;
             $room = $item['room'];
             $assigned_user_id = $emailToUserId[$item['assigned_user_email']];
             $id_campus = $campus_id;
             $status = 1;
             $exam_date = $item['ngay_thi'];
             $key = implode('|', [
-                $id_block_subject,
-                $id_class,
-                $examination_count,
+//                $id_block_subject,
+//                $id_class,
+//                $examination_count,
                 $start_examination_id,
-                $finish_examination_id,
+//                $finish_examination_id,
                 $room,
-                $assigned_user_id,
+//                $assigned_user_id,
                 $id_campus,
 //                $status
             ]);
@@ -943,7 +953,7 @@ class QuestionController extends Controller
                 'id_semeter' => $id_semeter,
                 'id_block_subject' => $id_block_subject,
                 'id_class' => $id_class,
-                'examination_count' => $examination_count,
+//                'examination_count' => $examination_count,
                 'start_examination_id' => $start_examination_id,
                 'finish_examination_id' => $finish_examination_id,
                 'room' => $room,
@@ -951,22 +961,58 @@ class QuestionController extends Controller
                 'id_campus' => $id_campus,
                 'status' => $status,
                 'exam_date' => $exam_date,
+                'parent_poetry_examination_key' => $item['parent_poetry_examination'] == 0 ? null : implode('|', [
+//                    $id_block_subject,
+//                    $id_class,
+                    $item['parent_poetry_examination'],
+                    $room,
+//                    $assigned_user_id,
+                    $id_campus,
+                ]),
             ];
         }
 
-        $poetryValidArr = array_diff(array_keys($poetryDataArr), $poetryByDay);
-        $poetryInsertArr = array_map(function ($item) use ($poetryDataArr) {
-            return $poetryDataArr[$item];
-        }, $poetryValidArr);
-
-
-        DB::table('poetry')->insert($poetryInsertArr);
-        $poetryInsertCount = count($poetryInsertArr);
-        if ($poetryInsertCount !== 0) {
-            return response("Tạo thành công {$poetryInsertCount} ca thi, " . count($poetryDataArr) - $poetryInsertCount . " bị trùng", 201);
-        } else {
+//        dd($poetryDataArr);
+        $poetryKeyValidArr = array_diff(array_keys($poetryDataArr), $poetryByDay);
+        $poetryKeyInvalidArr = array_diff(array_keys($poetryDataArr), $poetryKeyValidArr);
+//        dd($poetryKeyInvalidArr);
+        if (count(($poetryKeyValidArr)) !== 0) {
+            foreach ($poetryKeyInvalidArr as $key) {
+                if (!empty($poetryDataArr[$key])) {
+                    $parentKey = $poetryDataArr[$key]['parent_poetry_examination_key'];
+                }
+                if (!empty($parentKey)) {
+                    if (!empty($poetryDataArr[$parentKey])) {
+                        unset($poetryDataArr[$parentKey]);
+                    }
+                    $poetryDataArr = array_filter($poetryDataArr, function ($poetry) use ($parentKey) {
+                        return $poetry['parent_poetry_examination_key'] != $parentKey;
+                    });
+                }
+                $poetryDataArr = array_filter($poetryDataArr, function ($poetry) use ($key) {
+                    return $poetry['parent_poetry_examination_key'] != $key;
+                });
+                unset($poetryDataArr[$key]);
+            }
+//            dd($poetryDataArr);
+            if (count($poetryDataArr) > 0) {
+                $poetryInsertArr = [];
+                $poetryIdMax = DB::table('poetry')->max('id') ?? 0;
+                foreach ($poetryDataArr as $key => $item) {
+                    $parent_poetry_examination_key = $item['parent_poetry_examination_key'];
+                    $item['id'] = ++$poetryIdMax;
+                    $item['parent_poetry_id'] = !empty($parent_poetry_examination_key) ? $poetryInsertArr[$parent_poetry_examination_key]['id'] : 0;
+                    unset($item['parent_poetry_examination_key']);
+                    $poetryInsertArr[$key] = $item;
+                }
+                DB::table('poetry')->insert($poetryInsertArr);
+                $poetryInsertCount = count($poetryInsertArr);
+                return response("Tạo thành công {$poetryInsertCount} ca thi, " . count($poetryDataArr) - $poetryInsertCount . " bị trùng", 201);
+            }
             return response("Bạn đã nhập file ca thi này trước đây rồi", 404);
         }
+
+        return response("Bạn đã nhập file ca thi này trước đây rồi", 404);
 
     }
 

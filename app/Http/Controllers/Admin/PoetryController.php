@@ -34,11 +34,11 @@ class PoetryController extends Controller
     {
     }
 
-    public function index($id, $idblock)
+    public function index($id, $idblock, Request $request)
     {
 //        $data = $this->oneindexApi(140);
 //        dd($data);
-        $data = $this->poetry->ListPoetry($id, $idblock);
+        $data = $this->poetry->ListPoetry($id, $idblock, $request);
         $semeter = $this->semeter->ListSemeter();
         $name = $this->semeter->getName($id);
         $listExamination = $this->examination->getList();
@@ -57,8 +57,6 @@ class PoetryController extends Controller
         }
         $listCampus = $listCampusQuery->get();
         $teachers = $usersQuery->get();
-//        dd($teachers);
-//        dd($teachers);
         return view('pages.poetry.index', [
             'poetry' => $data,
             'semeter' => $semeter,
@@ -128,7 +126,6 @@ class PoetryController extends Controller
             'campus_id' => 'required',
             'start_examination_id' => 'required|numeric',
             'finish_examination_id' => 'required|numeric|gte:start_examination_id',
-            'examination_count' => 'required',
             'class_id' => 'required',
             'assigned_user' => 'required',
             'status' => 'required',
@@ -146,7 +143,6 @@ class PoetryController extends Controller
                 'start_examination_id.required' => 'Vui lòng chọn ca bắt đầu!',
                 'finish_examination_id.required' => 'Vui lòng chọn ca kết thúc!',
                 'finish_examination_id.gte' => 'Ca thi kết thúc không được nhỏ hơn ca thi bắt đầu!',
-                'examination_count.required' => 'Vui lòng chọn số ca thi liên tiếp!',
                 'class_id.required' => 'Vui lòng chọn lớp!',
                 'assigned_user.required' => 'Vui lòng chọn giáo viên!',
                 'status.required' => 'Vui lòng chọn trạng thái',
@@ -169,7 +165,7 @@ class PoetryController extends Controller
             }
 
         }
-        if ($request->finish_examination_id < $request->start_examination_id + $request->examination_count) {
+        if ($request->finish_examination_id < $request->start_examination_id + 1) {
             return response("Vui lòng chọn ca kết thúc sao cho hợp lý!", 404);
         }
         [$assigned_user_id, $assigned_user_campus_id] = explode('|', $request->assigned_user);
@@ -184,30 +180,48 @@ class PoetryController extends Controller
             ['status', '=', $request->status],
             ['exam_date', '=', $request->exam_date],
         ])
-            ->whereBetween('start_examination_id', [$request->start_examination_id, $request->start_examination_id + $request->examination_count - 1])
+            ->whereBetween('start_examination_id', [$request->start_examination_id, $request->start_examination_id + 1])
             ->join('block_subject', 'block_subject.id', '=', 'id_block_subject')
             ->first();
         if (!empty($checkIsset)) {
             return response("Phòng thi này đã tồn tại ca thi bạn chọn, vui lòng chọn lựa chọn khác", 404);
         }
+        $poetryIdMax = DB::table('poetry')->max('id') ?? 0;
         $data = [
-            'id_semeter' => $request->semeter_id,
-            'id_block_subject' => $request->block_subject_id,
-            'room' => $request->room,
-            'id_campus' => $request->campus_id,
-            'start_examination_id' => $request->start_examination_id,
-            'finish_examination_id' => $request->finish_examination_id,
-            'examination_count' => $request->examination_count,
-            'id_class' => $request->class_id,
-            'assigned_user_id' => $assigned_user_id,
-            'status' => $request->status,
-            'exam_date' => $request->exam_date,
+            [
+                'parent_poetry_id' => 0,
+                'id' => ++$poetryIdMax,
+                'id_semeter' => $request->semeter_id,
+                'id_block_subject' => $request->block_subject_id,
+                'room' => $request->room,
+                'id_campus' => $request->campus_id,
+                'start_examination_id' => $request->start_examination_id,
+                'finish_examination_id' => $request->finish_examination_id,
+                'id_class' => $request->class_id,
+                'assigned_user_id' => $assigned_user_id,
+                'status' => $request->status,
+                'exam_date' => $request->exam_date,
+            ],
+            [
+                'parent_poetry_id' => $poetryIdMax,
+                'id' => ++$poetryIdMax,
+                'id_semeter' => $request->semeter_id,
+                'id_block_subject' => $request->block_subject_id,
+                'room' => $request->room,
+                'id_campus' => $request->campus_id,
+                'start_examination_id' => $request->start_examination_id + 1,
+                'finish_examination_id' => null,
+                'id_class' => $request->class_id,
+                'assigned_user_id' => $assigned_user_id,
+                'status' => $request->status,
+                'exam_date' => $request->exam_date,
+            ],
         ];
 
 //        DB::table('poetry')->insert($data);
 //        $id = DB::getPdo()->lastInsertId();
 //        $data['id'] = array_merge($data, $this->poetry->getItem($id));
-        $poetry = \App\Models\poetry::create($data);
+        $poetry = \App\Models\poetry::query()->insert($data);
 //        $data = $request->all();
         return response(['message' => "Thêm thành công", 'data' => $poetry], 200);
     }
@@ -260,7 +274,6 @@ class PoetryController extends Controller
             'campus_id_update' => 'required',
             'start_examination_id_update' => 'required|numeric',
             'finish_examination_id_update' => 'required|numeric|gte:start_examination_id_update',
-            'examination_count_update' => 'required',
             'class_id_update' => 'required',
             'assigned_user_update' => 'required',
             'status_update' => 'required',
@@ -278,7 +291,6 @@ class PoetryController extends Controller
                 'start_examination_id_update.required' => 'Vui lòng chọn ca bắt đầu!',
                 'finish_examination_id_update.required' => 'Vui lòng chọn ca kết thúc!',
                 'finish_examination_id_update.gte' => 'Ca thi kết thúc không được nhỏ hơn ca thi bắt đầu!',
-                'examination_count_update.required' => 'Vui lòng chọn số ca thi liên tiếp!',
                 'class_id_update.required' => 'Vui lòng chọn lớp!',
                 'assigned_user_update.required' => 'Vui lòng chọn giáo viên!',
                 'status_update.required' => 'Vui lòng chọn trạng thái',
@@ -301,7 +313,7 @@ class PoetryController extends Controller
             }
 
         }
-        if ($request->finish_examination_id_update < $request->start_examination_id_update + $request->examination_count_update) {
+        if ($request->finish_examination_id_update < $request->start_examination_id_update + 1) {
             return response("Vui lòng chọn ca kết thúc sao cho hợp lý!", 404);
         }
         [$assigned_user_id_update, $assigned_user_campus_id_update] = explode('|', $request->assigned_user_update);
@@ -317,7 +329,7 @@ class PoetryController extends Controller
             ['exam_date', '=', $request->exam_date_update],
             ['poetry.id', '<>', $id]
         ])
-            ->whereBetween('start_examination_id', [$request->start_examination_id_update, $request->start_examination_id_update + $request->examination_count_update - 1])
+            ->whereBetween('start_examination_id', [$request->start_examination_id_update, $request->start_examination_id_update + 1])
             ->join('block_subject', 'block_subject.id', '=', 'id_block_subject')
             ->first();
         if (!empty($checkIsset)) {
@@ -330,13 +342,27 @@ class PoetryController extends Controller
             'id_campus' => $request->campus_id_update,
             'start_examination_id' => $request->start_examination_id_update,
             'finish_examination_id' => $request->finish_examination_id_update,
-            'examination_count' => $request->examination_count_update,
             'id_class' => $request->class_id_update,
             'assigned_user_id' => $assigned_user_id_update,
             'status' => $request->status_update,
             'exam_date' => $request->exam_date_update,
         ];
-        \App\Models\poetry::query()->where('id', $id)->update($data);
+        $data2 = [
+            'id_semeter' => $request->semeter_id_update,
+            'id_block_subject' => $request->block_subject_id_update,
+            'room' => $request->room_update,
+            'id_campus' => $request->campus_id_update,
+            'start_examination_id' => $request->start_examination_id_update + 1,
+            'finish_examination_id' => null,
+            'id_class' => $request->class_id_update,
+            'assigned_user_id' => $assigned_user_id_update,
+            'status' => $request->status_update,
+            'exam_date' => $request->exam_date_update,
+            'parent_poetry_id' => $id,
+        ];
+        $poetryModel = new \App\Models\poetry();
+        $poetryModel->query()->where('id', $id)->update($data);
+        $poetryModel->query()->where('parent_poetry_id', $id)->update($data2);
 //        dd($data);
 //        $poetry = $this->poetry->getItempoetry($id);
 //        if (!$poetry) {
