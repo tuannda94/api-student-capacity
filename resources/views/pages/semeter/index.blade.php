@@ -56,6 +56,7 @@
                             </span>
                             </th>
                             <th scope="col">Trạng thái</th>
+                            <th scope="col">Cơ sở</th>
                             <th scope="col">Thời gian bắt đầu
                                 <span role="button" data-key="date_start" data-bs-toggle="tooltip" title="" class=" svg-icon svg-icon-primary  svg-icon-2x format-database" data-bs-original-title="Lọc theo thời gian bắt đầu ">
                                 <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo2/dist/../src/media/svg/icons/Navigation/Up-down.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 14px !important ; height: 14px !important" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
@@ -97,6 +98,9 @@
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" data-id="{{ $value->id }}" type="checkbox" {{ $value->status == 1 ? 'checked' : '' }} role="switch" id="flexSwitchCheckDefault">
                                     </div>
+                                </td>
+                                <td>
+                                    {{ $value->campus->name == 0 ? 'Chưa có cơ sở' :  $value->campus->name}}
                                 </td>
                                 <td>{{ $value->start_time == null ? 'Chưa có thời gian bắt đầu' :    date('d-m-Y', strtotime($value->start_time)) 	 }}</td>
                                 <td>{{ $value->end_time == null ? 'Chưa có thời gian kết thúc' :   date('d-m-Y', strtotime($value->end_time)) }}</td>
@@ -154,6 +158,14 @@
                                placeholder="Nhập tên kỳ học">
                     </div>
                     <div class="form-group m-10">
+                        <select class="form-select" name="status" id="campus_id">
+                            <option selected value="">Cơ sở</option>
+                            @foreach($campusList as $value)
+                            <option value="{{ $value->id }}">{{ $value->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group m-10">
                         <select class="form-select" name="status" id="status_add">
                             <option selected value="">Trạng thái</option>
                             <option value="1">Kích hoạt</option>
@@ -199,6 +211,14 @@
                                placeholder="Nhập tên Môn học">
                     </div>
                     <div class="form-group m-10">
+                        <select class="form-select" name="status" id="campus_id_update">
+                            <option selected value="">Cơ sở</option>
+                            @foreach($campusList as $value)
+                                <option value="{{ $value->id }}">{{ $value->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group m-10">
                         <select class="form-select" name="status" id="status_update">
                             <option selected value="">Trạng thái</option>
                             <option value="1">Kích hoạt</option>
@@ -230,6 +250,26 @@
             new Notify({
                 status: 'success',
                 title: 'Thành công',
+                text: `${message}`,
+                effect: 'fade',
+                speed: 300,
+                customClass: null,
+                customIcon: null,
+                showIcon: true,
+                showCloseButton: true,
+                autoclose: true,
+                autotimeout: 3000,
+                gap: 20,
+                distance: 20,
+                type: 1,
+                position: 'right top'
+            })
+        }
+
+        function wanrning(message) {
+            new Notify({
+                status: 'warning',
+                title: 'Đang chạy',
                 text: `${message}`,
                 effect: 'fade',
                 speed: 300,
@@ -296,12 +336,15 @@
             e.preventDefault();
             var url = $('#form-submit').attr("action");
             var name = $('#namebasis').val();
+            var campus_id = $('#campus_id').val();
+            var name_campus = $('#campus_id').find('option:selected').text();
             var status = $('#status_add').val();
             var start_time_semeter = $('#start_time').val();
             var end_time_semeter = $('#end_time').val();
             var dataAll = {
                 '_token' : _token,
                 'namebasis' : name,
+                'campus_id' : campus_id,
                 'status' : status,
                 'start_time_semeter' : start_time_semeter,
                 'end_time_semeter' : end_time_semeter,
@@ -316,42 +359,49 @@
                     console.log(response)
                     $('#form-submit')[0].reset();
                     notify(response.message);
-                    var newRow = `          <tr>
-                                <td>
-                                    ${response.data.namebasis}
-                    </td>
-                    <td>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" data-id="${response.data.id}" type="checkbox" ${response.data.status == 1 ? 'checked' : ''} role="switch" id="flexSwitchCheckDefault">
-                                    </div>
-                                </td>
-                                <td>${  formatDate(start_time_semeter) }</td>
-                                <td>${ formatDate(end_time_semeter)}</td>
-                                <td>
-                               <button  class="btn btn-info" onclick="location.href='admin/semeter/block/${response.data.id}'"   type="button">
-                                                                             Block
-                                                                </button>
-                                  <button  class="btn btn-info" onclick="location.href='admin/subject/exam/${response.data.id}'"   type="button">
-                                        Chi tiết
-                                    </button>
-
-                                    <button  class="btn-edit btn btn-primary"  data-id="${response.data.id}" type="button">
-                                        Chỉnh sửa
-                                    </button>
-
-                                    <button  class="btn-delete btn btn-danger" data-id="${response.data.id}">
-                                        Xóa
-                                    </button>
-                                </td>
-                            </tr>
-                    `;
-
-                    $('#table-data tbody').append(newRow);
-                    btnEdit = document.querySelectorAll('.btn-edit');
-                    update(btnEdit)
-                    btnDelete = document.querySelectorAll('.btn-delete');
-                    dele(btnDelete)
+   //                  var newRow = `          <tr>
+   //                              <td>
+   //                                  ${response.data.namebasis}
+   //                  </td>
+   //                  <td>
+   //                      <div class="form-check form-switch">
+   //                          <input class="form-check-input" data-id="${response.data.id}" type="checkbox" ${response.data.status == 1 ? 'checked' : ''} role="switch" id="flexSwitchCheckDefault">
+   //                                  </div>
+   //                              </td>
+   // <td>
+   //
+   //                  </td>
+   //                              <td>${  formatDate(start_time_semeter) }</td>
+   //                              <td>${ formatDate(end_time_semeter)}</td>
+   //                              <td>
+   //                             <button  class="btn btn-info" onclick="location.href='admin/semeter/block/${response.data.id}'"   type="button">
+   //                                                                           Block
+   //                                                              </button>
+   //                                <button  class="btn btn-info" onclick="location.href='admin/subject/exam/${response.data.id}'"   type="button">
+   //                                      Chi tiết
+   //                                  </button>
+   //
+   //                                  <button  class="btn-edit btn btn-primary"  data-id="${response.data.id}" type="button">
+   //                                      Chỉnh sửa
+   //                                  </button>
+   //
+   //
+   //                              </td>
+   //                          </tr>
+   //                  `;
+   //
+   //                  $('#table-data tbody').append(newRow);
+   //                  btnEdit = document.querySelectorAll('.btn-edit');
+   //                  update(btnEdit)
+   //                  btnDelete = document.querySelectorAll('.btn-delete');
+   //                  dele(btnDelete)
                     $('#kt_modal_1').modal('hide');
+                    wanrning('Đữ liệu mới đang được tải vui lòng đợi...');
+                    setTimeout(function(){
+                        notify('Tải hoàn tất ');
+                        window.location.reload();
+                    }, 1000);
+
                 },
                 error: function(response){
                     // console.log(response.responseText)
@@ -384,6 +434,7 @@
                             $('#nameUpdate').val(response.data.name);
                             $('#status_update').val(response.data.status);
                             $('#id_update').val(response.data.id)
+                            $('#campus_id_update').val(response.data.id_campus)
                             const date_start = moment(response.data.start_time ).format("YYYY-MM-DD");
                             $('#start_time_update').val(date_start)
                             const date_end = moment(response.data.end_time).format("YYYY-MM-DD");
@@ -404,6 +455,8 @@
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 var nameupdate = $('#nameUpdate').val();
+                var campus_id_update = $('#campus_id_update').val();
+                var name_campus = $('#campus_id_update').find('option:selected').text();
                 var status = $('#status_update').val();
                 var id = $('#id_update').val();
                 const date_start = $('#start_time_update').val();
@@ -411,6 +464,7 @@
                 var dataAll = {
                     '_token' : _token,
                     'namebasis' : nameupdate,
+                    'campus_id_update' : campus_id_update,
                     'status' : status,
                     'start_time_semeter' : date_start,
                     'end_time_semeter' : date_end,
@@ -433,8 +487,9 @@
                         elembtn[1].innerText = response.data.namebasis;
                         const output = response.data.status == 1 ? true : false;
                         elembtn[3].childNodes[1].childNodes[1].checked= output
-                        elembtn[5].innerText =  response.data.start_time_semeter;
-                        elembtn[7].innerText =  response.data.end_time_semeter;
+                        elembtn[5].innerText =  name_campus;
+                        elembtn[7].innerText =  response.data.start_time_semeter;
+                        elembtn[9].innerText =  response.data.end_time_semeter;
 
                         btnEdit = document.querySelectorAll('.btn-edit');
                         update(btnEdit)

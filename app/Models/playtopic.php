@@ -9,6 +9,16 @@ class playtopic extends Model
 {
     use HasFactory;
     protected $table = 'playtopic';
+    protected $fillable = [
+        'has_received_exam',
+        'exam_name',
+        'questions_order',
+        'exam_time',
+        'student_poetry_id',
+        'rejoined_at',
+        'created_at',
+        'updated_at',
+    ];
     public function userStudent()
     {
         return $this->belongsTo(User::class, 'id_user', 'id');
@@ -36,6 +46,6 @@ class playtopic extends Model
 
     public function resultCapacity()
     {
-        return $this->hasMany(ResultCapacity::class, 'user_id','id_user');
+        return $this->hasMany(ResultCapacity::class, 'playtopic_id','id');
     }
 }

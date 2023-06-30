@@ -53,6 +53,7 @@
                                     <!--end::Svg Icon-->
                             </span>
                             </th>
+{{--                            <th scope="col">Thuộc block</th>--}}
                             <th scope="col">Trạng thái</th>
                             <th scope="col">Thời gian bắt đầu
                                 <span role="button" data-key="date_start" data-bs-toggle="tooltip" title="" class=" svg-icon svg-icon-primary  svg-icon-2x format-database" data-bs-original-title="Lọc theo thời gian bắt đầu ">
@@ -92,6 +93,9 @@
                                 <td>
                                     {{ $value->name }}
                                 </td>
+{{--                                <td>--}}
+{{--                                    {{ $value->block_subject->where('id_subject',$value->id) }}--}}
+{{--                                </td>--}}
                                 <td>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" data-id-subject-semeter="{{ $value->id_subject_semeter }}" type="checkbox" {{ $value->statusSubject == 1 ? 'checked' : '' }} role="switch" id="flexSwitchCheckDefault">
@@ -108,9 +112,9 @@
 {{--                                        Chỉnh sửa--}}
 {{--                                    </button>--}}
 
-                                    <button  class="btn-delete btn btn-danger" data-id="{{ $value->id }}" data-semeter="{{ $id_semeter }}">
-                                        Xóa
-                                    </button>
+{{--                                    <button  class="btn-delete btn btn-danger" data-id="{{ $value->id }}" data-semeter="{{ $id_semeter }}">--}}
+{{--                                        Xóa--}}
+{{--                                    </button>--}}
                                 </td>
                             </tr>
                         @endforeach
@@ -166,6 +170,14 @@
                             <option selected value="">Môn học</option>
                             @foreach($listSubject as $value)
                             <option value="{{ $value->id }}">{{ $value->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group m-10">
+                        <select class="form-select" name="subject" id="block_id">
+                            <option selected value="">Block</option>
+                            @foreach($listBlock as $value)
+                                <option value="{{ $value->id }}">{{ $value->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -301,10 +313,12 @@
             var url = $('#form-submit').attr("action");
             var subject_id = $('#subject_id').val();
             const id_semeter = $('#id_semeter').val();
+            const block_id = $('#block_id').val();
             var dataAll = {
                 '_token' : _token,
                 'subject_id' : subject_id,
                 'id_semeter' : id_semeter,
+                'block_id' : block_id,
                 'start_time' : start_time,
                 'end_time' : end_time
             }

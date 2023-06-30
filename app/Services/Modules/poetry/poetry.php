@@ -79,13 +79,18 @@ class poetry implements MPoetryInterface
     public function ListPoetryRespone($idSubject)
     {
         try {
-            $records = $this->modelPoetry->where('id_subject', $idSubject)->get();
+            $records = $this->modelPoetry
+                ->when(!empty($idBlock), function ($query) use ($idSubject) {
+                    $query->whereHas('block_subject', function ($subQuery) use ($idSubject) {
+                        $subQuery->where('id_subject', $idSubject);
+                    });
+                })->get();
             $records->load(['classsubject' => function ($q) {
                 return $q->select('id', 'name', 'code_class');
             }]);
             return $records;
         } catch (\Exception $e) {
-            return false;
+            return $e;
         }
     }
 
@@ -95,17 +100,18 @@ class poetry implements MPoetryInterface
             $records = $this->modelPoetry->when(!empty($idSemeter), function ($query) use ($idSemeter) {
                 $query->where('id_semeter', $idSemeter);
             })
-                ->when(!empty($idBlock), function ($query) use ($idBlock) {
+                ->when(!empty($idBlock) && empty($id_subject), function ($query) use ($idBlock) {
                     $query->whereHas('block_subject', function ($subQuery) use ($idBlock) {
                         $subQuery->where('id_block', $idBlock);
                     });
                 })
-                ->when(!empty($id_subject) && empty($id_class), function ($query) use ($id_subject) {
-                    $query->where('id_subject', $id_subject);
+                ->when(!empty($idBlock) && !empty($id_subject), function ($query) use ($idBlock, $id_subject) {
+                    $query->whereHas('block_subject', function ($subQuery) use ($idBlock, $id_subject) {
+                        $subQuery->where('id_block', $idBlock)->where('id_subject', $id_subject);
+                    });
                 })
-                ->when(!empty($id_subject) && !empty($id_class), function ($query) use ($id_subject, $id_class) {
-                    $query->where('id_subject', $id_subject)
-                        ->where('id_class', $id_class);
+                ->when(!empty($id_subject) && !empty($id_class), function ($query) use ($id_class) {
+                    $query->where('id_class', $id_class);
                 })->pluck('id');
             $studentRecords = studentPoetry::whereIn('id_poetry', $records)
                 ->pluck('id_student')->unique()
@@ -132,24 +138,133 @@ class poetry implements MPoetryInterface
         }
     }
 
-    public function ListPoetryDetailChart($idSemeter, $idBlock, $id_subjects)
+    public function ListPoetryDetailChart($idcampus, $idSemeter, $idBlock)
     {
         try {
-            $records = $this->modelPoetry->when(!empty($idBlock), function ($query) use ($idBlock) {
-                $query->whereHas('block_subject', function ($subQuery) use ($idBlock) {
-                    $subQuery->where('id_block', $idBlock);
-                });
+            $records = $this->modelPoetry->when(!empty($idcampus), function ($query) use ($idcampus) {
+                $query->where('id_campus', $idcampus);
             })
-                ->where('id_semeter', $idSemeter) // Thêm điều kiện 'id_semester' = $idSemester
-                ->where('id_subject', $id_subjects) // Thêm điều kiện 'id_subject' = $id_subject
+                ->when(!empty($idSemeter) && empty($idBlock), function ($query) use ($idSemeter) {
+                    $query->where('id_semeter', $idSemeter);
+                })
+                ->when(!empty($idBlock), function ($query) use ($idBlock) {
+                    $query->whereHas('block_subject', function ($subQuery) use ($idBlock) {
+                        $subQuery->where('id_block', $idBlock);
+                    });
+                })
+                ->with(['student_poetry', 'student_poetry.playtopic.resultCapacity', 'semeter', 'campus', 'block_subject.block'])
+                ->withCount(['student_poetry AS total_student_poetry',
+                        'student_poetry as total_playtopic' => function ($query) {
+                            $query->whereDoesntHave('playtopic');
+                        },
+                        'student_poetry as total_no_resultCapacity' => function ($query) {
+                            $query->whereDoesntHave('playtopic.resultCapacity');
+                        }]
+                )
+                ->groupBy('id_semeter', 'id_block_subject', 'id_class', 'room', 'assigned_user_id', 'id_campus', 'exam_date')
                 ->get();
-            $data = [];
-            foreach ($records as $value) {
-                $data[] = [
-                    'name' => $value->examination->name . '-' . $value->subject->name . "-" . $value->classsubject->name,
-                    'id_poetry' => $value->id
-                ];
-            }
+            $totalPoetry = $records->groupBy('id_semeter')->map(function ($group) {
+                return $group->count();
+            });
+
+//            T
+
+//            $result = $records->map(function ($record) use ($totalPoetry) {
+//                return [
+//                    'name' => $record->campus->name .'-' .$record->semeter->name .'-'. $record->block_subject->block->name ,
+//                    'total_no_resultCapacity' => $record->total_no_resultCapacity,
+//                    'total_playtopic' => $record->total_playtopic,
+//                    'total_student_poetry' => $record->total_student_poetry,
+//                    'total_succes_capacity' => $record->total_student_poetry - $record->total_no_resultCapacity,
+//                    'totalPoetry' => $totalPoetry
+//                ];
+//            });
+
+
+//           tổng số sinh viên
+            $totalStudentPoetry = $records->sum('total_student_poetry');
+//            tổng số sinh đã thêm nhưng chưa phát đề
+            $totalPlayTopic = $records->sum('total_playtopic');
+//            Tổng số sinh viên chưa thi
+            $totalNoResultCapacity = $records->sum('total_no_resultCapacity');
+//            Sinh viên đã thi
+            $total_succes_capacity = $totalStudentPoetry - $totalNoResultCapacity;
+
+//            $records->idblock =  $records->pluck('block_subject');
+//            số ca thi
+            $totalPoetry = $records->groupBy('id_semeter')->map(function ($group) {
+                return $group->count();
+            });
+            $totalPoetry = $totalPoetry->sum();
+
+
+            $data = [
+                'totalStudentPoetry' => $totalStudentPoetry,
+                'totalPlaytopic' => $totalPlayTopic,
+                'totalNoResultCapacity' => $totalNoResultCapacity,
+                'total_succes_capacity' => $total_succes_capacity,
+                'totalPoetry' => $totalPoetry
+            ];
+
+            return $data;
+        } catch (\Exception $e) {
+            return $e;
+        }
+    }
+
+    public function ListPoetryChart()
+    {
+        try {
+            $records = $this->modelPoetry->with(['student_poetry', 'student_poetry.playtopic.resultCapacity', 'semeter', 'campus', 'block_subject.block'])
+                ->withCount(['student_poetry AS total_student_poetry',
+                        'student_poetry as total_playtopic' => function ($query) {
+                            $query->whereDoesntHave('playtopic');
+                        },
+                        'student_poetry as total_no_resultCapacity' => function ($query) {
+                            $query->whereDoesntHave('playtopic.resultCapacity');
+                        }]
+                )
+                ->groupBy('id_semeter', 'id_block_subject', 'id_class', 'room', 'assigned_user_id', 'id_campus', 'exam_date')
+                ->get();
+
+//            T
+
+//            $result = $records->map(function ($record) use ($totalPoetry) {
+//                return [
+//                    'name' => $record->campus->name .'-' .$record->semeter->name .'-'. $record->block_subject->block->name ,
+//                    'total_no_resultCapacity' => $record->total_no_resultCapacity,
+//                    'total_playtopic' => $record->total_playtopic,
+//                    'total_student_poetry' => $record->total_student_poetry,
+//                    'total_succes_capacity' => $record->total_student_poetry - $record->total_no_resultCapacity,
+//                    'totalPoetry' => $totalPoetry
+//                ];
+//            });
+
+
+//           tổng số sinh viên
+            $totalStudentPoetry = $records->sum('total_student_poetry');
+//            tổng số sinh đã thêm nhưng chưa phát đề
+            $totalPlayTopic = $records->sum('total_playtopic');
+//            Tổng số sinh viên chưa thi
+            $totalNoResultCapacity = $records->sum('total_no_resultCapacity');
+//            Sinh viên đã thi
+            $total_succes_capacity = $totalStudentPoetry - $totalNoResultCapacity;
+
+//            $records->idblock =  $records->pluck('block_subject');
+//            số ca thi
+            $totalPoetry = $records->groupBy('id_semeter')->map(function ($group) {
+                return $group->count();
+            });
+            $totalPoetry = $totalPoetry->sum();
+
+
+            $data = [
+                'totalStudentPoetry' => $totalStudentPoetry,
+                'totalPlaytopic' => $totalPlayTopic,
+                'totalNoResultCapacity' => $totalNoResultCapacity,
+                'total_succes_capacity' => $total_succes_capacity,
+                'totalPoetry' => $totalPoetry
+            ];
 
             return $data;
         } catch (\Exception $e) {
@@ -175,6 +290,7 @@ class poetry implements MPoetryInterface
                     'class.name as name_class',
                     'playtopic.exam_time',
                     'playtopic.exam_name',
+                    'playtopic.rejoined_at',
                     'result_capacity.created_at',
                     'result_capacity.status',
                 ])
@@ -212,7 +328,11 @@ class poetry implements MPoetryInterface
                 $start_time = $value->exam_date . " " . $poetryIdToPoetryTime[$value->start_examination_id]['started_at'];
                 $finish_time = $value->exam_date . " " . $poetryIdToPoetryTime[$value->finish_examination_id]['finished_at'];
                 $start_time_timestamp = strtotime($start_time);
-                $is_in_time = !(time() < $start_time_timestamp || time() >= strtotime("+15 minutes", $start_time_timestamp) || time() >= strtotime($finish_time));
+                $rejoin_timestamp = strtotime($value->rejoined_at);
+                $is_in_time = (
+                    (time() >= $rejoin_timestamp && time() < strtotime("+15 minutes", $rejoin_timestamp))
+                    || (time() >= $start_time_timestamp && time() < strtotime("+15 minutes", $start_time_timestamp) && time() < strtotime($finish_time))
+                );
                 $have_done = (!empty($value->created_at) && $value->status == 1);
                 $data['data'][] = [
                     "id" => $value->id,
@@ -229,7 +349,7 @@ class poetry implements MPoetryInterface
             }
             return $data;
         } catch (\Exception $e) {
-            return false;
+            return $e->getMessage();
         }
     }
 

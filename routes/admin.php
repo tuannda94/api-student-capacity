@@ -142,7 +142,7 @@ Route::prefix('subject')->group(function () {
     Route::prefix('question')->group(function () {
         Route::get('/{id}/{id_subject}/{name}', [QuestionController::class, 'indexSubject'])->name('admin.subject.question.index');
         Route::get('edit/{id}', [QuestionController::class, 'editSubject'])->name('admin.subject.question.edit');
-        Route::get('destroy/{id}/{id_exam}', [QuestionController::class, 'destroysubject'])->name('admin.subject.question.destroy');
+        Route::delete('destroy/{id}/{id_exam}', [QuestionController::class, 'destroysubject'])->name('admin.subject.question.destroy');
         Route::post('un-status/{id}', [QuestionController::class, 'un_status'])->name('admin.subject.question.un.status');
         Route::post('re-status/{id}', [QuestionController::class, 're_status'])->name('admin.subject.question.re.status');
         Route::delete('delete/{id}', [QuestionController::class, 'deletesubject'])->name('admin.subject.question.delete');
@@ -216,6 +216,8 @@ Route::prefix('accountStudent')->group(function () {
 
 Route::prefix('chart')->group(function(){
     Route::get('',[chartController::class, 'index'])->name('admin.chart');
+    Route::get('getsemeter/{id_campus}',[chartController::class, 'semeter'])->name('admin.getsemter');
+    Route::get('getBlock/{id_semeter}',[chartController::class, 'block'])->name('admin.getsemter');
     Route::post('GetPoetryDetail', [PoetryController::class, 'ListPoetryResponedetailChart'])->name('manage.semeter.list');
     Route::get('detail',[chartController::class, 'detail'])->name('admin.chart.detail');
 });
@@ -234,11 +236,12 @@ Route::prefix('poetry')->group(function () {
         Route::post('/form-add-student', [studentPoetryController::class, 'create'])->name('admin.poetry.manage.create');
         Route::put('now-status/{id}', [studentPoetryController::class, 'now_status'])->name('admin.poetry.un.status');
         Route::delete('delete/{id}', [studentPoetryController::class, 'delete'])->name('admin.poetry.delete');
+        Route::post('rejoin/{id}', [studentPoetryController::class, 'rejoin'])->name('admin.poetry.delete');
     });
     Route::prefix('playTopic')->group(function(){
         Route::get('/{id_peotry}/{id_subject}', [playtopicController::class, 'index'])->name('admin.poetry.playtopic.index');
         Route::get('getExam/{id_subject}', [playtopicController::class, 'listExam']);
-        Route::post('addTopics', [playtopicController::class, 'AddTopic'])->name('admin.poetry.playtopic.create');
+        Route::post('addTopics', [playtopicController::class, 'AddTo    pic'])->name('admin.poetry.playtopic.create');
         Route::post('addTopicsReload', [playtopicController::class, 'AddTopicReload'])->name('admin.poetry.playtopic.create.reload');
     });
 });

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Rules\UniqueSubjectAndBlock;
 use App\Services\Modules\MContest\MContestInterface;
 use App\Services\Modules\MContestUser\MContestUserInterface;
 use App\Services\Modules\MSubjects\Subject;
@@ -18,6 +19,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Models\block;
+use App\Models\blockSubject;
 class subjectController extends Controller
 {
     use TUploadImage, TResponse, TTeamContest, TStatus;
@@ -51,12 +54,14 @@ class subjectController extends Controller
     public function setemer($id){
         $this->checkTypeContest();
         if (!($data = $this->subject->getItemSubjectSetemer($id))) return abort(404);
+//        dd($data);
         if (!($listSubject = $this->subject->List($id))) return abort(404);
-
+        $listBlock = block::where('id_semeter',$id)->get();
         return view('pages.semeter.subject.index', [
             'subjects' => $data,
             'listSubject' => $listSubject,
-            'id_semeter' => $id
+            'id_semeter' => $id,
+            'listBlock' => $listBlock
         ]);
     }
     public function getsemeter($id){
@@ -99,20 +104,23 @@ class subjectController extends Controller
         $validator =  Validator::make(
             $request->all(),
             [
-                'namebasis' => 'required|min:3|unique:subject,name',
+                'namebasis' => 'required|min:2|unique:subject,name',
+                'code_subject' => 'required|unique:subject,code_subject',
                 'status' => 'required'
             ],
             [
-                'namebasis.unique' => 'Trường dữ liệu đã tồn tại',
+                'namebasis.unique' => 'Tên Môn Đã tồn tại',
                 'namebasis.required' => 'Không để trống tên Môn !',
-                'namebasis.min' => 'Tối thiếu 3 ký tự',
+                'code_subject.required' => 'Không để trống mã môn !',
+                'code_subject.unique' => 'Mã Môn đã tồn tại',
+                'namebasis.min' => 'Tối thiếu 2 ký tự',
                 'status.required' => 'Vui lòng chọn trạng thái'
             ]
         );
 
         if($validator->fails() == 1){
             $errors = $validator->errors();
-            $fields = ['namebasis', 'status'];
+            $fields = ['namebasis','code_subject','status'];
             foreach ($fields as $field) {
                 $fieldErrors = $errors->get($field);
 
@@ -127,6 +135,7 @@ class subjectController extends Controller
         $data = [
             'name' => $request->namebasis,
             'status' => $request->status,
+            'code_subject' => $request->code_subject,
             'created_at' => now(),
             'updated_at' => now()
         ];
@@ -141,18 +150,20 @@ class subjectController extends Controller
         $validator =  Validator::make(
             $request->all(),
             [
-                'subject_id' => 'required',
-                'semeter_id' => 'required',
+                'subject_id' => ['required', new UniqueSubjectAndBlock($request->subject_id, $request->block_id)],
+                'id_semeter' => 'required',
+                'block_id' => ['required', new UniqueSubjectAndBlock($request->subject_id, $request->block_id)],
             ],
             [
                 'subject_id.required' => 'Vui lòng chọn môn học !',
-                'semeter_id.required' => 'Vui lòng chọn kỳ học !',
+                'id_semeter.required' => 'Vui lòng chọn kỳ học !',
+                'block_id.required' => 'Vui lòng chọn blocks !',
             ]
         );
 
         if($validator->fails() == 1){
             $errors = $validator->errors();
-            $fields = ['subject_id' ];
+            $fields = ['subject_id','id_semeter','block_id' ];
             foreach ($fields as $field) {
                 $fieldErrors = $errors->get($field);
 
@@ -165,7 +176,12 @@ class subjectController extends Controller
 
         }
 
-
+        blockSubject::insert(
+            [
+                'id_subject' => $request->subject_id,
+                'id_block' =>  $request->block_id
+            ]
+        );
         $data = $this->subject->getItemSubject($request->subject_id);
         $this->subject->createSubjectSemater($request->subject_id,$request->id_semeter);
 
