@@ -216,7 +216,7 @@ Route::prefix('accountStudent')->group(function () {
 });
 
 Route::prefix('chart')->group(function(){
-    Route::get('',[chartController::class, 'index'])->name('admin.chart');
+    Route::get('',[chartController::class, 'index'])->middleware('role_admin')->name('admin.chart');
     Route::get('getsemeter/{id_campus}',[chartController::class, 'semeter'])->name('admin.getsemter');
     Route::get('getBlock/{id_semeter}',[chartController::class, 'block'])->name('admin.getsemter');
     Route::post('GetPoetryDetail', [PoetryController::class, 'ListPoetryResponedetailChart'])->name('manage.semeter.list');
@@ -290,7 +290,7 @@ Route::group([
         return response()->download(public_path('assets/media/excel/excel_download.xlsx'));
     })->name("admin.download.execel.pass");
     Route::get('dowload-frm-excel-poetry', function () {
-        return response()->download(public_path('assets/media/excel/Poetry-dowload-new.xlsx'));
+        return response()->download(public_path('assets/media/excel/file-mau-kh-thi.xlsx'));
     })->name("admin.download.execel.poetry");
     Route::post('upload-image', [CkeditorController::class, 'updoadFile'])->name('admin.ckeditor.upfile');
     Route::prefix('questions')->group(function () {

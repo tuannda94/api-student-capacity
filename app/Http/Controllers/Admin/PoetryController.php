@@ -36,7 +36,6 @@ class PoetryController extends Controller
 
     public function index($id, $idblock, Request $request)
     {
-//        dd($request->except('sort'));
         $sort = $request->sort;
         $data = $this->poetry->ListPoetry($id, $idblock, $request, $sort);
         if (!empty($sort)) {
@@ -46,6 +45,7 @@ class PoetryController extends Controller
         }
         $data->appends($request->query());
         $semeter = $this->semeter->ListSemeter();
+        $campus = (new Campus())->query()->find($semeter->find($id)->id_campus);
         $name = $this->semeter->getName($id);
         $listExamination = $this->examination->getList();
         $ListSubject = $this->subject->getItemSubjectSetemerReponse($idblock);
@@ -56,19 +56,24 @@ class PoetryController extends Controller
             ->withWhereHas('roles', function ($query) {
                 $query->where('id', config('util.TEACHER_ROLE'));
             });
-        $listCampusQuery = (new Campus())->query();
-        if (!auth()->user()->hasRole('super admin')) {
-            $listCampusQuery->where('id', auth()->user()->campus_id);
+//        $listCampusQuery = (new Campus())->query();
+        if (auth()->user()->hasRole('admin')) {
+//            $listCampusQuery->where('id', auth()->user()->campus_id);
             $usersQuery->where('campus_id', auth()->user()->campus_id);
         }
-        $listCampus = $listCampusQuery->get();
+        if (auth()->user()->hasRole('teacher')) {
+//            $listCampusQuery->where('id', auth()->user()->campus_id);
+            $usersQuery->where('id', auth()->user()->id);
+        }
+//            dd(1);
+//        $listCampus = $listCampusQuery->get();
         $teachers = $usersQuery->get();
         return view('pages.poetry.index', [
             'poetry' => $data,
             'semeter' => $semeter,
             'listSubject' => $ListSubject,
             'id_poetry' => $id,
-            'listcampus' => $listCampus,
+            'campus' => $campus,
             'idBlock' => $idblock,
             'name' => $name,
             'listExamination' => $listExamination,

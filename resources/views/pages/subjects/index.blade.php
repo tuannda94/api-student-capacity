@@ -39,6 +39,7 @@
                     <table id="table-data" class="table table-row-bordered table-row-gray-300 gy-7  table-hover ">
                         <thead>
                         <tr>
+                            <th scope="col">Mã môn</th>
                             <th scope="col">Tên Môn học
                                 <span role="button" data-key="name" data-bs-toggle="tooltip" title="" class=" svg-icon svg-icon-primary  svg-icon-2x format-database" data-bs-original-title="Lọc theo tên đánh giá năng lực">
                                 <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo2/dist/../src/media/svg/icons/Navigation/Up-down.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 14px !important ; height: 14px !important" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
@@ -88,6 +89,7 @@
                         <tbody>
                         @foreach($subjects as $key => $value)
                             <tr>
+                                <td>{{ $value->code_subject }}</td>
                                 <td>
                                     {{ $value->name }}
                                 </td>
@@ -245,7 +247,7 @@
         }
 
         const table = document.querySelectorAll('#table-data tbody tr');
-        let STT = parseInt(table[table.length - 1].childNodes[1].innerText) + 1;
+        // let STT = parseInt(table[table.length - 1].childNodes[1].innerText) + 1;
         let btnDelete = document.querySelectorAll('.btn-delete');
         let btnEdit = document.querySelectorAll('.btn-edit');
         let btnUpdate = document.querySelector('#btn-update');
@@ -256,13 +258,14 @@
             '{{ request()->has('end_time') ? \Carbon\Carbon::parse(request('end_time'))->format('m/d/Y h:i:s A') : \Carbon\Carbon::now()->format('m/d/Y h:i:s A') }}'
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" ></script>
-    <script src="{{ asset('assets/js/system/question/index.js') }}"></script>
+{{--    <script src="{{ asset('assets/js/system/question/index.js') }}"></script>--}}
     <script src="{{ asset('assets/js/system/subject/subject.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     {{--    Thêm --}}
     <script>
         $('#upload-basis').click(function (e){
             e.preventDefault();
+            console.log(1);
             var url = $('#form-submit').attr("action");
             var name = $('#namebasis').val();
             var code_subject = $('#code_subject').val();
@@ -288,36 +291,39 @@
                     // <button  class="btn-delete btn btn-danger" data-id="${response.data.id}">
                     //     Xóa
                     // </button>
-                    var newRow = `          <tr>
-                                <td>
-                                    ${response.data.namebasis}
-                    </td>
-                    <td>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" data-id="${response.data.id}" type="checkbox" ${response.data.status == 1 ? 'checked' : ''} role="switch" id="flexSwitchCheckDefault">
-                                    </div>
-                                </td>
-
-                                <td>
-                                  <button  class="btn btn-info" onclick="location.href='admin/subject/exam/${response.data.id}'"   type="button">
-                                        Chi tiết
-                                    </button>
-
-                                    <button  class="btn-edit btn btn-primary"  data-id="${response.data.id}" type="button">
-                                        Chỉnh sửa
-                                    </button>
-
-
-                                </td>
-                            </tr>
-                    `;
-
-                    $('#table-data tbody').append(newRow);
-                    btnEdit = document.querySelectorAll('.btn-edit');
-                    update(btnEdit)
-                    btnDelete = document.querySelectorAll('.btn-delete');
-                    dele(btnDelete)
+                    // var newRow = `          <tr>
+                    //             <td>
+                    //                 ${response.data.namebasis}
+                    // </td>
+                    // <td>
+                    //     <div class="form-check form-switch">
+                    //         <input class="form-check-input" data-id="${response.data.id}" type="checkbox" ${response.data.status == 1 ? 'checked' : ''} role="switch" id="flexSwitchCheckDefault">
+                    //                 </div>
+                    //             </td>
+                    //
+                    //             <td>
+                    //               <button  class="btn btn-info" onclick="location.href='admin/subject/exam/${response.data.id}'"   type="button">
+                    //                     Chi tiết
+                    //                 </button>
+                    //
+                    //                 <button  class="btn-edit btn btn-primary"  data-id="${response.data.id}" type="button">
+                    //                     Chỉnh sửa
+                    //                 </button>
+                    //
+                    //
+                    //             </td>
+                    //         </tr>
+                    // `;
+                    //
+                    // $('#table-data tbody').append(newRow);
+                    // btnEdit = document.querySelectorAll('.btn-edit');
+                    // update(btnEdit)
+                    // btnDelete = document.querySelectorAll('.btn-delete');
+                    // dele(btnDelete)
                     $('#kt_modal_1').modal('hide');
+                    setTimeout(function (){
+                        window.location.reload();
+                    }, 2000);
                 },
                 error: function(response){
                     // console.log(response.responseText)

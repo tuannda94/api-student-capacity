@@ -261,7 +261,7 @@
                                     <td class="text-end">
                                         @if ($value->status == 1)
                                             <div class="menu-item px-3">
-                                                <button class="menu-link px-3 border border-0 bg-transparent"
+                                                <button class="menu-link px-3 border border-0 bg-transparent btn btn-sm btn-outline-primary"
                                                         onclick="location.href='{{ route('admin.poetry.manage.index',['id' => $value->id,'id_poetry' =>$id_poetry,'id_block' => $idBlock ]) }}'"
                                                         type="button">
                                                     Phát đề thi
@@ -317,16 +317,14 @@
                           method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="modal-body text-center">
-                            @if(auth()->user()->hasRole('super admin'))
-                                <div class="form-group">
-                                    <select name="campus_id" id="campus_id_excel" class="form-select">
-                                        <option value="">--Chọn cơ sở--</option>
-                                        @foreach($listcampus as $campus)
-                                            <option value="{{ $campus->id }}">{{ $campus->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            @endif
+                            <div class="form-group d-none">
+                                <select name="campus_id" id="campus_id_excel" class="form-select">
+                                    <option value="{{ $campus->id }}"> Cơ sở {{ $campus->name }}</option>
+                                    {{--                                        @foreach($listcampus as $campus)--}}
+                                    {{--                                            <option value="{{ $campus->id }}">{{ $campus->name }}</option>--}}
+                                    {{--                                        @endforeach--}}
+                                </select>
+                            </div>
                             <div class="HDSD">
                             </div>
                             <label for="up-file{{ $id_poetry }}"
@@ -396,10 +394,10 @@
                         </div>
                         <div class="form-group m-10">
                             <select class="form-select" name="subject" id="campus_id">
-                                <option selected value="">--Chọn cơ sở--</option>
-                                @foreach($listcampus as $campus)
-                                    <option value="{{ $campus->id }}">{{ $campus->name }}</option>
-                                @endforeach
+                                <option selected value="{{ $campus->id }}">Cơ sở {{ $campus->name }}</option>
+                                {{--                                @foreach($listcampus as $campus)--}}
+                                {{--                                    <option value="{{ $campus->id }}">{{ $campus->name }}</option>--}}
+                                {{--                                @endforeach--}}
                             </select>
                         </div>
                         <div class="form-group m-10">
@@ -487,10 +485,10 @@
                         </div>
                         <div class="form-group m-10">
                             <select class="form-select" name="subject" id="campus_id_update">
-                                <option selected value="">--Chọn cơ sở--</option>
-                                @foreach($listcampus as $campus)
-                                    <option value="{{ $campus->id }}">{{ $campus->name }}</option>
-                                @endforeach
+                                <option selected value="{{ $campus->id }}">Cơ sở {{ $campus->name }}</option>
+                                {{--                                @foreach($listcampus as $campus)--}}
+                                {{--                                    <option value="{{ $campus->id }}">{{ $campus->name }}</option>--}}
+                                {{--                                @endforeach--}}
                             </select>
                         </div>
                         <div class="form-group m-10">
