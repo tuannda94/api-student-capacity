@@ -354,6 +354,7 @@ class RoundController extends Controller
                 $exam->ponit = 0;
                 $exam->type = 1;
                 $exam->status = 1;
+                $exam->external_url = 'null';
                 $exam->save();
 
                 // Lấy danh sách câu hỏi theo kỹ năng và mức độ
