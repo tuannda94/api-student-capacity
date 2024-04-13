@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
 Route::redirect('/', '/admin');
 Route::group(['prefix' => 'auth', 'middleware' => "guest"], function () {
     Route::get('login', [AuthController::class, 'adminLogin'])->name('login');

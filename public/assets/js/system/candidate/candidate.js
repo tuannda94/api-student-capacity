@@ -4,6 +4,10 @@ $(document).ready(function () {
         let post_id = $(this).val();
         window.location = UpdateQueryString("post_id", post_id);
     });
+    $("#select-student-code").change(function () {
+        let candidate_id = $(this).val();
+        window.location = UpdateQueryString("candidate_id", candidate_id);
+    });
     $("#select-major-recruitment").change(function () {
         let major_id = $(this).val();
         window.location = UpdateQueryString("major_id", major_id);

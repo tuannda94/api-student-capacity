@@ -7,7 +7,7 @@ use App\Jobs\SendMailUploadCV;
 use App\Jobs\SendMailNoteCV;
 use App\Jobs\SendMailWhenCandidateIsNotSupport;
 use App\Jobs\SendMailWhenSendCvToEnterprise;
-use App\Mail\MailUploadCV;
+use App\Jobs\SendMailWhenEnterpriseStopRecruit;
 use App\Models\Candidate;
 use App\Models\CandidateNote;
 use App\Models\Major;
@@ -19,7 +19,6 @@ use App\Services\Traits\TStatus;
 use App\Services\Traits\TUploadImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
@@ -42,7 +41,6 @@ class CandidateController extends Controller
 
     public function index(Request $request)
     {
-
         $posts = $this->post::where('postable_type', Recruitment::class)->with(['enterprise'])->get();
         $candidates = $this->MCandidate->index($request);
         $count = $this->MCandidate->getList($request)->count();
@@ -171,6 +169,11 @@ class CandidateController extends Controller
             'status' => false,
             'payload' => 'Không tìm thấy thông tin ứng viên tuyển dụng!',
         ]);
+        if ($result == 'full') {
+            $candidate->load(['post.enterprise']);
+            $email = new SendMailWhenEnterpriseStopRecruit($candidate);
+            dispatch($email);
+        }
 
         $candidate->update([
             'result' => $result

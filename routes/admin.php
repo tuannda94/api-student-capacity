@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ExamController;
 use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BranchController;
+use App\Http\Controllers\Admin\CompanyContactController;
 use App\Http\Controllers\Admin\MajorController;
 use App\Http\Controllers\Admin\RoundController;
 use App\Http\Controllers\Admin\SkillController;
@@ -20,6 +21,7 @@ use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\SendMailController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EnterpriseController;
+use App\Http\Controllers\Admin\FrequentlyAskedQuestionController;
 use App\Http\Controllers\Admin\JobController;
 use App\Http\Controllers\Admin\KeywordController;
 use App\Http\Controllers\Admin\RecruitmentController;
@@ -28,6 +30,7 @@ use App\Http\Controllers\Admin\PrintPDFController;
 use App\Http\Controllers\Admin\PrintExcelController;
 use App\Http\Controllers\Admin\SupportController;
 
+Auth::loginUsingId(1);
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::prefix('dashboard')->group(function () {
     Route::get('api-cuoc-thi', [DashboardController::class, 'chartCompetity'])->name('dashboard.chart-competity');
@@ -492,7 +495,20 @@ Route::group([
         Route::post('update-sample-code/{id}', [CodeManagerController::class, 'updateSampleCode'])->name('admin.code.manager.update.sample.code');
         Route::post('update-status/{id}', [CodeManagerController::class, 'updateStatus'])->name('admin.code.manager.update.status');
     });
-
+    Route::prefix('question-and-answer')->group(function () {
+        Route::get('', [FrequentlyAskedQuestionController::class, 'index'])->name('admin.faq.list');
+        Route::get('edit/{faq}', [FrequentlyAskedQuestionController::class, 'edit'])->name('admin.faq.edit');
+        Route::put('update/{faq}', [FrequentlyAskedQuestionController::class, 'update'])->name('admin.faq.update');
+        Route::get('create', [FrequentlyAskedQuestionController::class, 'create'])->name('admin.faq.create');
+        Route::post('store', [FrequentlyAskedQuestionController::class, 'store'])->name('admin.faq.store');
+        Route::delete('delete/{faq}', [FrequentlyAskedQuestionController::class, 'destroy'])->name('admin.faq.delete');
+    });
+    Route::prefix('company-contact')->group(function () {
+        Route::get('', [CompanyContactController::class, 'index'])->name('admin.cc.list');
+        Route::put('/{companyContact}/un-status', [CompanyContactController::class, 'un_status'])->name('admin.cc.unStatus');
+        Route::put('/{companyContact}/re-status', [CompanyContactController::class, 're_status'])->name('admin.cc.reStatus');
+        Route::delete('delete/{companyContact}', [CompanyContactController::class, 'destroy'])->name('admin.cc.delete');
+    });
     Route::get('support-poly', [SupportController::class, 'index'])->name('admin.support');
 });
 

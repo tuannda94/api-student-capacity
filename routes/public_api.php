@@ -18,6 +18,8 @@ use App\Http\Controllers\Admin\RoundController;
 use App\Http\Controllers\Admin\SkillController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\BranchController;
+use App\Http\Controllers\Admin\CompanyContactController;
+use App\Http\Controllers\Admin\FrequentlyAskedQuestionController;
 use App\Http\Controllers\Admin\SponsorController as AdminSponsorController;
 use App\Http\Controllers\Admin\StudentStatusController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -138,5 +140,10 @@ Route::prefix('code-language')->group(function () {
     Route::get('', [CodeManagerController::class, 'getCodeLanguageAll']);
 });
 
-
-
+Route::prefix('question-and-answer')->group(function () {
+    Route::get('', [FrequentlyAskedQuestionController::class, 'getListFAQ']);
+    Route::get('{faq}', [FrequentlyAskedQuestionController::class, 'apiDetail']);
+});
+Route::group(['prefix'=>'company-contact', 'middleware' =>'throttle:2'], function () {
+    Route::post('add', [CompanyContactController::class, 'apiSaveCompanyContact']);
+});
