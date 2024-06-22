@@ -7,6 +7,7 @@ use App\Jobs\SendMailUploadCV;
 use App\Jobs\SendMailNoteCV;
 use App\Jobs\SendMailWhenCandidateIsNotSupport;
 use App\Jobs\SendMailWhenSendCvToEnterprise;
+use App\Mail\MailCandidateResultFull;
 use App\Mail\MailUploadCV;
 use App\Models\Candidate;
 use App\Models\CandidateNote;
@@ -23,6 +24,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CandidateController extends Controller
 {
@@ -175,6 +177,14 @@ class CandidateController extends Controller
         $candidate->update([
             'result' => $result
         ]);
+
+				if ($result == 'full') {
+					try {
+            Mail::to($candidate->email)->queue(new MailCandidateResultFull($candidate));
+					} catch (\Exception $e) {
+							Log::error("message");
+					}
+				}
 
         return response()->json([
             'status' => true,
