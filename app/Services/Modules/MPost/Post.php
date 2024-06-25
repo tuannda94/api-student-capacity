@@ -129,7 +129,6 @@ class Post
         if ($request->post != null) {
             $this->loadAble($query, $request->post);
         }
-
         return $query;
     }
 
@@ -168,6 +167,8 @@ class Post
             $query->where('postable_type', $this->round::class);
         } elseif ($post == config('util.post-recruitment')) {
             $query->where('postable_type', $this->recruitment::class);
+        } elseif ($post == config('util.post-event')) {
+            $query->where('postable_type', 0)->whereNull('postable_id');
         }
     }
 
@@ -256,6 +257,9 @@ class Post
             $dataRound->posts()->create($data);
         } elseif ($request->post_type === 'recruitment') {
             $data['postable_type'] = $this->recruitment::class;
+            $this->post::create($data);
+        } elseif ($request->post_type === 'event') {
+            $data['postable_type'] = $request->typeEvent;
             $this->post::create($data);
         }
     }

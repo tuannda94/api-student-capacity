@@ -88,7 +88,6 @@ class PostController extends Controller
     {
         $this->db::beginTransaction();
         try {
-
             $contest = $this->contest::where('type', 0)->get(['id', 'name']);
             $capacity = $this->contest::where('type', 1)->get(['id', 'name']);
             $users = $this->user::all(['id', 'name', 'email']);
@@ -99,7 +98,7 @@ class PostController extends Controller
                 $recruitment->enterprises_id = $recruitment->enterprise->pluck('id')->toArray();
             }
             $majors = $this->majors::select(['id', 'name'])->where('for_recruitment', 1)->get();
-            // dd($users);
+//             dd($majors);
             $enterprises = $this->enterprise::all(['id', 'name']);
             $rounds = $this->round::all(['id', 'name', 'contest_id']);
             $branches = $this->branches::select('id', 'name')->get();
@@ -148,6 +147,10 @@ class PostController extends Controller
             $enterprises = $this->enterprise::all(['id', 'name']);
             $rounds = $this->round::all(['id', 'name', 'contest_id']);
             $branches = $this->branches::select('id', 'name')->get();
+            $tax_numbers = $this->modulesPost
+                ->getLatestInfoWithDiffTaxNumber()
+                ->select('tax_number', 'contact_name', 'contact_phone', 'contact_email')
+                ->get();
             $this->db::commit();
             return view(
                 'pages.post.form-add-outside',
@@ -161,6 +164,7 @@ class PostController extends Controller
                     'branches' => $branches,
                     'enterprises' => $enterprises,
                     'majors' => $majors,
+                    'tax_numbers' => $tax_numbers
                 ]
             );
         } catch (\Throwable $th) {
@@ -171,6 +175,7 @@ class PostController extends Controller
 
     public function store(RequestsPost $request)
     {
+//        dd($request->all());
         $this->db::beginTransaction();
         try {
             if ($request->post_type !== 'recruitment') $request['code_recruitment'] = null;
@@ -199,8 +204,6 @@ class PostController extends Controller
 
     public function edit(Request $request, $slug)
     {
-
-
         $round = null;
         $contest = $this->contest::where('type', 0)->get(['id', 'name']);
         $capacity = $this->contest::where('type', 1)->get(['id', 'name']);
@@ -227,9 +230,10 @@ class PostController extends Controller
         if ($post->postable && (get_class($post->postable) == $this->round::class)) {
             $round = $this->round::find($post->postable->id)->load('contest:id,name');
         }
-
         if ($post->postable_type == $this->recruitment::class) {
             $post_type = 'recruitment';
+        } elseif ($post->postable_type == 0) {
+            $post_type = 'event';
         } elseif ($post->postable_type == $this->round::class) {
             $post_type = 'round';
         } elseif ($post->postable_type == $this->contest::class) {
@@ -239,6 +243,8 @@ class PostController extends Controller
         } else {
             $post_type = 'outside';
         }
+
+
 
         return view('pages.post.form-edit', [
             'round' => $round,
@@ -274,7 +280,7 @@ class PostController extends Controller
     {
         $data = $this->post::where('slug', $slug)->first();
         $candidates = null;
-        if ($data->postable_type == Recruitment::class) {
+        if ($data->postable_type != 0 && $data->postable_type == Recruitment::class )  {
             \request()->merge(['post_id' => $data->id]);
             $candidates = $this->candidate->getList(\request())->get();
         }

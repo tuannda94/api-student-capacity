@@ -28,20 +28,24 @@
                         <label class="form-label" for="">Thuộc các thành phần</label>
                         <div class="row col-12 m-auto">
                             <button type="button"
-                                    class="click-recruitment  btn {{ old('recruitment_id') ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light">
+                                    class="click-recruitment  btn {{ old('recruitment_id') ? 'btn-primary' : '' }} col-12 col-lg-2 col-sx-12 col-md-12 col-sm-12 col-xxl-2 col-xl-2 btn-light">
                                 Tuyển dụng
                             </button>
                             <button id="clickContset" type="button"
-                                    class="mygroup btn  {{ old('contest_id') ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light click-contest">
+                                    class="mygroup btn  {{ old('contest_id') ? 'btn-primary' : '' }} col-12 col-lg-2 col-sx-12 col-md-12 col-sm-12 col-xxl-2 col-xl-2 btn-light click-contest">
                                 Cuộc thi
                             </button>
                             <button type="button"
-                                    class="click-capacity  btn {{ old('capacity_id') ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light">
+                                    class="click-capacity  btn {{ old('capacity_id') ? 'btn-primary' : '' }} col-12 col-lg-2 col-sx-12 col-md-12 col-sm-12 col-xxl-2 col-xl-2 btn-light">
                                 Bài Test
                             </button>
                             <button type="button"
-                                    class="mygroup btn  {{ old('round_id') ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light click-round">
+                                    class="mygroup btn  {{ old('round_id') ? 'btn-primary' : '' }} col-12 col-lg-2 col-sx-12 col-md-12 col-sm-12 col-xxl-2 col-xl-2 btn-light click-round">
                                 Vòng thi
+                            </button>
+                            <button type="button"
+                                    class=" btn  {{ old('event_id') ? 'btn-primary' : '' }} col-12 col-lg-2 col-sx-12 col-md-12 col-sm-12 col-xxl-2 col-xl-2 btn-light click-event">
+                                Tin tức-sự kiện
                             </button>
                         </div>
                         <br>
@@ -96,6 +100,19 @@
                                     </select>
                                 </div>
                                 <br>
+                            </div>
+                            <div style="{{ old('event_id') ? '' : 'display:none' }}" id="event">
+                                <label class="form-label">Loại</label>
+                                <select id="select-contest-p" name="typeEvent" class="form-select form-contest "
+                                        data-control="select2" data-placeholder="Chọn loại ">
+                                    <option value="">Chọn loại sự kiện</option>
+                                        <option @selected(old('typeEvent') == 0) value="0">
+                                            Tin Tức - Sự Kiện
+                                        </option>
+{{--                                    <option @selected(old('typeEvent') == 1) value="1">--}}
+{{--                                        Tin Tức--}}
+{{--                                    </option>--}}
+                                </select>
                             </div>
                             <div style="{{ old('recruitment_id') ? '' : 'display:none' }}" id="recruitment" class="row">
                                 {{--                                <div class="form-group mb-10 col-xl-6 col-12">--}}
@@ -314,6 +331,7 @@
     <script src="assets/js/system/post/date-after.js"></script>
     <script>
         const oldRound = @json(old('round_id'));
+        const oldEvent = @json(old('event_id'));
         const oldRecruitment = @json(old('recruitment_id'));
         const oldCapacity = @json(old('capacity_id'));
         const recruitments = @json($recruitments);
@@ -334,10 +352,10 @@
             let contactEmail = $('input[name="contact_email"]');
             let majorSelect = $('select[name="major_id"]');
 
-            if (oldRound == null || oldRecruitment == null || oldCapacity == null) {
+            if (oldRound == null || oldEvent == null || oldRecruitment == null || oldCapacity == null) {
                 $(".click-recruitment").click();
             }
-            if (oldRound != null) {
+            if (oldRound != null || oldEvent != null) {
                 $("#select-contest-p").change();
             }
             enterpriseSelect.select2({

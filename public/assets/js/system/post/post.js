@@ -42,6 +42,8 @@ $(document).ready(function () {
         $(".click-capacity").removeClass("btn-primary");
         $(".click-round").removeClass("btn-primary");
         $(".click-recruitment").removeClass("btn-primary");
+        $(".click-event").removeClass("btn-primary");
+        $("#event").hide(100);
         $(this).addClass("btn-primary");
         $("#capacity").hide(100);
         $("#round").hide(100);
@@ -53,6 +55,8 @@ $(document).ready(function () {
         $(".click-contest").removeClass("btn-primary");
         $(".click-round").removeClass("btn-primary");
         $(".click-recruitment").removeClass("btn-primary");
+        $(".click-event").removeClass("btn-primary");
+        $("#event").hide(100);
         $(this).addClass("btn-primary");
         $("#contest").hide(100);
         $("#round").hide(100);
@@ -64,6 +68,8 @@ $(document).ready(function () {
         $(".click-contest").removeClass("btn-primary");
         $(".click-recruitment").removeClass("btn-primary");
         $(".click-capacity").removeClass("btn-primary");
+        $(".click-event").removeClass("btn-primary");
+        $("#event").hide(100);
         $("#capacity").hide(100);
         $("#contest").hide(100);
         $("#recruitment").hide(100);
@@ -75,12 +81,28 @@ $(document).ready(function () {
         $(".click-contest").removeClass("btn-primary");
         $(".click-round").removeClass("btn-primary");
         $(".click-capacity").removeClass("btn-primary");
+        $(".click-event").removeClass("btn-primary");
         $("#capacity").hide(100);
         $("#contest").hide(100);
         $("#round").hide(100);
+        $("#event").hide(100);
         $("#post_type").val("recruitment");
         $(this).addClass("btn-primary");
         $("#recruitment").show(300);
+    });
+
+    $(".click-event").click(function () {
+        $(".click-contest").removeClass("btn-primary");
+        $(".click-recruitment").removeClass("btn-primary");
+        $(".click-capacity").removeClass("btn-primary");
+        $(".click-round").removeClass("btn-primary");
+        $("#capacity").hide(100);
+        $("#contest").hide(100);
+        $("#recruitment").hide(100);
+        $("#round").hide(100);
+        $(this).addClass("btn-primary");
+        $("#post_type").val("event");
+        $("#event").toggle(300);
     });
 });
 
