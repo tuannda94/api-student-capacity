@@ -25,6 +25,7 @@ class Candidate
         $startTime = $request->has('startTime') ? $request->startTime : null;
         $endTime = $request->has('endTime') ? $request->endTime : null;
         $code_recruitment = $request->has('post_id') ? $request->post_id : null;
+        $candidate_id = $request->has('candidate_id') ? $request->candidate_id : null;
         $major_id = $request->has('major_id') ? $request->major_id : null;
         $status = $request->has('status') ? $request->status : null;
         $result = $request->has('result') ? $request->result : null;
@@ -49,6 +50,9 @@ class Candidate
         if ($code_recruitment != null) {
             $query->where('post_id', $code_recruitment);
         }
+        if ($candidate_id != null) {
+            $query->where('id', $candidate_id);
+        }
         if ($major_id != null) {
             $query->where('major_id', $major_id);
         }
@@ -66,6 +70,7 @@ class Candidate
         return $this->getList($request)
             ->with('post:id,code_recruitment,slug')
             ->with('candidateNotes.user')
+            ->with('major')
 //            ->orderBy('updated_at', 'desc')
             ->paginate(request('limit') ?? 10);
     }

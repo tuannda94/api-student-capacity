@@ -435,7 +435,8 @@ class PostController extends Controller
             [
                 'postable:id,name',
                 'postable.enterprise:enterprises.id,enterprises.name,enterprises.logo,enterprises.link_web',
-                'user:id,name,email'
+                'user:id,name,email',
+                'enterprise:id,name,address,description,link_web'
             ]
         )->makeHidden([
             'deleted_at', 'updated_at',

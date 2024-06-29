@@ -10,7 +10,20 @@ return [
         '2' => 'Online',
     ],
 
-
+    'FAQ' => [
+        'TYPE' => [
+            'INTERNSHIP' => 0,
+            'WORKING' => 1,
+            'EVENT' => 2,
+        ]
+    ],
+    'COMPANY_CONTACT' => [
+        'STATUS' => [
+            'NEW' => 0,
+            'REPLIED' => 1,
+        ]
+    ],
+ 
     'TAKE_EXAM_STATUS_CANCEL' => 0, //TRẠNG THÁI HỦY BÀI THI
     'TAKE_EXAM_STATUS_UNFINISHED' => 1, // TRẠNG THÁI CHƯA HOÀN THÀNH BÀI THI
     'TAKE_EXAM_STATUS_COMPLETE' => 2, // TRẠNG THái đã HOÀN THÀNH BÀI THI
@@ -78,7 +91,7 @@ return [
     "ANSWER_TRUE" => 1,
 
     "NAME_DOCKER" => "capacity_",
-    "EXCEL_QESTIONS" => [
+    "EXCEL_QUESTIONS" => [
         "TYPE" => "Một đáp án",
         "RANKS" => [
             "Dễ",

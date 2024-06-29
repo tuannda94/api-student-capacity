@@ -15,16 +15,13 @@
     <p>
         Phòng Quan hệ Doanh nghiệp, trường Cao đẳng FPT Polytechnic xin gửi CV ứng tuyển {{ $post->position }}.
     </p>
-    <br>
     <p>
         Anh, chị xem xét CV của sinh viên nếu thấy phù hợp với vị trí công việc của Quý doanh nghiệp thì liên hệ sinh
         viên phỏng vấn và CC email Phòng để bên em nắm được thông tin nhé.
     </p>
-    <br>
     <p>
         Ngoài ra, khi Phòng có thêm CV ứng tuyển phù hợp, em sẽ gửi sang thêm cho quý doanh xem xét.
     </p>
-    <br>
     <p>
         Trân trọng cảm ơn!
     </p>

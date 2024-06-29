@@ -58,7 +58,7 @@
             </div>
         </div>
         <div class="row card-format">
-            <div class="col-12 col-lg-6 col-sx-12 col-md-12 col-sm-12 col-xxl-6 col-xl-6">
+            <div class="col-12 col-lg-4 col-sx-12 col-md-12 col-sm-12 col-xxl-4 col-xl-4">
                 <div class="form-group p-2">
                     <label class="form-label">Mã tuyển dụng</label>
                     <select id="select-code-recruitment" class="form-select mb-2 select2-hidden-accessible"
@@ -73,7 +73,24 @@
                     </select>
                 </div>
             </div>
-            <div class="col-12 col-lg-6 col-sx-12 col-md-12 col-sm-12 col-xxl-6 col-xl-6">
+            <div class="col-12 col-lg-4 col-sx-12 col-md-12 col-sm-12 col-xxl-4 col-xl-4">
+                <div class="form-group p-2">
+                    <label class="form-label">Mã sinh viên</label>
+                    <select id="select-student-code" class="form-select mb-2 select2-hidden-accessible"
+                            name="candidate_id" data-control="select2" data-hide-search="false" tabindex="-1"
+                            aria-hidden="true">
+                        <option value="">Chọn mã sinh viên</option>
+                        @foreach ($candidates as $candidate)
+                            @if ($candidate->student_code)
+                            <option @selected(request('candidate_id')==$candidate->id) value="{{ $candidate->id }}">
+                                {{ $candidate->student_code }}
+                            </option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4 col-sx-12 col-md-12 col-sm-12 col-xxl-4 col-xl-4">
                 <div class="  form-group pt-2">
                     <div class="mb-0">
                         <label class="form-label">Thời gian ứng tuyển </label>
@@ -189,6 +206,8 @@
                         </th>
                         <th scope="col"> DN ứng tuyển
                         </th>
+                        <th scope="col"> Vị trí tuyển dụng
+                        </th>
                         <th scope="col">Thời gian ứng tuyển
                             <a data-href="{{ request()->has('sortBy') ? (request('sortBy') == 'desc' ? 'asc' : 'desc') : 'asc' }}"
                                data-order="created_at" id="time_candidate">
@@ -262,6 +281,7 @@
                                                     <li>Email : {{ $key->email }} .</li>
                                                     <li>Sdt : {{ $key->phone }} .</li>
                                                     <li>Mã sinh viên : {{ $key->student_code }} .</li>
+                                                    <li>Chuyên ngành : {{ $key->major->name ?? 'Không có dữ liệu'}}</li>
                                                     <li>Trạng
                                                         thái: {{ config('util.CANDIDATE_OPTIONS.STUDENT_STATUSES')[$key->student_status] ?? 'Chưa có' }}</li>
 
@@ -286,7 +306,7 @@
 
                                 {{--                                <a class="show_file btn btn-primary btn-sm" target="_blank" rel="noopener"--}}
                                 {{--                                   href="{{ Storage::disk('s3')->temporaryUrl($key->file_link, now()->addMinutes(5)) }}">Xem</a>--}}
-                                <a class="show_file btn btn-primary btn-sm" target="_blank" rel="noopener"
+                                <a class="show_file btn btn-primary btn-sm" rel="noopener"
                                    href="{{ route('admin.candidate.showcv', $key->id) }}">Xem</a>
                             </td>
 
@@ -294,7 +314,9 @@
                                 {{--                    <a class="download_file btn btn-success btn-sm" href="{{ route('dowload.file') . '?url=' . $key->file_link }}">Tải--}}
                                 {{--                        xuống</a>--}}
                                 {{ $posts->find($key->post_id)->enterprise->name ?? "" }}
-
+                            </td>
+                            <td>
+                                {{ $posts->find($key->post_id)->position ?? 'Chưa có' }}   
                             </td>
 
                             <td>

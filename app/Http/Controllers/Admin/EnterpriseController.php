@@ -72,6 +72,7 @@ class EnterpriseController extends Controller
     {
         $data = $this->modulesEnterprise->index($request);
         $data->load(['recruitment:id,name', 'recruitment.contest:id,name']);
+        
         return $this->responseApi(
             true,
             $data
@@ -80,9 +81,8 @@ class EnterpriseController extends Controller
     public function index(Request $request)
     {
         $contest =  $this->contest::all();
-
         $listEnterprise = $this->modulesEnterprise->index($request);
-//        dd($listEnterprise->first()->logo);
+
         return view('pages.enterprise.index', compact('listEnterprise', 'contest'));
     }
     public function getModelDataStatus($id)
