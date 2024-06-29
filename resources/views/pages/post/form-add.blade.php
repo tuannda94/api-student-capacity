@@ -330,6 +330,24 @@
     <script src="assets/js/system/post/post.js"></script>
     <script src="assets/js/system/post/date-after.js"></script>
     <script>
+        $('#enterprise_id').change(function(){
+            const dataSend= {
+                enterprise_id : parseInt($(this).select2('data')[0].id),
+            };
+            console.log(dataSend)
+
+            $.ajax({
+                type:'POST',
+                url:'{{ route("admin.get.info") }}',
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                data : dataSend,
+                success:function(data){
+                    console.log(data)
+                }
+            });
+        });
+    </script>
+    <script>
         const oldRound = @json(old('round_id'));
         const oldEvent = @json(old('event_id'));
         const oldRecruitment = @json(old('recruitment_id'));

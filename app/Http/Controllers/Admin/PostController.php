@@ -188,6 +188,19 @@ class PostController extends Controller
         }
     }
 
+    public function getInfo(Request $request){
+        try {
+            $enterprise = $this->enterprise::query()
+                ->where('id', $request->enterprise_id)
+                ->orWhere('name', $request->enterprise_id)
+                ->first();
+            return response()->json(["code" => 200,"data" => $enterprise],200);
+        }catch (\Exception $e){
+            return response()->json(["code" => 404,"message" => $e->getMessage()],404);
+        }
+
+    }
+
     public function destroy($slug)
     {
         try {

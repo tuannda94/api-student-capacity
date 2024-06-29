@@ -264,6 +264,8 @@ class Post
         }
     }
 
+
+
     public function update($request, $id)
     {
         $post = $this->post::find($id);
