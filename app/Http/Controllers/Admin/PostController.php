@@ -20,6 +20,7 @@ use App\Models\User;
 use App\Models\Branch;
 use App\Services\Modules\MPost\Post as MPostPost;
 use App\Services\Traits\TStatus;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -175,7 +176,7 @@ class PostController extends Controller
 
     public function store(RequestsPost $request)
     {
-//        dd($request->all());
+    //    dd($request->all());
         $this->db::beginTransaction();
         try {
             if ($request->post_type !== 'recruitment') $request['code_recruitment'] = null;

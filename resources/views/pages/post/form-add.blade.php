@@ -144,6 +144,39 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                <div class="row" id="new-enterprise-fields" class="row" style="display: none;">
+                                    <div class="col-8">
+                                        <div class="form-group mb-10">
+                                            <label class="form-label" for="">Địa chỉ doanh nghiệp</label>
+                                            <input type="text" name="enterprise_address" value="{{ old('enterprise_address') }}"
+                                                class="form-control" placeholder="">
+                                        </div>
+                                        <div class="form-group mb-10">
+                                            <label class="form-label" for="">Địa chỉ website doanh nghiệp</label>
+                                            <input type="text" name="enterprise_link_web" value="{{ old('enterprise_link_web') }}"
+                                                class="form-control" placeholder="">
+                                        </div>
+                                        <div class="form-group mb-10">
+                                            <label class="form-label" for="">Giới thiệu doanh nghiệp</label>
+                                            <textarea class="form-control" name="enterprise_description" rows="3">{{ old('enterprise_description') }}</textarea>
+                                            @error('enterprise_description')
+                                                <p class="text-danger">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="form-group ">
+                                            <label for="" class="form-label">Logo doanh nghiệp</label>
+                                            <input name="enterprise_logo" type='file' id="enterprise-file-input"
+                                                accept=".png, .jpg, .jpeg" class="form-control" />
+                                            <img class="w-100 mt-4 border rounded-3" id="enterprise-image-preview"
+                                                src="https://vanhoadoanhnghiepvn.vn/wp-content/uploads/2020/08/112815953-stock-vector-no-image-available-icon-flat-vector.jpg" />
+                                        </div>
+                                        @error('enterprise_logo')
+                                            <p class="text-danger">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
                                 <div class="form-group mb-10 col-xl-3 col-12">
                                     <label for="" class="form-label">Chuyên ngành</label>
                                     <select name="major_id" class="form-select form-major" data-control="select2"
@@ -381,6 +414,18 @@
                 allowClear: true,
                 tags: true,
             });
+
+            enterpriseSelect.on('change', function () {
+                const selectedValue = $(this).val();
+                const isNewEnterprise = !enterprises.some(enterprise => enterprise.id == selectedValue);
+
+                if (isNewEnterprise) {
+                    $('#new-enterprise-fields').show();
+                } else {
+                    $('#new-enterprise-fields').hide();
+                }
+            });
+
             majorSelect.select2({
                 placeholder: "Chọn chuyên ngành",
                 allowClear: true,
@@ -412,6 +457,7 @@
         messages.thumbnail_url = {
             required: 'Chưa nhập trường này !',
         };
+        preview.showFile('#enterprise-file-input', '#enterprise-image-preview');
         preview.showFile('#file-input', '#image-preview');
         dateAfter('input[type=datetime-local]#begin', 'input[type=datetime-local]#end')
 
