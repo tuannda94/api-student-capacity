@@ -21,10 +21,6 @@
     </p>
     <br>
     <p>
-        Ngoài ra, khi Phòng có thêm CV ứng tuyển phù hợp, em sẽ gửi sang thêm cho quý doanh xem xét.
-    </p>
-    <br>
-    <p>
 			Thân mến,
     </p>
     <p>
