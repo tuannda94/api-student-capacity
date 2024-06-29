@@ -417,6 +417,7 @@ Route::group([
         });
         Route::get('{slug}', [PostController::class, 'detail'])->name('admin.post.detail');
         Route::post('{slug}/sendCvToEnterprise', [PostController::class, 'sendCvToEnterprise'])->name('admin.post.sendCvToEnterprise');
+        Route::get('check-enterprise', [PostController::class, 'checkEnterprise'])->name('check.enterprise');
     });
     Route::prefix('candidates')->group(function () {
         Route::get('', [CandidateController::class, 'index'])->name('admin.candidate.list');
