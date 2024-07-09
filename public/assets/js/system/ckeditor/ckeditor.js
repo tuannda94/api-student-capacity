@@ -1,6 +1,7 @@
+let editor;
 const pageCkeditor = {
     classicCk: function () {
-        ClassicEditor.create(
+         ClassicEditor.create(
             document.querySelector("#kt_docs_ckeditor_classic"),
             {
                 alignment: {
@@ -33,7 +34,8 @@ const pageCkeditor = {
                 ],
             }
         )
-            .then((editor) => {
+            .then((newEditor) => {
+                editor = newEditor;
             })
             .catch((error) => {
             });

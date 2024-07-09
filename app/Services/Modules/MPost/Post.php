@@ -13,6 +13,7 @@ use App\Services\Traits\TUploadImage;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use function GuzzleHttp\Promise\all;
 
@@ -208,12 +209,19 @@ class Post
             'note' => $request->note != 0 ? $request->note : null,
         ];
 
+
+
         if ($request->post_type === 'recruitment') {
+            try {
             $enterprise = $this->enterprise::query()
                 ->where('id', $request->enterprise_id)
                 ->orWhere('name', $request->enterprise_id)
                 ->first();
-
+            if($request->filled('tax_number')){
+                if($enterprise->tax_number != $request->tax_number){
+                    return redirect()->back()->with('error','Mã số thuế không khớp với Doanh Nghiệp bạn đang chọn,vui lòng vào trang Doanh Nghiệp để cập nhật lại');
+                }
+            }
             if ($request->has('enterprise_logo')) {
                 $fileImageEnterprise = $request->file('enterprise_logo');
                 $imageEnterprise = $this->uploadFile($fileImageEnterprise);
@@ -226,7 +234,8 @@ class Post
                     'address' => $request->enterprise_address,
                     'link_web' => $request->enterprise_link_web,
                     'description' => $request->enterprise_description,
-                    'logo' => $imageEnterprise
+                    'logo' => $imageEnterprise,
+                    'tax_number' => $request->tax_number
                 ]);
             }
 
@@ -247,6 +256,10 @@ class Post
 
             $data['enterprise_id'] = $enterprise->id;
             $data['major_id'] = $major->id;
+            }catch (\Exception $e){
+                Log::error("Lỗi mã thuế");
+                return redirect()->back()->with('error','Lỗi mã thuế vui lòng liên hệ quản trị viên');
+            }
         }
 
         if ($request->has('thumbnail_url')) {
@@ -276,6 +289,8 @@ class Post
             $this->post::create($data);
         }
     }
+
+
 
     public function update($request, $id)
     {

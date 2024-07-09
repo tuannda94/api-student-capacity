@@ -236,7 +236,7 @@
                                 </div>
                                 <div class="form-group mb-10 col-xl-3 col-6">
                                     <label for="" class="form-label">Bài đăng thuộc cơ sở</label>
-                                    <select name="branch_id" class="form-select form-major" data-control="select2"
+                                    <select name="branch_id" class="form-select form-major" id="branch_id_form" data-control="select2"
                                             data-placeholder="Chọn cơ sở đăng bài">
                                         @foreach ($branches as $branch)
                                             <option
@@ -248,7 +248,7 @@
                                 </div>
                                 <div class="form-group mb-10 col-xl-3 col-12">
                                     <label for="" class="form-label">Hình thức</label>
-                                    <select name="career_type" id="" class="form-select form-major"
+                                    <select name="career_type" id="recruitment_form" class="form-select form-major"
                                             data-control="select2">
                                         <option value="">Chọn hình thức</option>
                                         @foreach (config('util.CAREER_TYPES') as $key => $value)
@@ -363,6 +363,9 @@
     <script src="assets/js/system/post/post.js"></script>
     <script src="assets/js/system/post/date-after.js"></script>
     <script>
+
+    </script>
+    <script>
         const oldRound = @json(old('round_id'));
         const oldEvent = @json(old('event_id'));
         const oldRecruitment = @json(old('recruitment_id'));
@@ -372,18 +375,40 @@
         let branches = @json($branches);
         let careerTypes = @json(config('util.CAREER_TYPES'));
         let tax_numbers = @json($tax_numbers);
+        const recruitmentSelect = $('select[name="recruitment_id"]');
+        const enterpriseSelect = $('select[name="enterprise_id"]');
+        let branchSelect = $('select[name="branch_id"]');
+        let desShort = $('#kt_docs_ckeditor_classic');
+        let recruitment_form = $('#recruitment_form');
+        let branch_id_form = $('#branch_id_form');
+        let careerTypeSelect = $('select[name="career_type"]');
+        let total = $('input[name="total"]');
+        let position = $('input[name="position"]');
+        const taxNumberSelect = $('select[name="tax_number"]');
+        let contactName = $('input[name="contact_name"]');
+        let contactPhone = $('input[name="contact_phone"]');
+        let contactEmail = $('input[name="contact_email"]');
+        let majorSelect = $('select[name="major_id"]');
+        $('#tax_number').change(function(){
+            const dataSend= {
+                tax_number : $(this).select2('data')[0].text,
+            };
+
+            $.ajax({
+                type:'POST',
+                url:'{{ route("admin.get.info") }}',
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                data : dataSend,
+                success:function(response){
+                    enterpriseSelect.val(response.data.id).trigger('change');
+                    editor.setData( `<p>${branchSelect.find('option:selected').text()}-${enterpriseSelect.find('option:selected').text()}-${position.val()}-${recruitment_form.find('option:selected').text()}</p>` )
+                }
+            });
+        });
+
 
         $(document).ready(function () {
-            const recruitmentSelect = $('select[name="recruitment_id"]');
-            const enterpriseSelect = $('select[name="enterprise_id"]');
-            let branchSelect = $('select[name="branch_id"]');
-            let careerTypeSelect = $('select[name="career_type"]');
-            let total = $('input[name="total"]');
-            const taxNumberSelect = $('select[name="tax_number"]');
-            let contactName = $('input[name="contact_name"]');
-            let contactPhone = $('input[name="contact_phone"]');
-            let contactEmail = $('input[name="contact_email"]');
-            let majorSelect = $('select[name="major_id"]');
+
 
             if (oldRound == null || oldEvent == null || oldRecruitment == null || oldCapacity == null) {
                 $(".click-recruitment").click();
@@ -418,17 +443,30 @@
                 allowClear: true,
                 tags: true,
             });
+            position.on('change', function () {
+                editor.setData( `<p>${branchSelect.find('option:selected').text()}-${enterpriseSelect.find('option:selected').text()}-${position.val()}-${recruitment_form.find('option:selected').text()}</p>` )
+
+            })
+
+            branch_id_form.on('change', function () {
+                editor.setData( `<p>${branchSelect.find('option:selected').text()}-${enterpriseSelect.find('option:selected').text()}-${position.val()}-${recruitment_form.find('option:selected').text()}</p>` )
+
+            })
             taxNumberSelect.on('change', function () {
                 let taxNumber = $(this).val();
                 let info = tax_numbers.find(enterprise => enterprise.tax_number == taxNumber);
+                console.log(desShort);
                 if (info) {
                     contactName.val(info.contact_name);
                     contactPhone.val(info.contact_phone);
                     contactEmail.val(info.contact_email);
+                    enterpriseSelect.val(info.enterprise_id).trigger('change');
+                    editor.setData( `<p>${branchSelect.find('option:selected').text()}-${enterpriseSelect.find('option:selected').text()}-${position.val()}-${recruitment_form.find('option:selected').text()}</p>` )
                 } else {
                     contactName.val('');
                     contactPhone.val('');
                     contactEmail.val('');
+                    enterpriseSelect.val(null).trigger('change');
                 }
             });
 

@@ -66,6 +66,7 @@ class Enterprise
         $enterprise->description = $request->description;
         $enterprise->link_web = $request->link_web;
         $enterprise->address = $request->address;
+        $enterprise->tax_number = $request->tax_number;
         if ($request->has('logo')) {
             $fileImage =  $request->file('logo');
             $logo = $this->uploadFile($fileImage, $enterprise->logo);
