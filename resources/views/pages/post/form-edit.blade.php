@@ -34,20 +34,16 @@
                                 Tuyển dụng
                             </button>
                             <button id="clickContset" type="button"
-                                    class="mygroup btn  {{ $post->postable !== null && get_class($post->postable) == \App\Models\Contest::class && $post->status_capacity == 0 ? 'btn-primary' : '' }} col-12 col-lg-2 col-sx-12 col-md-12 col-sm-12 col-xxl-2 col-xl-2 btn-light  click-contest">
+                                    class="mygroup btn  {{ $post->postable !== null && get_class($post->postable) == \App\Models\Contest::class && $post->status_capacity == 0 ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light  click-contest">
                                 Cuộc thi
                             </button>
                             <button id="clickCapacity" type="button"
-                                    class="mygroup btn {{ $post->postable !== null && get_class($post->postable) == \App\Models\Contest::class && $post->status_capacity == 1 ? 'btn-primary' : '' }} col-12 col-lg-2 col-sx-12 col-md-12 col-sm-12 col-xxl-2 col-xl-2 btn-light click-capacity">
+                                    class="mygroup btn {{ $post->postable !== null && get_class($post->postable) == \App\Models\Contest::class && $post->status_capacity == 1 ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light click-capacity">
                                 Bài test
                             </button>
                             <button type="button"
-                                    class="mygroup btn {{ $post->postable !== null && get_class($post->postable) == \App\Models\Round::class ? 'btn-primary' : '' }} col-12 col-lg-2 col-sx-12 col-md-12 col-sm-12 col-xxl-2 col-xl-2 btn-light click-round">
+                                    class="mygroup btn {{ $post->postable !== null && get_class($post->postable) == \App\Models\Round::class ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light click-round">
                                 Vòng thi
-                            </button>
-                            <button type="button"
-                                    class=" btn   {{ $post->postable == null &&  $post->postable_type == 0 ? 'btn-primary' : '' }} col-12 col-lg-2 col-sx-12 col-md-12 col-sm-12 col-xxl-2 col-xl-2 btn-light click-event">
-                                Tin tức-sự kiện
                             </button>
 
                         </div>
@@ -274,19 +270,6 @@
                                     <textarea name="note" class="form-control" id="" cols="30"
                                               rows="3">{{ old('note') ?? $post->note }}</textarea>
                                 </div>
-                            </div>
-                            <div style="{{ $post->postable == null &&  $post->postable_type == 0 ? '' : 'display:none' }}" id="event">
-                                <label class="form-label">Loại</label>
-                                <select id="select-contest-p" name="typeEvent" class="form-select form-contest "
-                                        data-control="select2" data-placeholder="Chọn loại ">
-                                    <option value="">Chọn loại sự kiện</option>
-                                    <option @selected(old('typeEvent') == 0) value="0">
-                                        Tin Tức - Sự Kiện
-                                    </option>
-                                    {{--                                    <option @selected(old('typeEvent') == 1) value="1">--}}
-                                    {{--                                        Tin Tức--}}
-                                    {{--                                    </option>--}}
-                                </select>
                             </div>
                             <div class="form-group mb-10">
                                 <label class="form-label" for="">Mã tuyển dụng ( Áp dụng với bài viết tuyển

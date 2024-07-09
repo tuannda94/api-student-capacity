@@ -54,8 +54,8 @@
                 <div class=" d-flex flex-row justify-content-end bd-highlight">
                     <a href="{{ route('admin.post.create') }}" class=" btn btn-primary">Tạo mới bài viết
                     </a>
-{{--                    <a href="{{ route('admin.post.insert') }}" class=" btn btn-outline-primary">Tạo mới bài viết bên ngoài--}}
-{{--                    </a>--}}
+                    <a href="{{ route('admin.post.insert') }}" class=" btn btn-outline-primary">Tạo mới bài viết bên ngoài
+                    </a>
                 </div>
             </div>
         </div>
@@ -468,13 +468,9 @@
                                         Cuộc thi : <b><a
                                                 href="{{ route('admin.contest.show', ['id' => $key->postable->id]) }}">{{ $key->postable->name }}
                                             </a></b>
-                                    @elseif($class == \App\Models\Contest::class && $key->status_capacity == 1)
+                                    @else
                                         Bài test : <b><a
                                                 href="{{ route('admin.contest.show.capatity', ['id' => $key->postable->id]) }}">{{ $key->postable->name }}</a></b>
-                                    @elseif($key->postable ==  null && $key->postable_type == 0)
-                                            Tin Tức - Sự Kiện
-                                    @else
-                                        Không tồn tại Thành phần
                                     @endif
                                 </td>
                                 <td>

@@ -55,7 +55,6 @@ class RequestsPost extends FormRequest
 
         if (!$this->route()->id || $this->has('image_url')) $rule = array_merge($rule, [
             'thumbnail_url' => 'required|required|mimes:jpeg,png,jpg|max:10000',
-            'enterprise_logo' => 'mimes:jpeg,png,jpg|max:10000',
         ]);
         return $rule;
     }
@@ -73,7 +72,6 @@ class RequestsPost extends FormRequest
             'content.required' => 'Chưa nhập trường này !',
             'link_to.required' => 'Chưa nhập trường này !',
             'thumbnail_url.mimes' => 'Sai định dạng !',
-            'enterprise_logo.mimes' => 'Sai định dạng !',
             'code_recruitment.required' => 'Chưa nhập trường này !',
             'code_recruitment.max' => 'Trường không được quá 20 ký tự !',
             'code_recruitment.regex' => 'Trường phải viết hoa không dấu và không có ký tự đặc biệt!',
@@ -81,7 +79,6 @@ class RequestsPost extends FormRequest
 
             'thumbnail_url.required' => 'Chưa nhập trường này !',
             'thumbnail_url.max' => 'Dung lượng ảnh không được vượt quá 10MB !',
-            'enterprise_logo.max' => 'Dung lượng ảnh không được vượt quá 10MB !',
         ];
     }
 }

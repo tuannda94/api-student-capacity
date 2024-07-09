@@ -129,6 +129,7 @@ class Post
         if ($request->post != null) {
             $this->loadAble($query, $request->post);
         }
+
         return $query;
     }
 
@@ -167,8 +168,6 @@ class Post
             $query->where('postable_type', $this->round::class);
         } elseif ($post == config('util.post-recruitment')) {
             $query->where('postable_type', $this->recruitment::class);
-        } elseif ($post == config('util.post-event')) {
-            $query->where('postable_type', 0)->whereNull('postable_id');
         }
     }
 
@@ -200,9 +199,6 @@ class Post
             'major_id' => $request->major_id != 0 ? $request->major_id : null,
             'branch_id' => $request->branch_id != 0 ? $request->branch_id : 0,
             'enterprise_id' => $request->enterprise_id != 0 ? $request->enterprise_id : null,
-            'enterprise_address' => $request->enterprise_address != 0 ? $request->enterprise_address : null,
-            'enterprise_link_web' => $request->enterprise_link_web != 0 ? $request->enterprise_link_web : null,
-            'enterprise_description' => $request->enterprise_description != 0 ? $request->enterprise_description : null,
             'total' => $request->total != 0 ? $request->total : null,
             'deadline' => $request->deadline != 0 ? $request->deadline : null,
             'note' => $request->note != 0 ? $request->note : null,
@@ -214,19 +210,9 @@ class Post
                 ->orWhere('name', $request->enterprise_id)
                 ->first();
 
-            if ($request->has('enterprise_logo')) {
-                $fileImageEnterprise = $request->file('enterprise_logo');
-                $imageEnterprise = $this->uploadFile($fileImageEnterprise);
-                $data['enterprise_logo'] = $imageEnterprise;
-            }
-
             if (!$enterprise) {
                 $enterprise = $this->enterprise::create([
                     'name' => $request->enterprise_id,
-                    'address' => $request->enterprise_address,
-                    'link_web' => $request->enterprise_link_web,
-                    'description' => $request->enterprise_description,
-                    'logo' => $imageEnterprise
                 ]);
             }
 
@@ -270,9 +256,6 @@ class Post
             $dataRound->posts()->create($data);
         } elseif ($request->post_type === 'recruitment') {
             $data['postable_type'] = $this->recruitment::class;
-            $this->post::create($data);
-        } elseif ($request->post_type === 'event') {
-            $data['postable_type'] = $request->typeEvent;
             $this->post::create($data);
         }
     }

@@ -79,8 +79,8 @@ return [
         </g>
     </svg><!--end::Svg Icon--></span>',
         "name" => "Doanh nghiệp",
-//        "param" => '',
-//        "link" => "admin.enterprise.list",
+        //        "param" => '',
+        //        "link" => "admin.enterprise.list",
         "role" => $ROLE_HAS_ADMINS,
         "subs-menu" => [
             [
@@ -250,6 +250,12 @@ return [
                 "role" => $ROLE_HAS_ADMINS,
                 "param" => '',
                 "link" => "admin.job",
+            ],
+            [
+                "name" => "Hỏi đáp ",
+                "role" => $ROLE_HAS_ADMINS,
+                "param" => '',
+                "link" => "admin.qa.index",
             ],
         ]
     ], // Cau hinh

@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\RoundController;
 use App\Http\Controllers\Admin\SkillController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\BranchController;
+use App\Http\Controllers\Admin\QAController;
 use App\Http\Controllers\Admin\SponsorController as AdminSponsorController;
 use App\Http\Controllers\Admin\StudentStatusController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -139,4 +140,9 @@ Route::prefix('code-language')->group(function () {
 });
 
 
+Route::prefix('qa')->as('qa.')->group(function () {
+    Route::get('/internship', [QAController::class, 'internship'])->name('internship');
+    Route::get('/job', [QAController::class, 'job'])->name('job');
+    Route::get('/event', [QAController::class, 'event'])->name('event');
+});
 

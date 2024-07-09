@@ -15,8 +15,7 @@
         </div>
     </div>
     <div class="col-12 row">
-
-        @if($data->postable_type != 0 && $data->postable_type == \App\Models\Recruitment::class)
+        @if($data->postable_type == \App\Models\Recruitment::class)
             <div class="row col-12 mx-auto my-5">
 
                 <button
@@ -284,7 +283,6 @@
                 </div>
             </div>
         @else
-
             <div class="row">
                 <div class="col-xl-4 mb-5 mb-xl-10">
                     <div class="card card-flush ">
@@ -351,13 +349,10 @@
                                                 @elseif($data->postable_type == \App\Models\Contest::class && $data->postable->type == 0)
                                                     Cuộc thi : <b><a
                                                             href="{{ route('admin.contest.show', ['id' => $data->postable->id]) }}">{{ $data->postable->name }}</a></b>
-                                                @elseif($data->postable_type == \App\Models\Contest::class && $data->postable->type == 0)
+                                                @else
                                                     Bài test : <b><a
                                                             href="{{ route('admin.contest.show.capatity', ['id' => $data->postable->id]) }}">{{ $data->postable->name }}</a></b>
-                                                @else
-                                                    Tin Tức-Sự Kiện
                                                 @endif
-
                                             </div>
                                         </div>
                                     </div>

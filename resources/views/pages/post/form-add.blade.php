@@ -28,24 +28,20 @@
                         <label class="form-label" for="">Thuộc các thành phần</label>
                         <div class="row col-12 m-auto">
                             <button type="button"
-                                    class="click-recruitment  btn {{ old('recruitment_id') ? 'btn-primary' : '' }} col-12 col-lg-2 col-sx-12 col-md-12 col-sm-12 col-xxl-2 col-xl-2 btn-light">
+                                    class="click-recruitment  btn {{ old('recruitment_id') ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light">
                                 Tuyển dụng
                             </button>
                             <button id="clickContset" type="button"
-                                    class="mygroup btn  {{ old('contest_id') ? 'btn-primary' : '' }} col-12 col-lg-2 col-sx-12 col-md-12 col-sm-12 col-xxl-2 col-xl-2 btn-light click-contest">
+                                    class="mygroup btn  {{ old('contest_id') ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light click-contest">
                                 Cuộc thi
                             </button>
                             <button type="button"
-                                    class="click-capacity  btn {{ old('capacity_id') ? 'btn-primary' : '' }} col-12 col-lg-2 col-sx-12 col-md-12 col-sm-12 col-xxl-2 col-xl-2 btn-light">
+                                    class="click-capacity  btn {{ old('capacity_id') ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light">
                                 Bài Test
                             </button>
                             <button type="button"
-                                    class="mygroup btn  {{ old('round_id') ? 'btn-primary' : '' }} col-12 col-lg-2 col-sx-12 col-md-12 col-sm-12 col-xxl-2 col-xl-2 btn-light click-round">
+                                    class="mygroup btn  {{ old('round_id') ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light click-round">
                                 Vòng thi
-                            </button>
-                            <button type="button"
-                                    class=" btn  {{ old('event_id') ? 'btn-primary' : '' }} col-12 col-lg-2 col-sx-12 col-md-12 col-sm-12 col-xxl-2 col-xl-2 btn-light click-event">
-                                Tin tức-sự kiện
                             </button>
                         </div>
                         <br>
@@ -101,19 +97,6 @@
                                 </div>
                                 <br>
                             </div>
-                            <div style="{{ old('event_id') ? '' : 'display:none' }}" id="event">
-                                <label class="form-label">Loại</label>
-                                <select id="select-contest-p" name="typeEvent" class="form-select form-contest "
-                                        data-control="select2" data-placeholder="Chọn loại ">
-                                    <option value="">Chọn loại sự kiện</option>
-                                        <option @selected(old('typeEvent') == 0) value="0">
-                                            Tin Tức - Sự Kiện
-                                        </option>
-{{--                                    <option @selected(old('typeEvent') == 1) value="1">--}}
-{{--                                        Tin Tức--}}
-{{--                                    </option>--}}
-                                </select>
-                            </div>
                             <div style="{{ old('recruitment_id') ? '' : 'display:none' }}" id="recruitment" class="row">
                                 {{--                                <div class="form-group mb-10 col-xl-6 col-12">--}}
                                 {{--                                    <label for="" class="form-label">Thuộc đợt tuyển dụng</label>--}}
@@ -143,39 +126,6 @@
                                             </option>
                                         @endforeach
                                     </select>
-                                </div>
-                                <div class="row" id="new-enterprise-fields" class="row" style="display: none;">
-                                    <div class="col-8">
-                                        <div class="form-group mb-10">
-                                            <label class="form-label" for="">Địa chỉ doanh nghiệp</label>
-                                            <input type="text" name="enterprise_address" value="{{ old('enterprise_address') }}"
-                                                class="form-control" placeholder="">
-                                        </div>
-                                        <div class="form-group mb-10">
-                                            <label class="form-label" for="">Địa chỉ website doanh nghiệp</label>
-                                            <input type="text" name="enterprise_link_web" value="{{ old('enterprise_link_web') }}"
-                                                class="form-control" placeholder="">
-                                        </div>
-                                        <div class="form-group mb-10">
-                                            <label class="form-label" for="">Giới thiệu doanh nghiệp</label>
-                                            <textarea class="form-control" name="enterprise_description" id="kt_docs_ckeditor_classic3" rows="3">{{ old('enterprise_description') }}</textarea>
-                                            @error('enterprise_description')
-                                                <p class="text-danger">{{ $message }}</p>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="form-group ">
-                                            <label for="" class="form-label">Logo doanh nghiệp</label>
-                                            <input name="enterprise_logo" type='file' id="enterprise-file-input"
-                                                accept=".png, .jpg, .jpeg" class="form-control" />
-                                            <img class="w-100 mt-4 border rounded-3" id="enterprise-image-preview"
-                                                src="https://vanhoadoanhnghiepvn.vn/wp-content/uploads/2020/08/112815953-stock-vector-no-image-available-icon-flat-vector.jpg" />
-                                        </div>
-                                        @error('enterprise_logo')
-                                            <p class="text-danger">{{ $message }}</p>
-                                        @enderror
-                                    </div>
                                 </div>
                                 <div class="form-group mb-10 col-xl-3 col-12">
                                     <label for="" class="form-label">Chuyên ngành</label>
@@ -364,7 +314,6 @@
     <script src="assets/js/system/post/date-after.js"></script>
     <script>
         const oldRound = @json(old('round_id'));
-        const oldEvent = @json(old('event_id'));
         const oldRecruitment = @json(old('recruitment_id'));
         const oldCapacity = @json(old('capacity_id'));
         const recruitments = @json($recruitments);
@@ -385,10 +334,10 @@
             let contactEmail = $('input[name="contact_email"]');
             let majorSelect = $('select[name="major_id"]');
 
-            if (oldRound == null || oldEvent == null || oldRecruitment == null || oldCapacity == null) {
+            if (oldRound == null || oldRecruitment == null || oldCapacity == null) {
                 $(".click-recruitment").click();
             }
-            if (oldRound != null || oldEvent != null) {
+            if (oldRound != null) {
                 $("#select-contest-p").change();
             }
             enterpriseSelect.select2({
@@ -396,18 +345,6 @@
                 allowClear: true,
                 tags: true,
             });
-
-            enterpriseSelect.on('change', function () {
-                const selectedValue = $(this).val();
-                const isNewEnterprise = !enterprises.some(enterprise => enterprise.id == selectedValue);
-
-                if (isNewEnterprise) {
-                    $('#new-enterprise-fields').show();
-                } else {
-                    $('#new-enterprise-fields').hide();
-                }
-            });
-
             majorSelect.select2({
                 placeholder: "Chọn chuyên ngành",
                 allowClear: true,
@@ -439,7 +376,6 @@
         messages.thumbnail_url = {
             required: 'Chưa nhập trường này !',
         };
-        preview.showFile('#enterprise-file-input', '#enterprise-image-preview');
         preview.showFile('#file-input', '#image-preview');
         dateAfter('input[type=datetime-local]#begin', 'input[type=datetime-local]#end')
 

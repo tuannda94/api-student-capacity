@@ -99,7 +99,6 @@ return [
     "post-capacity" => "post-capacity",
     "post-round" => "post-round",
     "post-recruitment" => "post-recruitment",
-    "post-event" => "post-event",
     /**bÀI VIẾT TUYỂN DỤNG HOT */
     "POST_HOT" => 1,
     /** bÀI VIẾT TUYỂN DỤNG THƯỜNG  */

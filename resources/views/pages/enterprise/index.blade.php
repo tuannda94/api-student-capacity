@@ -215,36 +215,28 @@
                                     </button>
 
                                     <!-- Modal -->
-                                    <div class="modal fade" id="introduce_{{ $key->id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal fade" id="introduce_{{ $key->id }}" tabindex="-1"
+                                         aria-labelledby="exampleModalLabel" aria-hidden="true">
                                         <div class="modal-dialog modal-lg">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLabel">Giới thiệu về doanh nghiệp</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    <h5 class="modal-title" id="exampleModalLabel">
+                                                        Giới thiệu về doanh nghiệp
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
                                                 </div>
-                                                <div class="modal-body">
-                                                    <!-- Giới thiệu doanh nghiệp -->
-                                                    <div class="mb-3">
-                                                        {!! $key->description !!}
-                                                    </div>
-                                                    <!-- Địa chỉ doanh nghiệp -->
-                                                    <div class="mb-3">
-                                                        <h6>Địa chỉ doanh nghiệp</h6>
-                                                        <p>{{ $key->address }}</p>
-                                                    </div>
-                                                    <!-- Địa chỉ website -->
-                                                    <div class="mb-3">
-                                                        <h6>Địa chỉ website</h6>
-                                                        <p><a href="{{ $key->link_web }}" target="_blank">{{ $key->link_web }}</a></p>
-                                                    </div>
+                                                <div class="modal-body  ">
+                                                    {!! $key->description !!}
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Thoát</button>
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Thoát
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-
                                 </td>
                                 <td>
                                     <div class="btn-group dropup">

@@ -3,9 +3,6 @@
 use App\Events\PublicChannel;
 use App\Http\Controllers\AuthController;
 use App\Jobs\test;
-use App\Mail\MailCandidateResultFull;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,24 +18,39 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/admin');
 Route::group(['prefix' => 'auth', 'middleware' => "guest"], function () {
-	Route::get('login', [AuthController::class, 'adminLogin'])->name('login');
+    Route::get('login', [AuthController::class, 'adminLogin'])->name('login');
 
-	Route::get('google', [AuthController::class, 'redirectToGoogle'])->name('auth.redirect-google');
-	Route::get('google/callback', [AuthController::class, 'adminGoogleCallback'])->name('google-auth.callback');
+    Route::get('google', [AuthController::class, 'redirectToGoogle'])->name('auth.redirect-google');
+    Route::get('/google/callback', [AuthController::class, 'adminGoogleCallback'])->name('google-auth.callback');
 });
 Route::any('logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('download-file', function () {
-	$fileName = request('page') ?? '' . request('url') ?? '';
-	$headers = [
-		'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
-	];
-	if (!\Storage::disk('s3')->has($fileName)) return 'Không tồn tại file trong hệ thống ';
-	return \Response::make(\Storage::disk('s3')->get($fileName), 200, $headers);
+    $fileName = request('page') ?? '' . request('url') ?? '';
+    $headers = [
+        'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+    ];
+    if (!\Storage::disk('s3')->has($fileName)) return 'Không tồn tại file trong hệ thống ';
+    return \Response::make(\Storage::disk('s3')->get($fileName), 200, $headers);
 })->name('dowload.file');
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Route::get('test', function () {
-	// dispatch(new test())->onQueue('shedule');
-	// \Illuminate\Support\Facades\Cookie::queue('test-cookie-laravel', 'value test', 2);
-	// broadcast(new PublicChannel("This is message"));
+    // dispatch(new test())->onQueue('shedule');
+    // \Illuminate\Support\Facades\Cookie::queue('test-cookie-laravel', 'value test', 2);
+    // broadcast(new PublicChannel("This is message"));
 });
