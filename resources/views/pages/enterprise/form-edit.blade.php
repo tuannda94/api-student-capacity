@@ -96,6 +96,14 @@
                                 @enderror
                             </div>
                             <div class="form-group mb-10">
+                                <label class="form-label" for="email">Mã số thuế</label>
+                                <input type="text" name="tax_number" value="{{ $enterprise->tax_number ?? old('tax_number') }}" class=" form-control"
+                                       placeholder="">
+                                @error('tax_number')
+                                <p id="checkname" class="text-danger">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div class="form-group mb-10">
                                 <label class="form-label" for="">Địa chỉ Website</label>
                                 <input type="text" name="link_web" value="{{ $enterprise->link_web ?? old('link_web') }}"
                                     class=" form-control" placeholder="">

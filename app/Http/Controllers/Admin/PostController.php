@@ -106,7 +106,7 @@ class PostController extends Controller
 
             $tax_numbers = $this->modulesPost
                 ->getLatestInfoWithDiffTaxNumber()
-                ->select('tax_number', 'contact_name', 'contact_phone', 'contact_email')
+                ->select('tax_number', 'contact_name', 'contact_phone', 'contact_email','enterprise_id')
                 ->get();
             $this->db::commit();
             return view(
@@ -192,8 +192,7 @@ class PostController extends Controller
     public function getInfo(Request $request){
         try {
             $enterprise = $this->enterprise::query()
-                ->where('id', $request->enterprise_id)
-                ->orWhere('name', $request->enterprise_id)
+                ->where('tax_number', $request->tax_number)
                 ->first();
             return response()->json(["code" => 200,"data" => $enterprise],200);
         }catch (\Exception $e){
