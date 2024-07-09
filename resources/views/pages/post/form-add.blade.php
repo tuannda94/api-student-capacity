@@ -158,7 +158,7 @@
                                         </div>
                                         <div class="form-group mb-10">
                                             <label class="form-label" for="">Giới thiệu doanh nghiệp</label>
-                                            <textarea class="form-control" name="enterprise_description" rows="3">{{ old('enterprise_description') }}</textarea>
+                                            <textarea class="form-control" name="enterprise_description" id="kt_docs_ckeditor_classic3" rows="3">{{ old('enterprise_description') }}</textarea>
                                             @error('enterprise_description')
                                                 <p class="text-danger">{{ $message }}</p>
                                             @enderror
