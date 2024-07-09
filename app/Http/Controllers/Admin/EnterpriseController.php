@@ -114,6 +114,7 @@ class EnterpriseController extends Controller
                 'description' => $request->description,
                 'link_web' => $request->link_web,
                 'address' => $request->address,
+                'tax_number' => $request->tax_number,
             ];
 
             $logo = $this->uploadFile($request->file('logo'));

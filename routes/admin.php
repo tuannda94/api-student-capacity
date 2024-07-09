@@ -404,6 +404,7 @@ Route::group([
         Route::get('{postable?}', [PostController::class, 'index'])->where('postable', '(recruitment|roud|contest)')->name('admin.post.list');
         Route::get('create', [PostController::class, 'create'])->name('admin.post.create');
         Route::get('insert', [PostController::class, 'insert'])->name('admin.post.insert');
+        Route::post('info', [PostController::class, 'getInfo'])->name('admin.get.info');
 
         Route::post('un-status/{id}', [PostController::class, 'un_status'])->name('admin.post.un.status');
         Route::post('re-status/{id}', [PostController::class, 're_status'])->name('admin.post.re.status');
