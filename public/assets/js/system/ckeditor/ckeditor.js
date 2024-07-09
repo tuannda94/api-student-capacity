@@ -80,6 +80,49 @@ const pageCkeditor = {
             .catch((error) => {
             });
     },
+    classicCk3: function () {
+        ClassicEditor.create(
+            document.querySelector("#kt_docs_ckeditor_classic3"),
+            {
+                alignment: {
+                    options: ['left', 'right', 'center', 'justify',]
+                },
+                toolbar: [
+                    "heading",
+                    "undo",
+                    "redo",
+                    "bold",
+                    "italic",
+                    "blockQuote",
+                    "ckfinder",
+                    "imageTextAlternative",
+                    '|',
+                    'alignment:left',
+                    'alignment:right',
+                    'alignment:center',
+                    'alignment:justify',
+                    '|',
+                    // "imageUpload",
+                    // "heading",
+                    "imageStyle:full",
+                    "imageStyle:side",
+                    "link",
+                    "numberedList",
+                    "bulletedList",
+                    "mediaEmbed",
+                    "insertTable",
+                    "tableColumn",
+                    "tableRow",
+                    "mergeTableCells",
+                ],
+            }
+        )
+            .then((editor) => {
+            })
+            .catch((error) => {
+            });
+    }
 };
 pageCkeditor.classicCk();
 pageCkeditor.classicCk2();
+pageCkeditor.classicCk3();
