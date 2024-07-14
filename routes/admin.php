@@ -30,7 +30,6 @@ use App\Http\Controllers\Admin\PrintPDFController;
 use App\Http\Controllers\Admin\PrintExcelController;
 use App\Http\Controllers\Admin\SupportController;
 
-Auth::loginUsingId(1);
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::prefix('dashboard')->group(function () {
     Route::get('api-cuoc-thi', [DashboardController::class, 'chartCompetity'])->name('dashboard.chart-competity');
