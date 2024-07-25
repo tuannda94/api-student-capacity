@@ -106,13 +106,18 @@ class CompanyContactController extends Controller
                 'fullName' => 'required',
                 'companyName' => 'required',
                 'email' => 'required|email',
-                'phone' => 'required'
+                'phone' => [
+                    'required',
+                    'regex: /(?:\+84|0084|0)[235789][0-9]{1,2}[0-9]{7}(?:[^\d]+|$)/',
+                ]
             ],
             [
                 'fullName.required' => 'Họ tên không được bỏ trống',
                 'companyName.required' => 'Tên công ty không được bỏ trống',
                 'email.required' => 'Email không được để trống',
                 'email.email' => 'Email không đúng định dạng',
+                'phone.required' => 'SĐT không được để trống',
+                'phone.regex' => 'SĐT không đúng định dạng',
             ]
         );
 

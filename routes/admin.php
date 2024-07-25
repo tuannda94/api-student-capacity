@@ -402,7 +402,7 @@ Route::group([
     Route::prefix('posts')->group(function () {
         Route::get('{slug}/edit', [PostController::class, 'edit'])->name('admin.post.edit');
         Route::put('{id}', [PostController::class, 'update'])->name('admin.post.update');
-        Route::get('{postable?}', [PostController::class, 'index'])->where('postable', '(recruitment|roud|contest)')->name('admin.post.list');
+        Route::get('{postable?}', [PostController::class, 'index'])->where('postable', '(recruitment|round|contest|event)')->name('admin.post.list');
         Route::get('create', [PostController::class, 'create'])->name('admin.post.create');
         Route::get('insert', [PostController::class, 'insert'])->name('admin.post.insert');
 
