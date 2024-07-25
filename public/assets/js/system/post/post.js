@@ -42,10 +42,12 @@ $(document).ready(function () {
         $(".click-capacity").removeClass("btn-primary");
         $(".click-round").removeClass("btn-primary");
         $(".click-recruitment").removeClass("btn-primary");
+        $(".click-event").removeClass("btn-primary");
         $(this).addClass("btn-primary");
         $("#capacity").hide(100);
         $("#round").hide(100);
         $("#recruitment").hide(100);
+        $("#event").hide(100);
         $("#post_type").val("contest");
         $("#contest").show(300);
     });
@@ -53,19 +55,23 @@ $(document).ready(function () {
         $(".click-contest").removeClass("btn-primary");
         $(".click-round").removeClass("btn-primary");
         $(".click-recruitment").removeClass("btn-primary");
+        $(".click-event").removeClass("btn-primary");
         $(this).addClass("btn-primary");
         $("#contest").hide(100);
         $("#round").hide(100);
         $("#recruitment").hide(100);
+        $("#event").hide(100);
         $("#post_type").val("capacity");
         $("#capacity").show(300);
     });
     $(".click-round").click(function () {
         $(".click-contest").removeClass("btn-primary");
         $(".click-recruitment").removeClass("btn-primary");
+        $(".click-event").removeClass("btn-primary");
         $(".click-capacity").removeClass("btn-primary");
         $("#capacity").hide(100);
         $("#contest").hide(100);
+        $("#event").hide(100);
         $("#recruitment").hide(100);
         $(this).addClass("btn-primary");
         $("#post_type").val("round");
@@ -75,13 +81,28 @@ $(document).ready(function () {
         $(".click-contest").removeClass("btn-primary");
         $(".click-round").removeClass("btn-primary");
         $(".click-capacity").removeClass("btn-primary");
+        $(".click-event").removeClass("btn-primary");
         $("#capacity").hide(100);
         $("#contest").hide(100);
+        $("#event").hide(100);
         $("#round").hide(100);
         $("#post_type").val("recruitment");
         $(this).addClass("btn-primary");
         $("#recruitment").show(300);
     });
+    $(".click-event").click(function () {
+        $(".click-recruitment").removeClass("btn-primary");
+        $(".click-contest").removeClass("btn-primary");
+        $(".click-round").removeClass("btn-primary");
+        $(".click-capacity").removeClass("btn-primary");
+        $("#capacity").hide(100);
+        $("#contest").hide(100);
+        $("#round").hide(100);
+        $("#recruitment").hide(100);
+        $(this).addClass("btn-primary");
+        $("#post_type").val("event");
+        $("#event").show(300);
+    })
 });
 
 const pageSliderForm = {

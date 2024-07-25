@@ -18,6 +18,7 @@ use App\Models\Recruitment;
 use App\Models\Round;
 use App\Models\User;
 use App\Models\Branch;
+use App\Models\Event;
 use App\Services\Modules\MPost\Post as MPostPost;
 use App\Services\Traits\TStatus;
 use Illuminate\Support\Facades\Redirect;
@@ -35,6 +36,7 @@ class PostController extends Controller
 
         private Contest     $contest,
         private Post        $post,
+        private Event       $event,
         private MPostPost   $modulesPost,
         private User        $user,
         private Enterprise  $enterprise,
@@ -54,14 +56,14 @@ class PostController extends Controller
 
         $round = null;
         if (request()->has('round_id')) $round = $this->round::find(request('round_id'))->load('contest');
-
+        
         $contest = $this->contest::where('type', 0)->get();
         $capacity = $this->contest::where('type', 1)->get();
         $recruitments = $this->recruitment::select('id', 'name')->get();
         $rounds = $this->round::select('id', 'name')->get();
         $posts = $this->modulesPost->index($request, $postable);
         $branches = $this->branches::select('id', 'name')->get();
-
+        
         return view('pages.post.index', [
             'posts' => $posts,
             'contest' => $contest,
@@ -199,11 +201,10 @@ class PostController extends Controller
 
     public function edit(Request $request, $slug)
     {
-
-
         $round = null;
         $contest = $this->contest::where('type', 0)->get(['id', 'name']);
         $capacity = $this->contest::where('type', 1)->get(['id', 'name']);
+        
         $users = $this->user::all(['id', 'name', 'email']);
         $recruitments = $this->recruitment::with(['enterprise' => function ($query) {
             $query->select('enterprises.id')->pluck('enterprises.id')->toArray();
@@ -212,14 +213,18 @@ class PostController extends Controller
             $recruitment->enterprises_id = $recruitment->enterprise->pluck('id')->toArray();
         }
         $majors = $this->majors::select(['id', 'name'])->where('for_recruitment', 1)->get();
-        // dd($users);
         $enterprises = $this->enterprise::all(['id', 'name']);
         $post = $this->modulesPost->getList($request)->where('slug', $slug)->first();
-//        dd($post->major->name);
         $branches = $this->branches::select('id', 'name')->get();
-        $post->load(['postable' => function ($q) {
-            $q->select('id', 'name');
-        }]);
+        if ($post->postable_type == $this->contest::class) {
+            $post->load(['postable' => function ($q) {
+                $q->select('id', 'name', 'type');
+            }]);
+        } else {
+            $post->load(['postable' => function ($q) {
+                $q->select('id', 'name');
+            }]);
+        }
         $tax_numbers = $this->modulesPost
             ->getLatestInfoWithDiffTaxNumber()
             ->select('tax_number', 'contact_name', 'contact_phone', 'contact_email')
@@ -227,15 +232,17 @@ class PostController extends Controller
         if ($post->postable && (get_class($post->postable) == $this->round::class)) {
             $round = $this->round::find($post->postable->id)->load('contest:id,name');
         }
-
+        
         if ($post->postable_type == $this->recruitment::class) {
             $post_type = 'recruitment';
         } elseif ($post->postable_type == $this->round::class) {
             $post_type = 'round';
         } elseif ($post->postable_type == $this->contest::class) {
             $post_type = 'contest';
-        } elseif ($post->postable_type == $this->capacity::class) {
+        } elseif ($post->postable_type == $this->contest::class && $post->postable->type == 1) {
             $post_type = 'capacity';
+        } elseif ($post->postable_type == $this->event::class) {
+            $post_type = 'event';
         } else {
             $post_type = 'outside';
         }

@@ -141,9 +141,9 @@ Route::prefix('code-language')->group(function () {
 });
 
 Route::prefix('question-and-answer')->group(function () {
-    Route::get('', [FrequentlyAskedQuestionController::class, 'getListFAQ']);
+    Route::get('{type}', [FrequentlyAskedQuestionController::class, 'getListFAQ']);
     Route::get('{faq}', [FrequentlyAskedQuestionController::class, 'apiDetail']);
 });
-Route::group(['prefix'=>'company-contact', 'middleware' =>'throttle:2'], function () {
+Route::group(['prefix'=>'company-contact', 'middleware' =>'throttle:3'], function () {
     Route::post('add', [CompanyContactController::class, 'apiSaveCompanyContact']);
 });

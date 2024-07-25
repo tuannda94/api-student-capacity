@@ -4,6 +4,7 @@ namespace App\Services\Modules\MPost;
 
 use App\Models\Contest;
 use App\Models\Enterprise;
+use App\Models\Event;
 use App\Models\Keyword;
 use App\Models\Major;
 use App\Models\Post as ModelsPost;
@@ -25,6 +26,7 @@ class Post
         private Contest     $contest,
         private ModelsPost  $post,
         private Enterprise  $enterprise,
+        private Event       $event,
         private Recruitment $recruitment,
         private Round       $round,
         private Keyword     $keyword,
@@ -257,6 +259,9 @@ class Post
         } elseif ($request->post_type === 'recruitment') {
             $data['postable_type'] = $this->recruitment::class;
             $this->post::create($data);
+        } elseif ($request->post_type === 'event') {
+            $data['postable_type'] = $this->event::class;
+            $this->post::create($data);
         }
     }
 
@@ -320,7 +325,7 @@ class Post
             $post->enterprise_id = $enterprise->id;
             $post->major_id = $major->id;
         }
-
+        
         if ($request->has('thumbnail_url')) {
             $fileImage = $request->file('thumbnail_url');
             $image = $this->uploadFile($fileImage, $post->thumbnail_url);
@@ -344,6 +349,9 @@ class Post
             $post->status_capacity = 0;
         } elseif ($request->post_type === 'recruitment') {
             $post->postable_type = $this->recruitment::class;
+            $post->status_capacity = 0;
+        } elseif ($request->post_type === 'event') {
+            $post->postable_type = $this->event::class;
             $post->status_capacity = 0;
         }
         $post->save();

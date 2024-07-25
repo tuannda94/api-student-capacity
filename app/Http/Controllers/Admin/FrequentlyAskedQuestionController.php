@@ -140,8 +140,16 @@ class FrequentlyAskedQuestionController extends Controller
     }
 
     /**API for client */
-    public function getListFAQ(Request $request) {
+    public function getListFAQ(Request $request, $type) {
+        if ($type == 'internship') {
+            $typeCode = 0;
+        } else if ($type == 'job') {
+            $typeCode = 1;
+        } else if ($type == 'event') {
+            $typeCode = 2;
+        }
         $data = $this->getList($request)
+            ->where('type', $typeCode)
             ->paginate(request('limit') ?? 12);
 
         if (!$data) abort(404);

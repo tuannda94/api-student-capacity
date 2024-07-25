@@ -154,18 +154,20 @@
                 <label class="form-label" for="">Lọc theo thành phần</label>
                 <div class="row col-12 m-auto">
                     <button type="button"
-                        class="click-recruitment  btn {{ request()->has('recruitment_id') || ($postable && $postable == 'recruitment') ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light">
+                        class="click-recruitment  btn {{ request()->has('recruitment_id') || ($postable && $postable == 'recruitment') ? 'btn-primary' : '' }} col btn-light">
                         Bài viết thuộc tuyển dụng</button>
                     <button id="clickContset" type="button"
-                        class="mygroup btn  {{ request()->has('contest_id') ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light click-contest">
+                        class="mygroup btn  {{ request()->has('contest_id') ? 'btn-primary' : '' }} col btn-light click-contest">
                         Bài viết thuộc cuộc thi</button>
                     <button id="clickCapacity" type="button"
-                        class="mygroup btn  {{ request()->has('capacity_id') ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light click-capacity">
+                        class="mygroup btn  {{ request()->has('capacity_id') ? 'btn-primary' : '' }} col btn-light click-capacity">
                         Bài viết thuộc bài test</button>
                     <button type="button"
-                        class="mygroup btn {{ request()->has('round_id') ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light click-round">
+                        class="mygroup btn {{ request()->has('round_id') ? 'btn-primary' : '' }} col btn-light click-round">
                         Bài viết thuộc vòng thi</button>
-
+                    <button type="button"
+                        class="click-event  btn {{($postable && $postable == 'event') ? 'btn-primary' : '' }} col btn-light">
+                        Bài viết thuộc tin tức-sự kiện</button>
                 </div>
                 <br>
                 <div class="col-12 pb-2">
@@ -459,15 +461,17 @@
                                             </a></b>
                                     @elseif ($class == \App\Models\Recruitment::class)
                                         Tuyển dụng
-                                    @if($key->postable)
-                                        :
-                                        <b><a
-                                                href="{{ route('admin.recruitment.detail', ['id' => $key->postable->id]) }}">{{ $key->postable->name }}</a></b>
+                                        @if($key->postable)
+                                            :
+                                            <b><a
+                                                    href="{{ route('admin.recruitment.detail', ['id' => $key->postable->id]) }}">{{ $key->postable->name }}</a></b>
                                         @endif
                                     @elseif($class == \App\Models\Contest::class && $key->status_capacity == 0)
                                         Cuộc thi : <b><a
                                                 href="{{ route('admin.contest.show', ['id' => $key->postable->id]) }}">{{ $key->postable->name }}
                                             </a></b>
+                                    @elseif($class == \App\Models\Event::class)
+                                        Tin tức - sự kiện
                                     @else
                                         Bài test : <b><a
                                                 href="{{ route('admin.contest.show.capatity', ['id' => $key->postable->id]) }}">{{ $key->postable->name }}</a></b>

@@ -28,20 +28,24 @@
                         <label class="form-label" for="">Thuộc các thành phần</label>
                         <div class="row col-12 m-auto">
                             <button type="button"
-                                    class="click-recruitment  btn {{ old('recruitment_id') ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light">
+                                    class="click-recruitment mygroup btn {{ old('recruitment_id') ? 'btn-primary' : '' }} col btn-light">
                                 Tuyển dụng
                             </button>
                             <button id="clickContset" type="button"
-                                    class="mygroup btn  {{ old('contest_id') ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light click-contest">
+                                    class="click-contest mygroup btn  {{ old('contest_id') ? 'btn-primary' : '' }} col btn-light ">
                                 Cuộc thi
                             </button>
                             <button type="button"
-                                    class="click-capacity  btn {{ old('capacity_id') ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light">
+                                    class="click-capacity mygroup btn {{ old('capacity_id') ? 'btn-primary' : '' }} col btn-light">
                                 Bài Test
                             </button>
                             <button type="button"
-                                    class="mygroup btn  {{ old('round_id') ? 'btn-primary' : '' }} col-12 col-lg-3 col-sx-12 col-md-12 col-sm-12 col-xxl-3 col-xl-3 btn-light click-round">
+                                    class="click-round mygroup btn  {{ old('round_id') ? 'btn-primary' : '' }} col btn-light ">
                                 Vòng thi
+                            </button>
+                            <button type="button"
+                                    class="click-event mygroup btn col btn-light">
+                                Tin tức-sự kiện
                             </button>
                         </div>
                         <br>
@@ -222,15 +226,15 @@
                                     <textarea name="note" class="form-control" id="" cols="30"
                                               rows="3">{{ old('note') }}</textarea>
                                 </div>
-                            </div>
-                            <div class="form-group mb-10">
-                                <label class="form-label" for="">Mã tuyển dụng ( Áp dụng với bài viết tuyển
-                                    dụng ) </label>
-                                <input type="text" name="code_recruitment" value="{{ old('code_recruitment') }}"
-                                       class="form-control" placeholder="">
-                                @error('code_recruitment')
-                                <p class="text-danger">{{ $message }}</p>
-                                @enderror
+                                <div class="form-group mb-10">
+                                    <label class="form-label" for="">Mã tuyển dụng ( Áp dụng với bài viết tuyển
+                                        dụng ) </label>
+                                    <input type="text" name="code_recruitment" value="{{ old('code_recruitment') }}"
+                                        class="form-control" placeholder="">
+                                    @error('code_recruitment')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
 
