@@ -19,7 +19,6 @@ class Enterprise
     }
     public function getList(Request $request)
     {
-
         $keyword = $request->has('keyword') ? $request->keyword : "";
         $contest = $request->has('contest') ? $request->contest : null;
         $status = $request->has('status') ? $request->status : null;
@@ -63,6 +62,11 @@ class Enterprise
     {
         $enterprise = $this->enterprise::find($id);
         $enterprise->name = $request->name;
+        $enterprise->status = $request->status;
+        $enterprise->tax_number = $request->tax_number;
+        $enterprise->contact_name = $request->contact_name;
+        $enterprise->contact_phone = $request->contact_phone;
+        $enterprise->contact_email = $request->contact_email;
         $enterprise->description = $request->description;
         $enterprise->link_web = $request->link_web;
         $enterprise->address = $request->address;

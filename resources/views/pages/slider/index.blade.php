@@ -110,8 +110,6 @@
                     <button
                         class="btn-round {{ request()->has('round') ? 'btn-primary' : '' }} btn col-12 col-lg-6 col-sx-12 col-md-12 col-sm-12 col-xxl-6 col-xl-6 btn-light">Banner
                         thuộc vòng thi</button>
-
-
                 </div>
                 <div class="col-12 pb-2">
                     <div style="{{ request()->has('major') ? '' : 'display: none' }} " id="major">

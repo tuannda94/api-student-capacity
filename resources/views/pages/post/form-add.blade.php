@@ -270,7 +270,9 @@
                             <div class="form-group mb-10">
                                 <label class="form-label" for="">Mô tả ngắn bài viết</label>
                                 <textarea class="form-control" name="description" id="kt_docs_ckeditor_classic"
-                                          rows="3">{{ old('description') ?? "(Tên cơ sở) + [Tên Công ty] tuyển dụng [Số lượng tuyển] + [Vị trí tuyển] + [Hình thức tuyển]" }}</textarea>
+                                          rows="3">
+                                          {{ old('description') ?? "(Tên cơ sở) + [Tên Công ty] tuyển dụng [Số lượng tuyển] + [Vị trí tuyển] + [Hình thức tuyển]" }}
+                                </textarea>
                                 @error('description')
                                 <p class="text-danger">{{ $message }}</p>
                                 @enderror

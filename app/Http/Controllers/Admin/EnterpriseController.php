@@ -111,6 +111,11 @@ class EnterpriseController extends Controller
         try {
             $data = [
                 'name' => $request->name,
+                'status' => $request->status,
+                'tax_number' => $request->tax_number,
+                'contact_name' => $request->contact_name,
+                'contact_phone' => $request->contact_phone,
+                'contact_email' => $request->contact_email,
                 'description' => $request->description,
                 'link_web' => $request->link_web,
                 'address' => $request->address,
@@ -122,7 +127,6 @@ class EnterpriseController extends Controller
             $this->modulesEnterprise->store($data, $request);
             return redirect()->route('admin.enterprise.list');
         } catch (\Throwable $th) {
-
             return redirect('error');
         }
     }

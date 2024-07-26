@@ -164,15 +164,14 @@
                                 </a>
 
                             </th>
-                            <th scope="col">Logo
-
-                            </th>
-                            {{--                                <th scope="col">Hiển thị trên trang chủ--}}
-                            {{--                                </th>--}}
-                            <th scope="col">Giới thiệu
-                            </th>
+                            <th scope="col">Logo</th>
+                            <th scope="col">Hiển thị trên trang chủ</th>
+                            <th scope="col">Mã số thuế</th>
+                            <th scope="col">Người liên hệ</th>
+                            <th scope="col">SĐT liên hệ</th>
+                            <th scope="col">Email liên hệ</th>
+                            <th scope="col">Giới thiệu</th>
                             <th scope="col">Tài trợ
-
                         </tr>
                         </thead>
                         <tbody>
@@ -207,6 +206,27 @@
                                 {{--                                        @endhasrole--}}
 
                                 {{--                                    </td>--}}
+                                <td>
+                                    <div data-bs-toggle="tooltip" title="Is highlight "
+                                    class="form-check form-switch">
+                                    <input value="{{ $key->status }}" data-id="{{ $key->id }}"
+                                        class="form-select-status form-check-input"
+                                        type="checkbox" role="switch"
+                                        @checked($key->status == config('util.STATUS_ENTERPRISE_SHOW'))>
+                                    </div>
+                                </td>
+                                <td>
+                                    {{ $key->tax_number ? $key->tax_number : 'Chưa có dữ liệu' }}
+                                </td>
+                                <td>
+                                    {{ $key->contact_name ? $key->contact_name : 'Chưa có dữ liệu' }}
+                                </td>
+                                <td>
+                                    {{ $key->contact_phone ? $key->contact_phone : 'Chưa có dữ liệu' }}
+                                </td>
+                                <td>
+                                    {{ $key->contact_email ? $key->contact_email : 'Chưa có dữ liệu' }}
+                                </td>
                                 <td>
 
                                     <button class="btn  btn-primary btn-sm" type="button" data-bs-toggle="modal"

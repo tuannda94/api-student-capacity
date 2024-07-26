@@ -48,6 +48,7 @@ class Post
         $post = $request->has('post_id') ? $request->post_id : 0;
         $contest = $request->has('contest_id') ? $request->contest_id : 0;
         $capacity = $request->has('capacity_id') ? $request->capacity_id : 0;
+        $type = $request->has('post_type') ? $request->post_type : "";
         $rounds = $request->has('round_id') ? $request->round_id : 0;
         $recruitment = $request->has('recruitment_id') ? $request->recruitment_id : 0;
         $progress = $request->has('progress') ? $request->progress : null;
@@ -124,6 +125,9 @@ class Post
         }
         if ($enterprise_id != 0) {
             $query->where('enterprise_id', $enterprise_id)->where('postable_type', $this->recruitment::class);
+        }
+        if ($type == 'event') {
+            $query->where('postable_type', $this->event::class);
         }
 //        if (!auth()->user()->hasRole(config('util.SUPER_ADMIN_ROLE'))) {
 //            $query->where('branch_id', auth()->user()->branch_id);
