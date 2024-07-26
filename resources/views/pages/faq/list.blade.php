@@ -175,47 +175,33 @@
                         @php
                             $total = $faqs->total();
                         @endphp
-                        @forelse ($faqs as $index=> $key)
+                        @forelse ($faqs as $item)
                             <tr>
-                                {{-- @if (request()->has('sortBy'))
-                                    <th scope="row">
-                                        @if (request('sortBy') == 'desc')
-                                            {{ (request()->has('page') && request('page') !== 1 ? $faqs->perPage() * (request('page') - 1) : 0) + $index + 1 }}
-                                        @else
-                                            {{ request()->has('page') && request('page') !== 1 ? $total - $faqs->perPage() * (request('page') - 1) - $index : ($total -= 1) }}
-                                        @endif
-                                    </th>
-                                @else
-                                    <th scope="row">
-                                        {{ (request()->has('page') && request('page') !== 1 ? $faqs->perPage() * (request('page') - 1) : 0) + $index + 1 }}
-                                    </th>
-                                @endif --}}
-                                {{-- </th> --}}
                                 <td>
                                     <button class="p-3" style="border:none;background:none; text-align: left;"
                                         type="button" data-bs-toggle="modal"
-                                        data-bs-target="#deltai_team_{{ $key->id }}">
-                                        {!! $key->question !!}
+                                        data-bs-target="#deltai_team_{{ $item->id }}">
+                                        {!! $item->question !!}
                                     </button>
                                 </td>
 
                                 <td>
-                                    <p>{!! $key->answer !!}</p>
+                                    <p>{!! $item->answer !!}</p>
                                 </td>
                                 <td>
-                                    @if($key->type == config('util.FAQ.TYPE.INTERNSHIP'))
+                                    @if($item->type == config('util.FAQ.TYPE.INTERNSHIP'))
                                         <span class="badge bg-primary">Thực tập</span>
-                                    @elseif($key->type == config('util.FAQ.TYPE.WORKING'))
+                                    @elseif($item->type == config('util.FAQ.TYPE.WORKING'))
                                         <span class="badge bg-success">Việc làm</span>
                                     @else
                                         <span class="badge bg-danger">Sự kiện</span>
                                     @endif
                                 </td>
-                                <td>{{ $key->created_at }}</td>
+                                <td>{{ $item->created_at }}</td>
 
                                 <td>
-                                    <div data-bs-toggle="tooltip" title="Thao tác " class="btn-group dropstart">
-                                        <button type="button" class="btn   btn-sm dropdown-toggle"
+                                    <div data-bs-toggle="tooltip" title="Thao tác" class="btn-group dropstart">
+                                        <button type="button" class="btn btn-sm dropdown-toggle"
                                             data-bs-toggle="dropdown" aria-expanded="false">
                                             <span class="svg-icon svg-icon-success svg-icon-2x">
                                                 <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo2/dist/../src/media/svg/icons/General/Settings-2.svg--><svg
@@ -236,7 +222,7 @@
                                         </button>
                                         <ul class="dropdown-menu  px-4 ">
                                             <li class="my-3">
-                                                <a href="{{ route('admin.faq.edit', $key->id) }}">
+                                                <a href="{{ route('admin.faq.edit', $item->id) }}">
                                                     <span role="button" class="svg-icon svg-icon-success svg-icon-2x">
                                                         <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo2/dist/../src/media/svg/icons/Design/Edit.svg--><svg
                                                             xmlns="http://www.w3.org/2000/svg"
@@ -261,7 +247,8 @@
                                             </li>
 
                                             <li class="my-3">
-                                                <form action="{{ route('admin.faq.delete', $key->id) }}"
+                                                <form action="{{ route('admin.faq.delete', $item->id) }}"
+                                                    id="delete_{{$item->id}}"
                                                     method="post">
                                                     @csrf
                                                     @method('delete')
@@ -289,6 +276,7 @@
                                                         </span>
                                                         Xóa bỏ
                                                     </button>
+                                                </form>
                                             </li>
                                         </ul>
                                     </div>

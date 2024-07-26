@@ -79,14 +79,63 @@
 
                     <div class="row">
                         <div class="col-8">
-                            <div class="form-group mb-10">
-                                <label class="form-label" for="">Tên doanh nghiệp</label>
-                                <input type="text" name="name" value="{{ $enterprise->name ?? old('name') }}" class=" form-control"
-                                    placeholder="">
-                                @error('name')
-                                    <p id="checkname" class="text-danger">{{ $message }}</p>
-                                @enderror
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group mb-10">
+                                        <label class="form-label" for="">Tên doanh nghiệp</label>
+                                        <input type="text" name="name" value="{{ $enterprise->name ?? old('name') }}" class=" form-control"
+                                            placeholder="">
+                                        @error('name')
+                                            <p id="checkname" class="text-danger">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <div class="form-group mb-10">
+                                        <label class="form-label" for="">Người liên hệ </label>
+                                        <input type="text" name="contact_name" value="{{ $enterprise->contact_name ?? old('contact_name') }}" class=" form-control"
+                                            placeholder="">
+                                        @error('name')
+                                            <p id="checkname" class="text-danger">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <div class="form-group mb-10">
+                                        <label class="form-label" for="">Email liên hệ </label>
+                                        <input type="email" name="contact_email" value="{{ $enterprise->contact_email ?? old('contact_email') }}" class=" form-control"
+                                            placeholder="">
+                                        @error('name')
+                                            <p id="checkname" class="text-danger">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group mb-10">
+                                        <label class="form-label" for="">Mã số thuế </label>
+                                        <input type="text" name="tax_number" value="{{ $enterprise->tax_number ?? old('tax_number') }}" class=" form-control"
+                                            placeholder="">
+                                        @error('name')
+                                            <p id="checkname" class="text-danger">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <div class="form-group mb-10">
+                                        <label class="form-label" for="">SĐT liên hệ </label>
+                                        <input type="text" name="contact_phone" value="{{ $enterprise->contact_phone ?? old('contact_phone') }}" class=" form-control"
+                                            placeholder="">
+                                        @error('name')
+                                            <p id="checkname" class="text-danger">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <div class="form-group mb-10">
+                                        <label class="form-label" for="">Trạng thái (hiển thị ở trang chủ)</label>
+                                        <select name="status" id="status" class="form-control">
+                                            <option value="1" {{ $enterprise->status == 1 ? 'selected' : '' }}>Hiển thị</option>
+                                            <option value="0" {{ $enterprise->status == 0 ? 'selected' : '' }}>Không hiển thị</option>
+                                        </select>
+                                        @error('name')
+                                            <p id="checkname" class="text-danger">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
                             </div>
+                            
                             <div class="form-group mb-10">
                                 <label class="form-label" for="">Địa chỉ</label>
                                 <input type="text" name="address" value="{{ $enterprise->address ?? old('address') }}" class=" form-control"

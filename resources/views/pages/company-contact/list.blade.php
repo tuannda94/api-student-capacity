@@ -294,6 +294,7 @@
                                                         </span>
                                                         Xóa bỏ
                                                     </button>
+                                                </form>
                                             </li>
                                         </ul>
                                     </div>

@@ -9,7 +9,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
-use PhpOffice\PhpSpreadsheet\Shared\OLE\PPS;
 
 class FrequentlyAskedQuestionController extends Controller
 {
@@ -130,7 +129,8 @@ class FrequentlyAskedQuestionController extends Controller
 
     public function destroy(FrequentlyAskedQuestion $faq) {
         try {
-            if (!(auth()->user()->hasRole(config('util.ROLE_DELETE')))) return false;
+            dd($faq);
+            if (!(auth()->user()->hasRole(config('util.ROLE_ADMINS')))) return false;
             $faq->delete();
 
             return redirect()->back();
