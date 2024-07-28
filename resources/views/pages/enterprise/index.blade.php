@@ -57,7 +57,7 @@
             </div>
         </div>
         <div class="row card-format">
-            <div class="col-12 col-lg-4 col-sx-12 col-md-12 col-sm-12 col-xxl-4 col-xl-4">
+            <div class="col">
                 <div class="form-group p-2">
                     <div class="form-group mb-10">
                         <label class="form-label">Tài trợ cuộc thi </label>
@@ -78,11 +78,29 @@
                 </div>
             </div>
 
-            <div class="col-12 col-lg-4 col-sx-12 col-md-12 col-sm-12 col-xxl-4 col-xl-4">
+            <div class="col">
                 <div class="  form-group p-2">
                     <label class="form-label">Tìm kiếm </label>
                     <input value="{{ request('keyword') ?? '' }}" id="searchTeam" type="text"
-                           placeholder="'*Enter' tìm kiếm ..." class=" ip-search form-control">
+                           placeholder="Tìm theo tên doanh nghiệp ..." class=" ip-search form-control">
+                </div>
+            </div>
+            <div class="col">
+                <div class="  form-group p-2">
+                        <label class="form-label">Tìm theo mã số thuế </label>
+                        <input value="{{ request('keyword_tax_number') ?? '' }}" id="searchTaxNumber" type="text"
+                            placeholder="Tìm theo mã số thuế ..." class=" ip-search form-control">
+                    </div>
+                </div>
+            <div class="col">
+                <div class="form-group  pt-2">
+                    <label for="" class="form-label">Trạng thái (hiển thị ở trang chủ)</label>
+                    <select id="selectStatus" class="form-select mb-2 select2-hidden-accessible" data-control="select2"
+                        data-hide-search="true" tabindex="-1" aria-hidden="true">
+                        <option class="form-control" value="">Chọn trạng thái</option>
+                        <option class="form-control" value="1">Hiển thị</option>
+                        <option class="form-control" value="0">Không hiển thị</option>
+                    </select>
                 </div>
             </div>
         </div>
