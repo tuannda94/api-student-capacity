@@ -46,7 +46,6 @@ class FrequentlyAskedQuestionController extends Controller
 
             return view('pages.faq.list', compact('faqs'));
         } catch (\Throwable $th) {
-            dd($th);
             return response()->json(['status' => 'error']);
         }
     }
@@ -129,7 +128,6 @@ class FrequentlyAskedQuestionController extends Controller
 
     public function destroy(FrequentlyAskedQuestion $faq) {
         try {
-            dd($faq);
             if (!(auth()->user()->hasRole(config('util.ROLE_ADMINS')))) return false;
             $faq->delete();
 
