@@ -223,7 +223,7 @@
                                                 </div>
                                                 <div class="modal-body">
                                                     <!-- Giới thiệu doanh nghiệp -->
-                                                    <div class="mb-4">
+                                                    <div class="mb-1">
                                                         {{-- <h6 class="fw-bold">Giới thiệu doanh nghiệp</h6> --}}
                                                         <p>{!! $key->description !!}</p>
                                                     </div>
@@ -232,34 +232,34 @@
                                                             <!-- Mã số thuế -->
                                                             <div class="mb-4">
                                                                 <h6 class="fw-bold">Mã số thuế:</h6>
-                                                                <p>{{ $key->tax_number ?? 'Chưa có' }}</p>
+                                                                <p>{{ $key->tax_number ? $key->tax_number : 'Chưa có' }}</p>
                                                             </div>
                                                             <!-- Người liên hệ -->
                                                             <div class="mb-4">
                                                                 <h6 class="fw-bold">Người liên hệ:</h6>
-                                                                <p>{{ $key->contact_name ? '' : 'Chưa có' }}</p>
+                                                                <p>{{ $key->contact_name ? $key->contact_name : 'Chưa có' }}</p>
                                                             </div>
                                                             <!-- Số điện thoại liên hệ -->
                                                             <div class="mb-4">
                                                                 <h6 class="fw-bold">Số điện thoại liên hệ:</h6>
-                                                                <p>{{ $key->contact_phone ? '' : 'Chưa có' }}</p>
+                                                                <p>{{ $key->contact_phone ? $key->contact_phone : 'Chưa có' }}</p>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
                                                             <!-- Email liên hệ -->
                                                             <div class="mb-4">
                                                                 <h6 class="fw-bold">Email liên hệ:</h6>
-                                                                <p>{{ $key->contact_email ? '' : 'Chưa có' }}</p>
+                                                                <p>{{ $key->contact_email ? $key->contact_email : 'Chưa có' }}</p>
                                                             </div>
                                                             <!-- Địa chỉ doanh nghiệp -->
                                                             <div class="mb-4">
                                                                 <h6 class="fw-bold">Địa chỉ doanh nghiệp:</h6>
-                                                                <p>{{ $key->address ?? 'Chưa có' }}</p>
+                                                                <p>{{ $key->address ? $key->address : 'Chưa có' }}</p>
                                                             </div>
                                                             <!-- Địa chỉ website -->
                                                             <div class="mb-4">
                                                                 <h6 class="fw-bold">Địa chỉ website:</h6>
-                                                                <p><a href="{{ $key->link_web ?? 'Chưa có' }}" target="_blank">{{ $key->link_web ?? 'Chưa có' }}</a></p>
+                                                                <p><a href="{{ $key->link_web}}" target="_blank">{{ $key->link_web ? $key->link_web : 'Chưa có' }}</a></p>
                                                             </div>
                                                         </div>
                                                     </div>
