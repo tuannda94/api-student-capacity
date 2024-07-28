@@ -164,14 +164,15 @@
                                 </a>
 
                             </th>
-                            <th scope="col">Logo</th>
-                            <th scope="col">Hiển thị trên trang chủ</th>
-                            <th scope="col">Mã số thuế</th>
-                            <th scope="col">Người liên hệ</th>
-                            <th scope="col">SĐT liên hệ</th>
-                            <th scope="col">Email liên hệ</th>
-                            <th scope="col">Giới thiệu</th>
+                            <th scope="col">Logo
+
+                            </th>
+                            {{--                                <th scope="col">Hiển thị trên trang chủ--}}
+                            {{--                                </th>--}}
+                            <th scope="col">Giới thiệu
+                            </th>
                             <th scope="col">Tài trợ
+
                         </tr>
                         </thead>
                         <tbody>
@@ -207,52 +208,64 @@
 
                                 {{--                                    </td>--}}
                                 <td>
-                                    <div data-bs-toggle="tooltip" title="Is highlight "
-                                    class="form-check form-switch">
-                                    <input value="{{ $key->status }}" data-id="{{ $key->id }}"
-                                        class="form-select-status form-check-input"
-                                        type="checkbox" role="switch"
-                                        @checked($key->status == config('util.STATUS_ENTERPRISE_SHOW'))>
-                                    </div>
-                                </td>
-                                <td>
-                                    {{ $key->tax_number ? $key->tax_number : 'Chưa có dữ liệu' }}
-                                </td>
-                                <td>
-                                    {{ $key->contact_name ? $key->contact_name : 'Chưa có dữ liệu' }}
-                                </td>
-                                <td>
-                                    {{ $key->contact_phone ? $key->contact_phone : 'Chưa có dữ liệu' }}
-                                </td>
-                                <td>
-                                    {{ $key->contact_email ? $key->contact_email : 'Chưa có dữ liệu' }}
-                                </td>
-                                <td>
-
                                     <button class="btn  btn-primary btn-sm" type="button" data-bs-toggle="modal"
                                             data-bs-target="#introduce_{{ $key->id }}">
                                         Xem
                                     </button>
 
                                     <!-- Modal -->
-                                    <div class="modal fade" id="introduce_{{ $key->id }}" tabindex="-1"
-                                         aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal fade" id="introduce_{{ $key->id }}" tabindex="-1" aria-labelledby="introduceModalLabel_{{ $key->id }}" aria-hidden="true">
                                         <div class="modal-dialog modal-lg">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLabel">
-                                                        Giới thiệu về doanh nghiệp
-                                                    </h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
+                                                    <h5 class="modal-title" id="introduceModalLabel_{{ $key->id }}">Giới thiệu về doanh nghiệp: <span class="text-uppercase text-primary">{{$key->name}}</span> </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
-                                                <div class="modal-body  ">
-                                                    {!! $key->description !!}
+                                                <div class="modal-body">
+                                                    <!-- Giới thiệu doanh nghiệp -->
+                                                    <div class="mb-4">
+                                                        {{-- <h6 class="fw-bold">Giới thiệu doanh nghiệp</h6> --}}
+                                                        <p>{!! $key->description !!}</p>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <!-- Mã số thuế -->
+                                                            <div class="mb-4">
+                                                                <h6 class="fw-bold">Mã số thuế:</h6>
+                                                                <p>{{ $key->tax_number ?? 'Chưa có' }}</p>
+                                                            </div>
+                                                            <!-- Người liên hệ -->
+                                                            <div class="mb-4">
+                                                                <h6 class="fw-bold">Người liên hệ:</h6>
+                                                                <p>{{ $key->contact_name ? '' : 'Chưa có' }}</p>
+                                                            </div>
+                                                            <!-- Số điện thoại liên hệ -->
+                                                            <div class="mb-4">
+                                                                <h6 class="fw-bold">Số điện thoại liên hệ:</h6>
+                                                                <p>{{ $key->contact_phone ? '' : 'Chưa có' }}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <!-- Email liên hệ -->
+                                                            <div class="mb-4">
+                                                                <h6 class="fw-bold">Email liên hệ:</h6>
+                                                                <p>{{ $key->contact_email ? '' : 'Chưa có' }}</p>
+                                                            </div>
+                                                            <!-- Địa chỉ doanh nghiệp -->
+                                                            <div class="mb-4">
+                                                                <h6 class="fw-bold">Địa chỉ doanh nghiệp:</h6>
+                                                                <p>{{ $key->address ?? 'Chưa có' }}</p>
+                                                            </div>
+                                                            <!-- Địa chỉ website -->
+                                                            <div class="mb-4">
+                                                                <h6 class="fw-bold">Địa chỉ website:</h6>
+                                                                <p><a href="{{ $key->link_web ?? 'Chưa có' }}" target="_blank">{{ $key->link_web ?? 'Chưa có' }}</a></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary"
-                                                            data-bs-dismiss="modal">Thoát
-                                                    </button>
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Thoát</button>
                                                 </div>
                                             </div>
                                         </div>

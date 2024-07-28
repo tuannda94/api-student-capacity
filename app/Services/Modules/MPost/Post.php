@@ -200,6 +200,9 @@ class Post
             'contact_email' => $request->contact_email != 0 ? $request->contact_email : null,
             'career_source' => $request->career_source != 0 ? $request->career_source : null,
             'career_require' => $request->career_require != 0 ? $request->career_require : null,
+            'enterprise_address' => $request->enterprise_address != 0 ? $request->enterprise_address : null,
+            'enterprise_link_web' => $request->enterprise_link_web != 0 ? $request->enterprise_link_web : null,
+            'enterprise_description' => $request->enterprise_description != 0 ? $request->enterprise_description : null,
             'position' => $request->position != 0 ? $request->position : null,
             'career_type' => $request->career_type != 0 ? $request->career_type : 1,
             'major_id' => $request->major_id != 0 ? $request->major_id : null,
@@ -216,9 +219,19 @@ class Post
                 ->orWhere('name', $request->enterprise_id)
                 ->first();
 
+            if ($request->has('enterprise_logo') && $request->file('enterprise_logo')) {
+                $fileImageEnterprise = $request->file('enterprise_logo');
+                $imageEnterprise = $this->uploadFile($fileImageEnterprise);
+                $data['enterprise_logo'] = $imageEnterprise;
+            }
+
             if (!$enterprise) {
                 $enterprise = $this->enterprise::create([
-                    'name' => $request->enterprise_id,
+                    'name' => $request->enterprise_id ?? null,
+                    'address' => $request->enterprise_address ?? null,
+                    'link_web' => $request->enterprise_link_web ?? null,
+                    'description' => $request->enterprise_description ?? null,
+                    'logo' => $imageEnterprise ?? null,
                 ]);
             }
 
@@ -329,7 +342,7 @@ class Post
             $post->enterprise_id = $enterprise->id;
             $post->major_id = $major->id;
         }
-        
+
         if ($request->has('thumbnail_url')) {
             $fileImage = $request->file('thumbnail_url');
             $image = $this->uploadFile($fileImage, $post->thumbnail_url);
