@@ -72,7 +72,7 @@ class EnterpriseController extends Controller
     {
         $data = $this->modulesEnterprise->index($request);
         $data->load(['recruitment:id,name', 'recruitment.contest:id,name']);
-        
+
         return $this->responseApi(
             true,
             $data
