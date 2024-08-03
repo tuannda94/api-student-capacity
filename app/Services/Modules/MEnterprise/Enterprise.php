@@ -20,6 +20,7 @@ class Enterprise
     public function getList(Request $request)
     {
         $keyword = $request->has('keyword') ? $request->keyword : "";
+        $taxNumber = $request->has('taxNumber') ? $request->taxNumber : "";
         $contest = $request->has('contest') ? $request->contest : null;
         $status = $request->has('status') ? $request->status : null;
         $orderBy = $request->has('orderBy') ? $request->orderBy : 'id';
@@ -30,7 +31,8 @@ class Enterprise
             $query = $this->enterprise::onlyTrashed()->where('name', 'like', "%$keyword%")->orderByDesc('deleted_at');
             return $query;
         }
-        $query =  $this->enterprise::where('name', 'like', "%$keyword%");
+        $query =  $this->enterprise::where('name', 'like', "%$keyword%")
+            ->where('tax_number', 'like', "%$taxNumber%");
         if ($status != null) {
             $query->where('status', $status);
         }

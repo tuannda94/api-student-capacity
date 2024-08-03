@@ -383,10 +383,5 @@ class Post
                     ->whereNotNull('tax_number')
                     ->groupBy('tax_number');
             });
-//        return $this->post->query()
-//            ->select('tax_number', 'contact_name', 'contact_phone', 'contact_email')
-//            ->whereNotNull('tax_number')
-//            ->groupBy('tax_number')
-//            ->latest('created_at');
     }
 }

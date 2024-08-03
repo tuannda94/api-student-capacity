@@ -102,31 +102,13 @@
                                 <br>
                             </div>
                             <div style="{{ old('recruitment_id') ? '' : 'display:none' }}" id="recruitment" class="row">
-                                {{--                                <div class="form-group mb-10 col-xl-6 col-12">--}}
-                                {{--                                    <label for="" class="form-label">Thuộc đợt tuyển dụng</label>--}}
-                                {{--                                    <select name="recruitment_id" class="form-select form-major" data-control="select2"--}}
-                                {{--                                            data-placeholder="Chọn đợt tuyển dụng ">--}}
-                                {{--                                        <option value="0">Không thuộc đợt tuyển dụng nào</option>--}}
-                                {{--                                        @foreach ($recruitments as $item)--}}
-                                {{--                                            <option--}}
-                                {{--                                                @selected(old('recruitment_id') == $item->id) value="{{ $item->id }}">--}}
-                                {{--                                                {{ $item->name }}--}}
-                                {{--                                            </option>--}}
-                                {{--                                        @endforeach--}}
-                                {{--                                    </select>--}}
-                                {{--                                </div>--}}
                                 <div class="form-group mb-10 col-xl-12 col-12">
-                                    <label for="" class="form-label">Doanh nghiệp</label>
-                                    <select id="enterprise_id" name="enterprise_id" class="form-select form-major"
-                                            data-control="select2"
-                                            data-placeholder="Chọn doanh nghiệp">
+                                    <label for="enterprise_id" class="form-label">Doanh nghiệp</label>
+                                    <select id="enterprise_id" name="enterprise_id" class="form-select form-major" data-control="select2" data-placeholder="Chọn doanh nghiệp">
                                         <option value="0">Chọn doanh nghiệp</option>
                                         @foreach ($enterprises as $enterprise)
-                                            <option
-                                                @selected(old('enterprise_id') ? old('enterprise_id') == $enterprise->id : auth()->user()->enterprise_id == $enterprise->id) value="{{ $enterprise->id }}">
+                                            <option @selected(old('enterprise_id') ? old('enterprise_id') == $enterprise->id : auth()->user()->enterprise_id == $enterprise->id) value="{{ $enterprise->id }}">
                                                 {{ $enterprise->name }}
-                                                {{--                                                @selected(old('enterprise_name') ? old('enterprise_name') == $enterprise->name : auth()->user()->enterprise_id == $enterprise->id) value="{{ $enterprise->name }}">--}}
-                                                {{--                                                {{ $enterprise->name }}--}}
                                             </option>
                                         @endforeach
                                     </select>
@@ -178,13 +160,12 @@
                                     </select>
                                 </div>
                                 <div class="form-group mb-10 col-xl-3 col-12">
-                                    <label for="" class="form-label">Vị trí</label>
-                                    <input type="text" class="form-control" name="position"
-                                           value="{{ old('position') }}">
+                                    <label for="position" class="form-label">Vị trí</label>
+                                    <input type="text" id="position" class="form-control" name="position" value="{{ old('position') }}">
                                 </div>
                                 <div class="form-group mb-10 col-xl-3 col-12">
-                                    <label for="" class="form-label">Số lượng</label>
-                                    <input type="text" class="form-control" name="total" value="{{ old('total') }}">
+                                    <label for="total" class="form-label">Số lượng</label>
+                                    <input type="text" id="total" class="form-control" name="total" value="{{ old('total') }}">
                                 </div>
                                 <div class="form-group mb-10 col-xl-3 col-12">
                                     <label for="" class="form-label">Yêu cầu kinh nghiệm</label>
@@ -194,13 +175,10 @@
                                 <input type="hidden" name="post_type" id="post_type" value="recruitment">
                                 <div class="form-group mb-10 col-xl-3 col-6">
                                     <label for="" class="form-label">Mã số thuế</label>
-                                    <select name="tax_number" id="tax_number" class="form-select form-major"
-                                            data-control="select2"
-                                            data-placeholder="Mã số thuế">
+                                    <select name="tax_number" id="tax_number" class="form-select form-major" data-control="select2" data-placeholder="Mã số thuế">
                                         <option value="0">Mã số thuế</option>
                                         @foreach ($tax_numbers as $tax_number)
-                                            <option
-                                                @selected(old('tax_number') ? old('tax_number') == $tax_number->tax_number : '') value="{{ $tax_number->tax_number }}">
+                                            <option @selected(old('tax_number') ? old('tax_number') == $tax_number->tax_number : '') value="{{ $tax_number->tax_number }}">
                                                 {{ $tax_number->tax_number }}
                                             </option>
                                         @endforeach
@@ -222,25 +200,21 @@
                                            value="{{ old('contact_email') }}">
                                 </div>
                                 <div class="form-group mb-10 col-xl-3 col-6">
-                                    <label for="" class="form-label">Bài đăng thuộc cơ sở</label>
-                                    <select name="branch_id" class="form-select form-major" data-control="select2"
-                                            data-placeholder="Chọn cơ sở đăng bài">
+                                    <label for="branch_id" class="form-label">Bài đăng thuộc cơ sở</label>
+                                    <select id="branch_id" name="branch_id" class="form-select form-major" data-control="select2" data-placeholder="Chọn cơ sở đăng bài">
                                         @foreach ($branches as $branch)
-                                            <option
-                                                @selected(old('branch_id') ? old('branch_id') == $branch->id : auth()->user()->branch_id == $branch->id) value="{{ $branch->id }}">
+                                            <option @selected(old('branch_id') ? old('branch_id') == $branch->id : auth()->user()->branch_id == $branch->id) value="{{ $branch->id }}">
                                                 {{ $branch->name }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="form-group mb-10 col-xl-3 col-12">
-                                    <label for="" class="form-label">Hình thức</label>
-                                    <select name="career_type" id="" class="form-select form-major"
-                                            data-control="select2">
+                                    <label for="career_type" class="form-label">Hình thức</label>
+                                    <select id="career_type" name="career_type" class="form-select form-major" data-control="select2">
                                         <option value="">Chọn hình thức</option>
                                         @foreach (config('util.CAREER_TYPES') as $key => $value)
-                                            <option
-                                                @selected(old('career_type') == $key) value="{{ $key }}">{{ $value }}</option>
+                                            <option @selected(old('career_type') == $key) value="{{ $key }}">{{ $value }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -300,11 +274,10 @@
                                 <p class="text-danger">{{ $message }}</p>
                                 @enderror
                             </div>
-                            <div class="form-group mb-10">
-                                <label class="form-label" for="">Mô tả ngắn bài viết</label>
-                                <textarea class="form-control" name="description" id="kt_docs_ckeditor_classic"
-                                          rows="3">
-                                          {{ old('description') ?? "(Tên cơ sở) + [Tên Công ty] tuyển dụng [Số lượng tuyển] + [Vị trí tuyển] + [Hình thức tuyển]" }}
+                            <div class="form-group mb-10"  id="desShort">
+                                <label class="form-label" for="description">Mô tả ngắn bài viết</label>
+                                <textarea class="form-control" name="description" id="kt_docs_ckeditor_classics" rows="3">
+                                    {{ old('description') ?? "(Tên cơ sở) + [Tên Công ty] tuyển dụng [Số lượng tuyển] + [Vị trí tuyển] + [Hình thức tuyển]" }}
                                 </textarea>
                                 @error('description')
                                 <p class="text-danger">{{ $message }}</p>
@@ -379,6 +352,7 @@
             if (oldRound != null) {
                 $("#select-contest-p").change();
             }
+
             enterpriseSelect.select2({
                 placeholder: "Chọn doanh nghiệp",
                 allowClear: true,
@@ -401,25 +375,28 @@
                 allowClear: true,
                 tags: true,
             });
+
             taxNumberSelect.select2({
                 placeholder: "Chọn mã số thuế",
                 allowClear: true,
                 tags: true,
             });
+
             taxNumberSelect.on('change', function () {
                 let taxNumber = $(this).val();
                 let info = tax_numbers.find(enterprise => enterprise.tax_number == taxNumber);
                 if (info) {
+                    enterpriseSelect.val(info.id).trigger('change');
                     contactName.val(info.contact_name);
                     contactPhone.val(info.contact_phone);
                     contactEmail.val(info.contact_email);
                 } else {
+                    enterpriseSelect.val('').trigger('change');
                     contactName.val('');
                     contactPhone.val('');
                     contactEmail.val('');
                 }
             });
-
         });
         rules.thumbnail_url = {
             required: true,
@@ -434,4 +411,67 @@
         const rounds = @json($rounds);
     </script>
     <script src="assets/js/system/validate/validate.js"></script>
+		<script>
+			$(document).ready(function () {
+					// Initialize CKEditor
+					ClassicEditor
+							.create(document.querySelector('#kt_docs_ckeditor_classics'))
+							.then(editor => {
+									// Store the editor instance
+									window.editor = editor;
+
+									const branchSelect = $('select[name="branch_id"]');
+									const enterpriseSelect = $('select[name="enterprise_id"]');
+									const totalInput = $('input[name="total"]');
+									const positionInput = $('input[name="position"]');
+									const careerTypeSelect = $('select[name="career_type"]');
+
+									function updateDescription() {
+											const branchName = branchSelect.find('option:selected').text().trim();
+											const enterpriseName = enterpriseSelect.find('option:selected').text().trim();
+											const total = totalInput.val().trim();
+											const position = positionInput.val().trim();
+											const careerType = careerTypeSelect.find('option:selected').text().trim();
+
+											const description = `${branchName} ${enterpriseName} tuyển dụng ${total} ${position} ${careerType}`;
+											console.log("Branch Name:", branchName);
+											console.log("Enterprise Name:", enterpriseName);
+											console.log("Total:", total);
+											console.log("Position:", position);
+											console.log("Career Type:", careerType);
+											console.log("Description:", description);
+											editor.setData(description);
+									}
+
+									// Attach change event listeners to input and select fields
+									branchSelect.on('change', function() {
+											console.log("Branch select changed");
+											updateDescription();
+									});
+									enterpriseSelect.on('change', function() {
+											console.log("Enterprise select changed");
+											updateDescription();
+									});
+									totalInput.on('input', function() {
+											console.log("Total input changed");
+											updateDescription();
+									});
+									positionInput.on('input', function() {
+											console.log("Position input changed");
+											updateDescription();
+									});
+									careerTypeSelect.on('change', function() {
+											console.log("Career type select changed");
+											updateDescription();
+									});
+
+									// Initial description update
+									updateDescription();
+							})
+							.catch(error => {
+									console.error('There was a problem initializing the editor.', error);
+							});
+			});
+	</script>
+
 @endsection
