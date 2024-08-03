@@ -112,7 +112,6 @@
                                             </option>
                                         @endforeach
                                     </select>
-                                    <p class="form-label" style="color: #a1a5b7">*Vui lòng chọn mã số thuế trước khi chọn doanh nghiệp</p>
                                 </div>
                                 <div class="row" id="new-enterprise-fields" class="row" style="display: none;">
                                     <div class="col-8">
@@ -275,7 +274,7 @@
                                 <p class="text-danger">{{ $message }}</p>
                                 @enderror
                             </div>
-                            <div class="form-group mb-10">
+                            <div class="form-group mb-10"  id="desShort">
                                 <label class="form-label" for="description">Mô tả ngắn bài viết</label>
                                 <textarea class="form-control" name="description" id="kt_docs_ckeditor_classics" rows="3">
                                     {{ old('description') ?? "(Tên cơ sở) + [Tên Công ty] tuyển dụng [Số lượng tuyển] + [Vị trí tuyển] + [Hình thức tuyển]" }}
@@ -434,7 +433,7 @@
 											const position = positionInput.val().trim();
 											const careerType = careerTypeSelect.find('option:selected').text().trim();
 
-											const description = `(${branchName}) + [${enterpriseName}] + tuyển dụng + [${total}] + [${position}] + [${careerType}]`;
+											const description = `${branchName} ${enterpriseName} tuyển dụng ${total} ${position} ${careerType}`;
 											console.log("Branch Name:", branchName);
 											console.log("Enterprise Name:", enterpriseName);
 											console.log("Total:", total);
