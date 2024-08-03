@@ -106,9 +106,13 @@ class PostController extends Controller
             $rounds = $this->round::all(['id', 'name', 'contest_id']);
             $branches = $this->branches::select('id', 'name')->get();
 
-            $tax_numbers = $this->modulesPost
-                ->getLatestInfoWithDiffTaxNumber()
-                ->select('tax_number', 'contact_name', 'contact_phone', 'contact_email')
+            // $tax_numbers = $this->modulesPost
+            //     ->getLatestInfoWithDiffTaxNumber()
+            //     ->select('tax_number', 'contact_name', 'contact_phone', 'contact_email')
+            //     ->get();
+            $tax_numbers = $this->enterprise
+                ->whereNotNull('tax_number')
+                ->select('id','tax_number','name', 'address','contact_name', 'contact_phone', 'contact_email')
                 ->get();
             $this->db::commit();
             return view(
