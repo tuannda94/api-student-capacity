@@ -359,17 +359,6 @@
                 tags: true,
             });
 
-            enterpriseSelect.on('change', function () {
-                const selectedValue = $(this).val();
-                const isNewEnterprise = !enterprises.some(enterprise => enterprise.id == selectedValue);
-
-                if (isNewEnterprise) {
-                    $('#new-enterprise-fields').show();
-                } else {
-                    $('#new-enterprise-fields').hide();
-                }
-            });
-
             majorSelect.select2({
                 placeholder: "Chọn chuyên ngành",
                 allowClear: true,
@@ -382,6 +371,23 @@
                 tags: true,
             });
 
+            function toggleNewEnterpriseFields(selectedValue) {
+                const isNewEnterprise = !enterprises.some(enterprise => enterprise.id == selectedValue);
+
+                if (selectedValue === '0') {
+                    $('#new-enterprise-fields').hide();
+                } else if (isNewEnterprise) {
+                    $('#new-enterprise-fields').show();
+                } else {
+                    $('#new-enterprise-fields').hide();
+                }
+            }
+
+            enterpriseSelect.on('change', function () {
+                const selectedValue = $(this).val();
+                toggleNewEnterpriseFields(selectedValue);
+            });
+
             taxNumberSelect.on('change', function () {
                 let taxNumber = $(this).val();
                 let info = tax_numbers.find(enterprise => enterprise.tax_number == taxNumber);
@@ -391,7 +397,7 @@
                     contactPhone.val(info.contact_phone);
                     contactEmail.val(info.contact_email);
                 } else {
-                    enterpriseSelect.val('').trigger('change');
+                    enterpriseSelect.val('0').trigger('change');
                     contactName.val('');
                     contactPhone.val('');
                     contactEmail.val('');
@@ -413,11 +419,9 @@
     <script src="assets/js/system/validate/validate.js"></script>
 		<script>
 			$(document).ready(function () {
-					// Initialize CKEditor
 					ClassicEditor
 							.create(document.querySelector('#kt_docs_ckeditor_classics'))
 							.then(editor => {
-									// Store the editor instance
 									window.editor = editor;
 
 									const branchSelect = $('select[name="branch_id"]');
@@ -443,7 +447,6 @@
 											editor.setData(description);
 									}
 
-									// Attach change event listeners to input and select fields
 									branchSelect.on('change', function() {
 											console.log("Branch select changed");
 											updateDescription();
@@ -465,7 +468,6 @@
 											updateDescription();
 									});
 
-									// Initial description update
 									updateDescription();
 							})
 							.catch(error => {

@@ -212,7 +212,7 @@ class Post
             'deadline' => $request->deadline != 0 ? $request->deadline : null,
             'note' => $request->note != 0 ? $request->note : null,
         ];
-
+        
         if ($request->post_type === 'recruitment') {
             $enterprise = $this->enterprise::query()
                 ->where('id', $request->enterprise_id)
@@ -232,6 +232,11 @@ class Post
                     'link_web' => $request->enterprise_link_web ?? null,
                     'description' => $request->enterprise_description ?? null,
                     'logo' => $imageEnterprise ?? null,
+                    'tax_number' => $request->tax_number != 0 ? $request->tax_number : null,
+                    'contact_name' => $request->contact_name != 0 ? $request->contact_name : null,
+                    'contact_phone' => $request->contact_phone != 0 ? $request->contact_phone : null,
+                    'contact_email' => $request->contact_email != 0 ? $request->contact_email : null,
+                    'career_source' => $request->career_source != 0 ? $request->career_source : null,
                 ]);
             }
 
