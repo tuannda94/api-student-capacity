@@ -229,9 +229,13 @@ class PostController extends Controller
                 $q->select('id', 'name');
             }]);
         }
-        $tax_numbers = $this->modulesPost
-            ->getLatestInfoWithDiffTaxNumber()
-            ->select('tax_number', 'contact_name', 'contact_phone', 'contact_email')
+        // $tax_numbers = $this->modulesPost
+        //     ->getLatestInfoWithDiffTaxNumber()
+        //     ->select('tax_number', 'contact_name', 'contact_phone', 'contact_email')
+        //     ->get();
+        $tax_numbers = $this->enterprise
+            ->whereNotNull('tax_number')
+            ->select('id','tax_number','name', 'address','contact_name', 'contact_phone', 'contact_email')
             ->get();
         if ($post->postable && (get_class($post->postable) == $this->round::class)) {
             $round = $this->round::find($post->postable->id)->load('contest:id,name');

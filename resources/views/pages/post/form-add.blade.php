@@ -417,63 +417,52 @@
         const rounds = @json($rounds);
     </script>
     <script src="assets/js/system/validate/validate.js"></script>
-		<script>
-			$(document).ready(function () {
-					ClassicEditor
-							.create(document.querySelector('#kt_docs_ckeditor_classics'))
-							.then(editor => {
-									window.editor = editor;
+    <script>
+        $(document).ready(function () {
+                ClassicEditor
+                        .create(document.querySelector('#kt_docs_ckeditor_classics'))
+                        .then(editor => {
+                                window.editor = editor;
 
-									const branchSelect = $('select[name="branch_id"]');
-									const enterpriseSelect = $('select[name="enterprise_id"]');
-									const totalInput = $('input[name="total"]');
-									const positionInput = $('input[name="position"]');
-									const careerTypeSelect = $('select[name="career_type"]');
+                                const branchSelect = $('select[name="branch_id"]');
+                                const enterpriseSelect = $('select[name="enterprise_id"]');
+                                const totalInput = $('input[name="total"]');
+                                const positionInput = $('input[name="position"]');
+                                const careerTypeSelect = $('select[name="career_type"]');
 
-									function updateDescription() {
-											const branchName = branchSelect.find('option:selected').text().trim();
-											const enterpriseName = enterpriseSelect.find('option:selected').text().trim();
-											const total = totalInput.val().trim();
-											const position = positionInput.val().trim();
-											const careerType = careerTypeSelect.find('option:selected').text().trim();
+                                function updateDescription() {
+                                        const branchName = branchSelect.find('option:selected').text().trim();
+                                        const enterpriseName = enterpriseSelect.find('option:selected').text().trim();
+                                        const total = totalInput.val().trim();
+                                        const position = positionInput.val().trim();
+                                        const careerType = careerTypeSelect.find('option:selected').text().trim();
 
-											const description = `${branchName} ${enterpriseName} tuyển dụng ${total} ${position} ${careerType}`;
-											console.log("Branch Name:", branchName);
-											console.log("Enterprise Name:", enterpriseName);
-											console.log("Total:", total);
-											console.log("Position:", position);
-											console.log("Career Type:", careerType);
-											console.log("Description:", description);
-											editor.setData(description);
-									}
+                                        const description = `${branchName} ${enterpriseName} tuyển dụng ${total} ${position} ${careerType}`;
+                                        editor.setData(description);
+                                }
 
-									branchSelect.on('change', function() {
-											console.log("Branch select changed");
-											updateDescription();
-									});
-									enterpriseSelect.on('change', function() {
-											console.log("Enterprise select changed");
-											updateDescription();
-									});
-									totalInput.on('input', function() {
-											console.log("Total input changed");
-											updateDescription();
-									});
-									positionInput.on('input', function() {
-											console.log("Position input changed");
-											updateDescription();
-									});
-									careerTypeSelect.on('change', function() {
-											console.log("Career type select changed");
-											updateDescription();
-									});
+                                branchSelect.on('change', function() {
+                                        updateDescription();
+                                });
+                                enterpriseSelect.on('change', function() {
+                                        updateDescription();
+                                });
+                                totalInput.on('input', function() {
+                                        updateDescription();
+                                });
+                                positionInput.on('input', function() {
+                                        updateDescription();
+                                });
+                                careerTypeSelect.on('change', function() {
+                                        updateDescription();
+                                });
 
-									updateDescription();
-							})
-							.catch(error => {
-									console.error('There was a problem initializing the editor.', error);
-							});
-			});
-	</script>
+                                updateDescription();
+                        })
+                        .catch(error => {
+                                console.error('There was a problem initializing the editor.', error);
+                        });
+        });
+    </script>
 
 @endsection
