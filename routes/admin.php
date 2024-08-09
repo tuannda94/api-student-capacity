@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\SendMailController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EnterpriseController;
+use App\Http\Controllers\Admin\FaqRatingController;
 use App\Http\Controllers\Admin\FrequentlyAskedQuestionController;
 use App\Http\Controllers\Admin\JobController;
 use App\Http\Controllers\Admin\KeywordController;
@@ -501,6 +502,7 @@ Route::group([
         Route::get('create', [FrequentlyAskedQuestionController::class, 'create'])->name('admin.faq.create');
         Route::post('store', [FrequentlyAskedQuestionController::class, 'store'])->name('admin.faq.store');
         Route::delete('delete/{faq}', [FrequentlyAskedQuestionController::class, 'destroy'])->name('admin.faq.delete');
+        Route::delete('delete-rate/{faqRating}', [FaqRatingController::class, 'destroy'])->name('admin.faq.deleteRate');
     });
     Route::prefix('company-contact')->group(function () {
         Route::get('', [CompanyContactController::class, 'index'])->name('admin.cc.list');

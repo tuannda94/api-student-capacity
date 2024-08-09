@@ -15,7 +15,13 @@ return [
             'INTERNSHIP' => 0,
             'WORKING' => 1,
             'EVENT' => 2,
-        ]
+        ],
+        'RATING' => [
+            'TYPE' => [
+                'UPVOTE' => 1,
+                'DOWNVOTE' => 0,
+            ],
+        ],
     ],
     'COMPANY_CONTACT' => [
         'STATUS' => [

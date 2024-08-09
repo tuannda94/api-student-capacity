@@ -22,4 +22,12 @@ class FrequentlyAskedQuestion extends Model
         'created_at' => FormatDate::class,
         'updated_at' =>  FormatDate::class,
     ];
+
+    public function upRatings() {
+        return $this->hasMany(FaqRating::class, 'faq_id')->up();
+    }
+
+    public function downRatings() {
+        return $this->hasMany(FaqRating::class, 'faq_id')->down();
+    }
 }
