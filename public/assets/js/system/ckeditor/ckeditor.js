@@ -6,6 +6,7 @@ const pageCkeditor = {
                 alignment: {
                     options: ['left', 'right', 'center', 'justify',]
                 },
+                // plugins: [ CKFinder, CKFinderUploadAdapter],
                 toolbar: [
                     "heading",
                     "undo",
@@ -18,7 +19,7 @@ const pageCkeditor = {
                     '|',
                     'alignment',
                     '|',
-                    // "imageUpload",
+                    "uploadImage",
                     // "heading",
                     "imageStyle:full",
                     "imageStyle:side",
@@ -31,6 +32,10 @@ const pageCkeditor = {
                     "tableRow",
                     "mergeTableCells",
                 ],
+                ckfinder: {
+                    // Upload the images to the server using the CKFinder QuickUpload command.
+                    uploadUrl: 'https://example.com/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images&responseType=json'
+                },
             }
         )
             .then((editor) => {
@@ -60,7 +65,7 @@ const pageCkeditor = {
                     'alignment:center',
                     'alignment:justify',
                     '|',
-                    // "imageUpload",
+                    "imageUpload",
                     // "heading",
                     "imageStyle:full",
                     "imageStyle:side",

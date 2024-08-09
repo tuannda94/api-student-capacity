@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\FrequentlyAskedQuestion;
+use App\Services\Builder\Builder;
 use App\Services\Traits\TResponse;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -26,7 +27,8 @@ class FrequentlyAskedQuestionController extends Controller
         $orderBy = $request->has('orderBy') ? $request->orderBy : 'id';
         $sortBy = $request->has('sortBy') ? $request->sortBy : "desc";
 
-        $query = $this->faq::where('question', 'like', "%$keyword%");
+        $query = $this->faq::where('question', 'like', "%$keyword%")
+            ->with(['upRatings','downRatings']);
         if ($sortBy == "desc") {
             $query->orderByDesc($orderBy);
         } else {
@@ -43,7 +45,7 @@ class FrequentlyAskedQuestionController extends Controller
     public function index(Request $request) {
         try {
             $faqs = $this->getList($request)->paginate(config('util.HOMEPAGE_ITEM_AMOUNT'));
-
+            
             return view('pages.faq.list', compact('faqs'));
         } catch (\Throwable $th) {
             return response()->json(['status' => 'error']);
@@ -160,5 +162,15 @@ class FrequentlyAskedQuestionController extends Controller
         if (!$faq) abort(404);
 
         return $this->responseApi(true,$faq);
+    }
+
+    public function apiRelate(Request $request, FrequentlyAskedQuestion $faq)
+    {
+        $data = $this->getList($request)
+            ->where('type', $faq->type)
+            ->where('id', '<>', $faq->id)
+            ->paginate(request('limit') ?? 6);
+        
+        return $this->responseApi(true, $data); 
     }
 }
