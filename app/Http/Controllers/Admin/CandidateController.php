@@ -45,7 +45,7 @@ class CandidateController extends Controller
         $candidates = $this->MCandidate->index($request);
         $count = $this->MCandidate->getList($request)->count();
         $majors = $this->major::select(['id', 'name'])->where('for_recruitment', 1)->get();
-
+        
         return view('pages.candidate.index', [
             'candidates' => $candidates,
             'posts' => $posts,
@@ -102,7 +102,7 @@ class CandidateController extends Controller
             $data->has_checked = 1;
             $data->save();
         }
-
+        
         return view('pages.candidate.show-cv', compact('data'));
     }
 

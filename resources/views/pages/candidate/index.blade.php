@@ -306,8 +306,96 @@
 
                                 {{--                                <a class="show_file btn btn-primary btn-sm" target="_blank" rel="noopener"--}}
                                 {{--                                   href="{{ Storage::disk('s3')->temporaryUrl($key->file_link, now()->addMinutes(5)) }}">Xem</a>--}}
-                                <a class="show_file btn btn-primary btn-sm" rel="noopener"
-                                   href="{{ route('admin.candidate.showcv', $key->id) }}">Xem</a>
+                                <!-- <a class="show_file btn btn-primary btn-sm" rel="noopener"
+                                   href="{{ route('admin.candidate.showcv', $key->id) }}">Xem</a> -->
+                                <button class="show_file btn btn-primary btn-sm" type="button" data-bs-toggle="modal"
+                                        data-bs-target="#show_cv_{{ $key->id }}">
+                                    Xem
+                                </button>
+                                
+                                <!-- Modal show cv -->
+                                <div class="modal fade" id="show_cv_{{ $key->id }}" tabindex="-1"
+                                     aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl modal-fullscreen-lg-down">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">
+                                                    Xem CV ứng viên
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-4 col-xl-2">
+                                                        <div class="card sticky-top p-2">
+                                                            <!--begin::Heading-->
+                                                            <div
+                                                                class=" rounded bgi-no-repeat bgi-size-cover bgi-position-y-top bgi-position-x-center align-items-start "
+                                                                style="height: 250px">
+                                                                <!--begin::Title-->
+                                                                <div class="p-5 h-100">
+                                                                    <form class="card p-2 h-100" action="{{ route('admin.candidate.createNote', ['candidate_id' => $key->id]) }}" method="post">
+                                                                        @csrf
+                                                                        <div class="card-header p-2 align-items-center">
+                                                                            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">
+                                                                                Thêm ghi chú
+                                                                            </button>
+                                                                        </div>
+                                                                        <div class="card-body form-group p-2">
+                                                                            <textarea class="form-control h-100" name="content" required rows="3"></textarea>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                            <div class="card p-2">
+                                                                <div class="card-header p-2">
+                                                                    <h3 class="card-title fs-3">Danh sách ghi chú ({{ $key->candidateNotes->count() }})</h3>
+                                                                </div>
+                                                                <div class="card-body p-2" style="height: 150px; overflow-y: auto">
+                                                                    @foreach($key->candidateNotes as $idx => $note)
+                                                                        <ul style="list-style: none;">
+                                                                            <li>
+                                                                                <b>{{$idx + 1}}
+                                                                                    . {{ date('d-m-Y H:i', strtotime($note->created_at)) }}
+                                                                                    - {{$note->user->email}}</b>
+                                                                                <p>{{$note->content}}</p>
+                                                                            </li>
+                                                                        </ul>
+                                                                    @endforeach
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-8 col-xl-10">
+                                                        <div class="container-fluid  card card-flush">
+                                                            <div class="row">
+                                                                <div class="col-lg-12">
+                                                                    <div style="width:100%; height: 700px" class="fs-3">
+                                                                        <iframe
+                                                                            src="{{ Storage::disk('s3')->temporaryUrl($key->file_link, now()->addMinutes(5)) }}"
+                                                                            frameborder="0" width="100%" height="100%"></iframe>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                <a
+                                                    class="btn btn-primary"
+                                                    href="{{ route('admin.candidate.showcv', $key->id) }}"
+                                                    target="_blank"
+                                                >
+                                                    Xem trong trang mới
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
 
                             <td>
