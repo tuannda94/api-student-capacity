@@ -6,7 +6,6 @@ const pageCkeditor = {
                 alignment: {
                     options: ['left', 'right', 'center', 'justify',]
                 },
-                // plugins: [ CKFinder, CKFinderUploadAdapter],
                 toolbar: [
                     "heading",
                     "undo",
@@ -14,14 +13,14 @@ const pageCkeditor = {
                     "bold",
                     "italic",
                     "blockQuote",
-                    "ckfinder",
+                    // "ckfinder", //item unavailable
                     "imageTextAlternative",
                     '|',
                     'alignment',
                     '|',
                     "uploadImage",
                     // "heading",
-                    "imageStyle:full",
+                    // "imageStyle:full", //item unavailable
                     "imageStyle:side",
                     "link",
                     "numberedList",
@@ -32,10 +31,6 @@ const pageCkeditor = {
                     "tableRow",
                     "mergeTableCells",
                 ],
-                ckfinder: {
-                    // Upload the images to the server using the CKFinder QuickUpload command.
-                    uploadUrl: 'https://example.com/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images&responseType=json'
-                },
             }
         )
             .then((editor) => {
@@ -57,7 +52,7 @@ const pageCkeditor = {
                     "bold",
                     "italic",
                     "blockQuote",
-                    "ckfinder",
+                    // "ckfinder", //item unavailable
                     "imageTextAlternative",
                     '|',
                     'alignment:left',
@@ -67,7 +62,7 @@ const pageCkeditor = {
                     '|',
                     "imageUpload",
                     // "heading",
-                    "imageStyle:full",
+                    // "imageStyle:full", //item unavailable
                     "imageStyle:side",
                     "link",
                     "numberedList",

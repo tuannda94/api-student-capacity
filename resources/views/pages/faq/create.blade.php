@@ -86,7 +86,34 @@
     <script src="assets/plugins/custom/tinymce/tinymce.bundle.js"></script>
     <script src="assets/plugins/custom/ckeditor/ckeditor-classic.bundle.js"></script>
     <script type="text/javascript" src="assets/js/custom/documentation/general/ckfinder.js"></script>
-    <script src="assets/js/system/ckeditor/ckeditor.js"></script>
+    
+    <script>
+        const _token = "{{ csrf_token() }}";
+    </script>
+    <script>
+        ClassicEditor
+            .create(document.querySelector('#kt_docs_ckeditor_classic'), {
+                simpleUpload: {
+                    uploadUrl: "{{ route('admin.ckeditor.upfile') . '?_token=' . csrf_token() }}"
+                }
+            })
+            .then(editor => {
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        ClassicEditor
+            .create(document.querySelector('#kt_docs_ckeditor_classic2'), {
+                simpleUpload: {
+                    uploadUrl: "{{ route('admin.ckeditor.upfile') . '?_token=' . csrf_token() }}"
+                }
+            })
+            .then(editor => {
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    </script>
     <script src="{{ asset('assets/js/system/question-and-answer/validateForm.js') }}"></script>
     <script src="{{ asset('assets/js/system/validate/validate.js') }}"></script>
 @endsection

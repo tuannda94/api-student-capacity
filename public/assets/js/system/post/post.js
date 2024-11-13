@@ -1,3 +1,4 @@
+const CKEDITOR = import('assets/js/system/ckeditor/ckeditor.js');
 function to_slug(str) {
     // Chuyển hết sang chữ thường
     str = str.toLowerCase();

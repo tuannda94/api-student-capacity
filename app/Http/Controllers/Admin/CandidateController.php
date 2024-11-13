@@ -56,24 +56,34 @@ class CandidateController extends Controller
 
     public function createNote(Request $request, $candidateId)
     {
-        if (!$candidateId) {
+        try {
+            if (!$candidateId) {
+                return abort(404);
+            }
+    
+            $model = CandidateNote::create([
+                'content' => $request->content,
+                'candidate_id' => $candidateId,
+                'user_id' => Auth::user()->id,
+                'status' => 1, // TODO, 0: email not sent, 1: email sent
+            ]);
+    
+            $candidate = $this->candidate::find($candidateId);
+            if ($candidate->has_checked == 0) {
+                $candidate->has_checked = 1;
+                $candidate->save();
+            }
+
+            $post = $candidate->post;
+    
+            $email = new SendMailNoteCV($candidate, $post, $model->content);
+            dispatch($email);
+    
+            return redirect()->back();
+        } catch (\Throwable $th) {
             return abort(404);
         }
 
-        $model = CandidateNote::create([
-            'content' => $request->content,
-            'candidate_id' => $candidateId,
-            'user_id' => Auth::user()->id,
-            'status' => 1, // TODO, 0: email not sent, 1: email sent
-        ]);
-
-        $candidate = $this->candidate::find($candidateId);
-        $post = $candidate->post;
-
-        $email = new SendMailNoteCV($candidate, $post, $model->content);
-        dispatch($email);
-
-        return redirect()->back();
     }
 
     public function detail(Request $request, $id)
@@ -150,6 +160,11 @@ class CandidateController extends Controller
             dispatch($email);
         }
 
+        if ($candidate->has_checked == 0) {
+            $candidate->has_checked = 1;
+            $candidate->save();
+        }
+
         $candidate->update([
             'status' => $status
         ]);
@@ -173,6 +188,11 @@ class CandidateController extends Controller
             $candidate->load(['post.enterprise']);
             $email = new SendMailWhenEnterpriseStopRecruit($candidate);
             dispatch($email);
+        }
+
+        if ($candidate->has_checked == 0) {
+            $candidate->has_checked = 1;
+            $candidate->save();
         }
 
         $candidate->update([

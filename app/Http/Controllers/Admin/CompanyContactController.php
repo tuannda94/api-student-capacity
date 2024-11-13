@@ -88,7 +88,7 @@ class CompanyContactController extends Controller
     public function destroy(CompanyContact $companyContact)
     {
         try {
-            if (!(auth()->user()->hasRole(config('util.ROLE_DELETE')))) return false;
+            if (!(auth()->user()->hasRole(config('util.ROLE_ADMINS')))) return false;
             $companyContact->delete();
 
             return redirect()->back();

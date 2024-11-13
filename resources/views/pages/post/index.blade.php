@@ -374,6 +374,8 @@
                             </th>
                             <th scope="col">Nổi bật
                             </th>
+                            <th scope="col">Đã ngừng tuyển
+                            </th>
                             <th scope="col">Quá trình
                             </th>
                             <th scope="col">Ngày xuất bản
@@ -510,6 +512,21 @@
                                         </div>
                                     @endhasrole
 
+                                </td>
+                                <td>
+                                    @php
+                                        $class = $key->postable ? get_class($key->postable) : $key->postable_type;
+                                    @endphp
+                                    @if($class == \App\Models\Recruitment::class)
+                                        @hasanyrole('admin|super admin')
+                                            <div data-bs-toggle="tooltip" title="Đã ngừng tuyển"
+                                                class="form-check form-switch">
+                                                <input value="{{ $key->full_recruitment }}" data-id="{{ $key->id }}"
+                                                    class="form-select-full-recruitment form-check-input" @checked($key->full_recruitment == config('util.POST_FULL_RECRUITMENT'))
+                                                    type="checkbox" role="switch">
+                                            </div>
+                                        @endhasrole
+                                    @endif
                                 </td>
                                 <td>
                                     @if (\Carbon\Carbon::parse($key->published_at)->toDateTimeString() >
