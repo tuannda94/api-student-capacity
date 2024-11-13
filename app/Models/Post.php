@@ -42,6 +42,7 @@ class Post extends Model
         'total',
         'deadline',
         'note',
+        'full_recruitment'
     ];
     protected $casts = [
 //        'deadline' => FormatDate::class,

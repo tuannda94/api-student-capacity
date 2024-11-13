@@ -194,10 +194,49 @@ const pageSliderForm = {
             }
         });
     },
+    selectChangeFullRecruitment: function () {
+        $(".form-select-full-recruitment").on("change", function () {
+            let id = $(this).data("id");
+            if ($(this).val() == 1) {
+                $.ajax({
+                    url: `admin/posts/un-full-recruitment/${id}`,
+                    method: "POST",
+                    data: {
+                        _token: _token,
+                    },
+                    success: function (data) {
+                        if (!data.status) return alert(data.payload);
+                        loadTast(
+                            "Thành công !",
+                            "toastr-bottom-left",
+                            "success"
+                        );
+                    },
+                });
+            } else {
+                $.ajax({
+                    url: `admin/posts/re-full-recruitment/${id}`,
+                    method: "POST",
+                    data: {
+                        _token: _token,
+                    },
+                    success: function (data) {
+                        if (!data.status) return alert(data.payload);
+                        loadTast(
+                            "Thành công !",
+                            "toastr-bottom-left",
+                            "success"
+                        );
+                    },
+                });
+            }
+        });
+    },
 };
 pageSliderForm.selectRoundChildContest();
 pageSliderForm.selectChangeStatus();
 pageSliderForm.selectChangePostHot();
+pageSliderForm.selectChangeFullRecruitment();
 
 $(document).ready(function () {
     const url = "admin/posts";

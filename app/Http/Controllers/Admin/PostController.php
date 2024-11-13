@@ -76,12 +76,7 @@ class PostController extends Controller
         ]);
     }
 
-    public function getModelDataStatus($id)
-    {
-        return $this->modulesPost->find($id);
-    }
-
-    public function getModelDataHot($id)
+    public function getModelDataById($id)
     {
         return $this->modulesPost->find($id);
     }

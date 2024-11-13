@@ -316,7 +316,7 @@
                                 <!-- Modal show cv -->
                                 <div class="modal fade" id="show_cv_{{ $key->id }}" tabindex="-1"
                                      aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog modal-xl modal-fullscreen-lg-down">
+                                    <div class="modal-dialog modal-fullscreen">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="exampleModalLabel">
@@ -327,14 +327,14 @@
                                             </div>
                                             <div class="modal-body">
                                                 <div class="row">
-                                                    <div class="col-4 col-xl-2">
+                                                    <div class="col-4">
                                                         <div class="card sticky-top p-2">
                                                             <!--begin::Heading-->
                                                             <div
                                                                 class=" rounded bgi-no-repeat bgi-size-cover bgi-position-y-top bgi-position-x-center align-items-start "
                                                                 style="height: 250px">
                                                                 <!--begin::Title-->
-                                                                <div class="p-5 h-100">
+                                                                <div class="h-100">
                                                                     <form class="card p-2 h-100" action="{{ route('admin.candidate.createNote', ['candidate_id' => $key->id]) }}" method="post">
                                                                         @csrf
                                                                         <div class="card-header p-2 align-items-center">
@@ -368,7 +368,7 @@
 
                                                         </div>
                                                     </div>
-                                                    <div class="col-8 col-xl-10">
+                                                    <div class="col-8">
                                                         <div class="container-fluid  card card-flush">
                                                             <div class="row">
                                                                 <div class="col-lg-12">

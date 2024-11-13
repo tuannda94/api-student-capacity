@@ -123,6 +123,9 @@ return [
     /** bÀI VIẾT TUYỂN DỤNG THƯỜNG  */
     "POST_NORMAL" => 0,
 
+    "POST_NOT_FULL_RECRUITMENT" => 0, //đang tuyển
+    "POST_FULL_RECRUITMENT" => 1, //đã tuyển đủ (ngừng tuyển)
+
     /** trạng thái doanh nghiệp không hiện thị tại trang chủ */
     "STATUS_ENTERPRISE_HIDDEN" => 0,
     /** trạng thái doanh nghiệp được hiện thị tại trang chủ */
