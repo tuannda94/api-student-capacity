@@ -329,6 +329,7 @@
                                     </div>
                                 </div>
 
+                                @if ($data->postable_type != \App\Models\Event::class)
                                 <div class="fs-4 text-white mt-5">
                                     <div class="opacity-75">
                                         <div class="row">
@@ -357,6 +358,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                @endif
 
                                 @if ($data->code_recruitment != null)
                                     <div class="fs-4 text-white mt-5">
