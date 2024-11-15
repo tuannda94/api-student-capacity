@@ -126,8 +126,9 @@ class Post
         if ($enterprise_id != 0) {
             $query->where('enterprise_id', $enterprise_id)->where('postable_type', $this->recruitment::class);
         }
-        if ($type == 'event') {
-            $query->where('postable_type', $this->event::class);
+        
+        if ($type != '') {
+            $this->loadAble($query, $type);
         }
 //        if (!auth()->user()->hasRole(config('util.SUPER_ADMIN_ROLE'))) {
 //            $query->where('branch_id', auth()->user()->branch_id);
@@ -135,7 +136,7 @@ class Post
         if ($request->post != null) {
             $this->loadAble($query, $request->post);
         }
-
+        
         return $query;
     }
 

@@ -12,6 +12,7 @@ class CkeditorController extends Controller
     use TUploadImage;
     public function uploadFile(Request $request)
     {
+        dd($request);
         $nameFile = $this->uploadFile($request->upload);
         return response()->json([
             'fileName' => $nameFile,
