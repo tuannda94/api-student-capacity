@@ -234,7 +234,7 @@ class PostController extends Controller
             $post_type = 'round';
         } elseif ($post->postable_type == $this->contest::class) {
             $post_type = 'contest';
-        } elseif ($post->postable_type == $this->contest::class && $post->postable->type == 1) {
+        } elseif ($post->postable_type == $this->contest::class && $post->postable->type == config('util.TYPE_TEST')) {
             $post_type = 'capacity';
         } elseif ($post->postable_type == $this->event::class) {
             $post_type = 'event';
