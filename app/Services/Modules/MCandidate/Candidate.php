@@ -38,7 +38,7 @@ class Candidate
         $query = $this->candidate::whereRaw('id IN (select MAX(id) FROM candidates GROUP BY email,post_id)');
 
         if ($endTime != null && $startTime != null) {
-            $query->where('crepated_at', '>=', \Carbon\Carbon::parse(request('startTime'))->toDateTimeString())->where('created_at', '<=', \Carbon\Carbon::parse(request('endTime'))->toDateTimeString());
+            $query->where('created_at', '>=', \Carbon\Carbon::parse(request('startTime'))->toDateTimeString())->where('created_at', '<=', \Carbon\Carbon::parse(request('endTime'))->toDateTimeString());
         }
         if ($sortBy == "desc") {
             $query

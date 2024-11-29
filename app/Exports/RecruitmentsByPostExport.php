@@ -3,6 +3,8 @@
 namespace App\Exports;
 
 use App\Models\Post;
+use App\Models\Recruitment;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -16,12 +18,23 @@ class RecruitmentsByPostExport implements FromCollection, WithHeadings, WithMapp
 
     private $row = 0;
 
+    protected $startDate;
+    protected $endDate;
+
+    public function __construct($startDate,$endDate)
+    {
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
+    }
+
     /**
      * @return \Illuminate\Support\Collection
      */
     public function collection()
     {
-        return Post::all();
+        return Post::where('postable_type', Recruitment::class)
+            ->whereBetween('published_at', [Carbon::parse($this->startDate)->toDateTimeString(),Carbon::parse($this->endDate)->toDateTimeString()])
+            ->get();
     }
 
     public function model(array $row)
