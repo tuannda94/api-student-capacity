@@ -18,11 +18,17 @@ class FormatImageGet implements CastsAttributes
         if ($this->__checkRoute()) return $value;
         //check file exist in S3 bucket
         $s3 = new S3Client([
-            'region' => env('AWS_DEFAULT_REGION')
+            'region' => config('filesystems.disks.s3.region'),
+            'credentials' => [
+                'key' => config('filesystems.disks.s3.key'),
+                'secret' => config('filesystems.disks.s3.secret'),
+            ],
+            'version' => 'latest',
         ]);
-        $bucket = env('AWS_BUCKET');
+        $bucket = config('filesystems.disks.s3.bucket');
+        // dd($value,$s3->doesObjectExistV2($bucket,'abc.jpg'), $s3->doesObjectExistV2($bucket,$value));
         // if (Storage::disk('s3')->has($value ?? "abc.jpg")) return Storage::disk('s3')->temporaryUrl($value, now()->addDays(7));
-        
+
         if (!isset($value) || !$s3->doesObjectExistV2($bucket, $value)) {
             return Storage::disk('s3')->temporaryUrl('abc.jpg', now()->addDays(7));
         } else {
