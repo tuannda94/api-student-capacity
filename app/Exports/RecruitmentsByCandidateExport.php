@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Candidate;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -17,12 +18,21 @@ class RecruitmentsByCandidateExport implements FromCollection, WithHeadings, Wit
 
     private $row = 0;
 
+    protected $startDate;
+    protected $endDate;
+
+    public function __construct($startDate,$endDate)
+    {
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
+    }
     /**
      * @return \Illuminate\Support\Collection
      */
     public function collection()
     {
-        return Candidate::all();
+        return Candidate::whereBetween('created_at', [Carbon::parse($this->startDate)->toDateTimeString(),Carbon::parse($this->endDate)->toDateTimeString()])
+            ->get();
     }
 
     public function model(array $row)
