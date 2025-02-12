@@ -71,8 +71,8 @@
 @endsection
 @section('page-script')
     <script src="assets/plugins/custom/tinymce/tinymce.bundle.js"></script>
-    <script src="assets/plugins/custom/ckeditor/ckeditor-classic.bundle.js"></script>
-    <script type="text/javascript" src="assets/js/custom/documentation/general/ckfinder.js"></script>
+    <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/44.1.0/ckeditor5.css" crossorigin>
+    <script src="https://cdn.ckeditor.com/ckeditor5/44.1.0/ckeditor5.umd.js" crossorigin></script>
     <script src="assets/js/system/ckeditor/ckeditor.js"></script>
     <script src="{{ asset('assets/js/system/question-and-answer/validateForm.js') }}"></script>
     <script src="{{ asset('assets/js/system/validate/validate.js') }}"></script>
