@@ -458,7 +458,7 @@ Route::group([
     Route::get('dowload-frm-excel', function () {
         return response()->download(public_path('assets/media/excel/excel_download.xlsx'));
     })->name("admin.download.execel.pass");
-    Route::post('upload-image', [CkeditorController::class, 'uploadFile'])->name('admin.ckeditor.upfile');
+    Route::post('upload-image', [CkeditorController::class, 'uploadCkFile'])->name('admin.ckeditor.upfile');
     Route::prefix('questions')->group(function () {
         Route::get('', [QuestionController::class, 'index'])->name('admin.question.index');
         Route::get('add', [QuestionController::class, 'create'])->name('admin.question.create');
