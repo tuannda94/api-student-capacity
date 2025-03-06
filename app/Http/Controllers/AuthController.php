@@ -33,7 +33,9 @@ class AuthController extends Controller
              $ggUser = Socialite::driver('google')->stateless()->user();
          }
 //         $ggUser = Socialite::driver('google')->user();
-        $user = User::where('email', $ggUser->email)->first();
+        $user = User::where('email', $ggUser->email)
+            ->where('status', config('util.ACTIVE_STATUS'))
+            ->first();
         // dd($user->hasRole(config('util.ADMIN_ROLE')));
         if ($user && $user->hasRole([config('util.SUPER_ADMIN_ROLE'), config('util.ADMIN_ROLE'), config('util.JUDGE_ROLE'), config('util.TEACHER_ROLE')])) {
             Auth::login($user);

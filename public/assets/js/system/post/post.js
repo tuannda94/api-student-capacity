@@ -1,4 +1,3 @@
-const CKEDITOR = import('assets/js/system/ckeditor/ckeditor.js');
 function to_slug(str) {
     // Chuyển hết sang chữ thường
     str = str.toLowerCase();
@@ -51,6 +50,8 @@ $(document).ready(function () {
         $("#event").hide(100);
         $("#post_type").val("contest");
         $("#contest").show(300);
+        console.log($("#kt_docs_ckeditor_classic").attr("data-placeholder", ""));
+        // $("#kt_docs_ckeditor_classic").attr("data-placeholder", "")
     });
     $(".click-capacity").click(function () {
         $(".click-contest").removeClass("btn-primary");
@@ -64,6 +65,7 @@ $(document).ready(function () {
         $("#event").hide(100);
         $("#post_type").val("capacity");
         $("#capacity").show(300);
+        $("#kt_docs_ckeditor_classic").attr("data-placeholder", "")
     });
     $(".click-round").click(function () {
         $(".click-contest").removeClass("btn-primary");
@@ -77,6 +79,7 @@ $(document).ready(function () {
         $(this).addClass("btn-primary");
         $("#post_type").val("round");
         $("#round").toggle(300);
+        $("#kt_docs_ckeditor_classic").attr("data-placeholder", "")
     });
     $(".click-recruitment").click(function () {
         $(".click-contest").removeClass("btn-primary");
@@ -90,6 +93,7 @@ $(document).ready(function () {
         $("#post_type").val("recruitment");
         $(this).addClass("btn-primary");
         $("#recruitment").show(300);
+        $("#kt_docs_ckeditor_classic").attr("data-placeholder", "(Tên cơ sở) + [Tên Công ty] tuyển dụng [Số lượng tuyển] + [Vị trí tuyển] + [Hình thức tuyển]")
     });
     $(".click-event").click(function () {
         $(".click-recruitment").removeClass("btn-primary");
@@ -103,6 +107,7 @@ $(document).ready(function () {
         $(this).addClass("btn-primary");
         $("#post_type").val("event");
         $("#event").show(300);
+        $("#kt_docs_ckeditor_classic").attr("data-placeholder", "")
     })
 });
 
