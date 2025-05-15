@@ -296,6 +296,7 @@ class MajorController extends Controller
         //     Major::destroy($value->id);
         // }
         $major->delete();
+        
         return redirect()->back();
     }
 

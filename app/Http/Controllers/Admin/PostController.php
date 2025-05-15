@@ -24,7 +24,7 @@ use App\Services\Traits\TStatus;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Str;
 //use function GuzzleHttp\Promise\all;
 
 class PostController extends Controller
@@ -88,7 +88,7 @@ class PostController extends Controller
 
             $contest = $this->contest::where('type', 0)->get(['id', 'name']);
             $capacity = $this->contest::where('type', 1)->get(['id', 'name']);
-            $users = $this->user::all(['id', 'name', 'email']);
+            $users = $this->user::where('status', config('util.ACTIVE_STATUS'))->get(['id', 'name', 'email']);
             $recruitments = $this->recruitment::with(['enterprise' => function ($query) {
                 $query->select('enterprises.id')->pluck('enterprises.id')->toArray();
             }])->get(['id', 'name']);
@@ -96,8 +96,8 @@ class PostController extends Controller
                 $recruitment->enterprises_id = $recruitment->enterprise->pluck('id')->toArray();
             }
             $majors = $this->majors::select(['id', 'name'])->where('for_recruitment', 1)->get();
-            // dd($users);
-            $enterprises = $this->enterprise::all(['id', 'name']);
+
+            $enterprises = $this->enterprise::all(['id', 'name', 'tax_number', 'contact_name', 'contact_phone', 'contact_email']);
             $rounds = $this->round::all(['id', 'name', 'contest_id']);
             $branches = $this->branches::select('id', 'name')->get();
 
@@ -171,12 +171,33 @@ class PostController extends Controller
         $this->db::beginTransaction();
         try {
             if ($request->post_type !== 'recruitment') $request['code_recruitment'] = null;
+            if ($request->post_type == 'recruitment') {
+                //kiểm tra tồn tại enterprise hay không?
+                if ($request->enterprise_id != 0) {
+                    $enterprise = $this->enterprise::query()
+                        ->where('id', $request->enterprise_id)
+                        ->orWhere('name', $request->enterprise_id)
+                        ->first();
+                    abort_if(!$enterprise, 404, 'This chosen enterprise is invalid!');
+                }
+                
+                //kiểm tra tồn tại major hay không?
+                if ($request->major_id != 0) {
+                    $major_id = trim($request->major_id);
+                    $major = $this->majors::query()
+                        ->where('id', $major_id)
+                        ->orWhere('slug', Str::slug($major_id))
+                        ->first();
+                    abort_if(!$major, 404, 'This chosen major is invalid!');
+                }
+            }
             $this->modulesPost->store($request);
             $this->db::commit();
             return Redirect::route('admin.post.list');
         } catch (\Throwable $th) {
             $this->db::rollBack();
-            return abort(404);
+            
+            return redirect('error');
         }
     }
 
@@ -200,7 +221,7 @@ class PostController extends Controller
         $contest = $this->contest::where('type', 0)->get(['id', 'name']);
         $capacity = $this->contest::where('type', 1)->get(['id', 'name']);
         
-        $users = $this->user::all(['id', 'name', 'email']);
+        $users = $this->user::where('status', config('util.ACTIVE_STATUS'))->get(['id', 'name', 'email']);
         $recruitments = $this->recruitment::with(['enterprise' => function ($query) {
             $query->select('enterprises.id')->pluck('enterprises.id')->toArray();
         }])->get(['id', 'name']);
@@ -208,7 +229,7 @@ class PostController extends Controller
             $recruitment->enterprises_id = $recruitment->enterprise->pluck('id')->toArray();
         }
         $majors = $this->majors::select(['id', 'name'])->where('for_recruitment', 1)->get();
-        $enterprises = $this->enterprise::all(['id', 'name']);
+        $enterprises = $this->enterprise::all(['id', 'name', 'tax_number', 'contact_name', 'contact_phone', 'contact_email']);
         $post = $this->modulesPost->getList($request)->where('slug', $slug)->first();
         $branches = $this->branches::select('id', 'name')->get();
         if ($post->postable_type == $this->contest::class) {
@@ -263,6 +284,26 @@ class PostController extends Controller
         DB::beginTransaction();
         try {
             if ($request->post_type !== 'recruitment') $request['code_recruitment'] = null;
+            if ($request->post_type == 'recruitment') {
+                //kiểm tra tồn tại enterprise hay không?
+                if ($request->enterprise_id != 0) {
+                    $enterprise = $this->enterprise::query()
+                        ->where('id', $request->enterprise_id)
+                        ->orWhere('name', $request->enterprise_id)
+                        ->first();
+                    abort_if(!$enterprise, 404, 'This chosen enterprise is invalid!');
+                }
+                
+                //kiểm tra tồn tại major hay không?
+                if ($request->major_id != 0) {
+                    $major_id = trim($request->major_id);
+                    $major = $this->majors::query()
+                        ->where('id', $major_id)
+                        ->orWhere('slug', Str::slug($major_id))
+                        ->first();
+                    abort_if(!$major, 404, 'This chosen major is invalid!');
+                }
+            }
             $this->modulesPost->update($request, $id);
             Db::commit();
             return Redirect::route('admin.post.list');
@@ -307,7 +348,7 @@ class PostController extends Controller
         $syncEmail = $email->onConnection('sync')->onQueue('emails');
 
         dispatch($email)->onConnection('sync')->onQueue('emails');
-
+        
         return $this->responseApi(true, 'Gửi CV thành công');
     }
 

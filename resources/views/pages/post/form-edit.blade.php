@@ -205,7 +205,9 @@
                                 <input type="hidden" name="post_type" id="post_type" value="{{ $post_type }}">
                                 <div class="form-group mb-10 col-xl-3 col-6">
                                     <label for="" class="form-label">Mã số thuế</label>
-                                    <select name="tax_number" id="tax_number" class="form-select form-major"
+                                    <input type="text" class="form-control" name="tax_number" disabled
+                                           value="{{ old('tax_number') ?? $post->tax_number }}">
+                                    {{-- <select name="tax_number" id="tax_number" class="form-select form-major"
                                             data-control="select2"
                                             data-placeholder="Mã số thuế">
                                         <option value="0">Mã số thuế</option>
@@ -215,21 +217,21 @@
                                                 {{ $tax_number->tax_number }}
                                             </option>
                                         @endforeach
-                                    </select>
+                                    </select> --}}
                                 </div>
                                 <div class="form-group mb-10 col-xl-3 col-6">
                                     <label for="" class="form-label">Người liên hệ</label>
-                                    <input type="text" class="form-control" name="contact_name"
+                                    <input type="text" class="form-control" name="contact_name" disabled
                                            value="{{ old('contact_name') ?? $post->contact_name }}">
                                 </div>
                                 <div class="form-group mb-10 col-xl-3 col-6">
                                     <label for="" class="form-label">SĐT liên hệ</label>
-                                    <input type="text" class="form-control" name="contact_phone"
+                                    <input type="text" class="form-control" name="contact_phone" disabled
                                            value="{{ old('contact_phone') ?? $post->contact_phone }}">
                                 </div>
                                 <div class="form-group mb-10 col-xl-3 col-6">
                                     <label for="" class="form-label">Email liên hệ</label>
-                                    <input type="text" class="form-control" name="contact_email"
+                                    <input type="text" class="form-control" name="contact_email" disabled
                                            value="{{ old('contact_email') ?? $post->contact_email }}">
                                 </div>
                                 <div class="form-group mb-10 col-xl-3 col-6">
@@ -321,7 +323,7 @@
 
                             <div class="form-group mb-10">
                                 <label class="form-label" for="">Mô tả ngắn bài viết</label>
-                                <textarea class="form-control" name="description" id="kt_docs_ckeditor_classic"
+                                <textarea class="form-control" name="description" id="desCkEditor"
                                           rows="3">{{ $post->description }}</textarea>
                                 @error('description')
                                 <p class="text-danger">{{ $message }}</p>
@@ -389,44 +391,110 @@
         const rounds = @json($rounds);
         const recruitments = @json($recruitments);
         let enterprises = @json($enterprises);
-        let tax_numbers = @json($tax_numbers);
 
         $(document).ready(function () {
             const recruitmentSelect = $('select[name="recruitment_id"]');
             const enterpriseSelect = $('select[name="enterprise_id"]');
             let recruitment_id = recruitmentSelect.val();
-            const taxNumberSelect = $('select[name="tax_number"]');
+            let taxNumber = $('input[name="tax_number"]');
             let contactName = $('input[name="contact_name"]');
             let contactPhone = $('input[name="contact_phone"]');
             let contactEmail = $('input[name="contact_email"]');
             let majorSelect = $('select[name="major_id"]');
+            let companyName = $('select[name="enterprise_id"] option:selected').text();
+            let position = $('input[name="position"]'); //vị trí tuyển dụng
+            let total = $('input[name="total"]'); //số lượng tuyển dụng
+            let branch = $('select[name="branch_id"]'); //cơ sở
+            let branchValue = $('select[name="branch_id"] option:selected').text(); //cơ sở
+            let careerType = $('select[name="career_type"]'); //hình thức tuyển dụng (Full/part/...)
+            let careerTypeValue = $('select[name="career_type"] option:selected').text(); //hình thức tuyển dụng (Full/part/...)
+            let ckInstance;
+            ClassicEditor.create(
+                document.querySelector("#desCkEditor"),
+                {
+                    alignment: {
+                        options: ['left', 'right', 'center', 'justify',]
+                    },
+                    toolbar: [
+                        "heading",
+                        "undo",
+                        "redo",
+                        "bold",
+                        "italic",
+                        "blockQuote",
+                        // "ckfinder", //item unavailable
+                        "imageTextAlternative",
+                        '|',
+                        'alignment',
+                        '|',
+                        "uploadImage",
+                        // "heading",
+                        // "imageStyle:full", //item unavailable
+                        "imageStyle:side",
+                        "link",
+                        "numberedList",
+                        "bulletedList",
+                        "insertTable",
+                        "mediaEmbed",
+                        "tableColumn",
+                        "tableRow",
+                        "mergeTableCells",
+                    ],
+                }
+            ).then((editor) => {
+                ckInstance = editor;
+            })
+            .catch((error) => {
+            });
 
             enterpriseSelect.select2({
                 placeholder: "Chọn doanh nghiệp",
                 allowClear: true,
                 tags: true,
             });
+            enterpriseSelect.on('change', function () {
+                let enterpriseId = $(this).val();
+                let info = enterprises.find(enterprise => enterprise.id == enterpriseId);
+                if (info) {
+                    taxNumber.val(info.tax_number);
+                    contactName.val(info.contact_name);
+                    contactPhone.val(info.contact_phone);
+                    contactEmail.val(info.contact_email);
+                    companyName = info.name;
+                    updateShortDes();
+                } else {
+                    taxNumber.val('');
+                    contactName.val('');
+                    contactPhone.val('');
+                    contactEmail.val('');
+                }
+            })
             majorSelect.select2({
                 placeholder: "Chọn chuyên ngành",
                 allowClear: true,
                 tags: true,
             });
-
-            taxNumberSelect.select2({
-                placeholder: "Chọn mã số thuế",
-                allowClear: true,
-                tags: true,
-            });
-
-            taxNumberSelect.on('change', function () {
-                let taxNumber = $(this).val();
-                let info = tax_numbers.find(enterprise => enterprise.tax_number == taxNumber);
-                if (info) {
-                    contactName.val(info.contact_name);
-                    contactPhone.val(info.contact_phone);
-                    contactEmail.val(info.contact_email);
+            position.on('change', function () {
+                updateShortDes();
+            })
+            total.on('change', function () {
+                updateShortDes();
+            })
+            branch.on('change', function () {
+                branchValue = $('select[name="branch_id"] option:selected').text();
+                updateShortDes();
+            })
+            careerType.on('change', function () {
+                careerTypeValue = $('select[name="career_type"] option:selected').text()
+                updateShortDes();
+            })
+            //hàm tự động cập nhật short description
+            function updateShortDes() {
+                // (Tên cơ sở) + [Tên Công ty] tuyển dụng [Số lượng tuyển] + [Vị trí tuyển] + [Hình thức tuyển]
+                if (ckInstance) {
+                    ckInstance.setData(`<p>Cơ sở ${branchValue} - Công ty ${companyName} tuyển dụng ${total.val()} vị trí ${position.val()} theo hình thức ${careerTypeValue}</p>`);
                 }
-            });
+            }
         });
     </script>
     <script src="assets/js/system/validate/validate.js"></script>

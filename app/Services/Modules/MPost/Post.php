@@ -211,36 +211,41 @@ class Post
             'note' => $request->note != 0 ? $request->note : null,
         ];
 
-        if ($request->post_type === 'recruitment') {
-            $enterprise = $this->enterprise::query()
-                ->where('id', $request->enterprise_id)
-                ->orWhere('name', $request->enterprise_id)
-                ->first();
+        // if ($request->post_type === 'recruitment') {
+        //     $enterprise = $this->enterprise::query()
+        //         ->where('id', $request->enterprise_id)
+        //         ->orWhere('name', $request->enterprise_id)
+        //         ->first();
 
-            if (!$enterprise) {
-                $enterprise = $this->enterprise::create([
-                    'name' => $request->enterprise_id,
-                ]);
-            }
+        //     if (!$enterprise) {
+        //         //nếu nhập công ty không có trong hệ thống sẽ báo không tồn tại
+        //         // $enterprise = $this->enterprise::create([
+        //         //     'name' => $request->enterprise_id,
+        //         //     'tax_number' => $request->tax_number,
+        //         //     'contact_name' => $request->contact_name,
+        //         //     'contact_phone' => $request->contact_phone,
+        //         //     'contact_email' => $request->contact_email,
+        //         // ]);
+        //     }
 
-            $major_id = trim($request->major_id);
+        //     $major_id = trim($request->major_id);
 
-            $major = $this->majorModel::query()
-                ->where('id', $major_id)
-                ->orWhere('slug', Str::slug($major_id))
-                ->first();
+        //     $major = $this->majorModel::query()
+        //         ->where('id', $major_id)
+        //         ->orWhere('slug', Str::slug($major_id))
+        //         ->first();
 
-            if (!$major) {
-                $major = $this->majorModel::query()->create([
-                    'name' => $major_id,
-                    'slug' => Str::slug($major_id),
-                    'for_recruitment' => '1',
-                ]);
-            }
+        //     if (!$major) {
+        //         $major = $this->majorModel::query()->create([
+        //             'name' => $major_id,
+        //             'slug' => Str::slug($major_id),
+        //             'for_recruitment' => '1',
+        //         ]);
+        //     }
 
-            $data['enterprise_id'] = $enterprise->id;
-            $data['major_id'] = $major->id;
-        }
+        //     $data['enterprise_id'] = $enterprise->id;
+        //     $data['major_id'] = $major->id;
+        // }
 
         if ($request->has('thumbnail_url')) {
             $fileImage = $request->file('thumbnail_url');
@@ -309,6 +314,10 @@ class Post
             if (!$enterprise) {
                 $enterprise = $this->enterprise::create([
                     'name' => $request->enterprise_id,
+                    'tax_number' => $request->tax_number,
+                    'contact_name' => $request->contact_name,
+                    'contact_phone' => $request->contact_phone,
+                    'contact_email' => $request->contact_email,
                 ]);
             }
 

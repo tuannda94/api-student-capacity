@@ -8,6 +8,10 @@ return [
         '0' => 'Part-time',
         '1' => 'Full-time',
         '2' => 'Online',
+        '3' => 'Part-time + Full-time',
+        '4' => 'Part-time + Online',
+        '5' => 'Full-time + Online',
+        '6' => 'Part-time + Full-time + Online',
     ],
 
     'FAQ' => [
