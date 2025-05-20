@@ -88,7 +88,7 @@
                                         <label class="form-label" for="">Người liên hệ </label>
                                         <input type="text" name="contact_name" class=" form-control"
                                             placeholder="">
-                                        @error('name')
+                                        @error('contact_name')
                                             <p id="checkname" class="text-danger">{{ $message }}</p>
                                         @enderror
                                     </div>
@@ -96,7 +96,7 @@
                                         <label class="form-label" for="">Email liên hệ </label>
                                         <input type="email" name="contact_email" class=" form-control"
                                             placeholder="">
-                                        @error('name')
+                                        @error('contact_email')
                                             <p id="checkname" class="text-danger">{{ $message }}</p>
                                         @enderror
                                     </div>
@@ -106,7 +106,7 @@
                                         <label class="form-label" for="">Mã số thuế </label>
                                         <input type="text" name="tax_number" class=" form-control"
                                             placeholder="">
-                                        @error('name')
+                                        @error('tax_number')
                                             <p id="checkname" class="text-danger">{{ $message }}</p>
                                         @enderror
                                     </div>
@@ -114,7 +114,7 @@
                                         <label class="form-label" for="">SĐT liên hệ </label>
                                         <input type="text" name="contact_phone" class=" form-control"
                                             placeholder="">
-                                        @error('name')
+                                        @error('contact_phone')
                                             <p id="checkname" class="text-danger">{{ $message }}</p>
                                         @enderror
                                     </div>
@@ -124,9 +124,6 @@
                                             <option value="1">Hiển thị</option>
                                             <option value="0">Không hiển thị</option>
                                         </select>
-                                        @error('name')
-                                            <p id="checkname" class="text-danger">{{ $message }}</p>
-                                        @enderror
                                     </div>
                                 </div>
                             </div> 
@@ -142,12 +139,8 @@
                                 <label class="form-label" for="">Địa chỉ Website</label>
                                 <input type="text" name="link_web" class=" form-control"
                                     placeholder="">
-                                @error('link_web')
-                                    <p id="checkname" class="text-danger">{{ $message }}</p>
-                                @enderror
                             </div>
                             <div class="form-group mb-10">
-
                                 <label for="" class="form-label">Giới thiệu</label>
                                 <textarea class="form-control" name="description" id="kt_docs_ckeditor_classic" rows="3">{{ old('description') }}</textarea>
                                 @error('description')

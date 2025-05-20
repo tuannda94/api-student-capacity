@@ -31,27 +31,52 @@ class SyncEnterpriseInfo extends Command
      */
     public function handle()
     {
-        $recruitmentPosts = Post::whereNotNull('code_recruitment')->get();
+        $recruitmentPosts = Post::where('postable_type', \App\Models\Recruitment::class)->get();
         $enterprises = Enterprise::all();
         $count = 0;
 
         try {
             DB::beginTransaction();
             foreach ($enterprises as $e) {
-                $recruitmentPost = $recruitmentPosts->first(function ($item, $key) use ($e) {
+                $isUpdate = false;
+                $recruitmentPost = $recruitmentPosts->last(function ($item) use ($e) {
                     return $item->enterprise_id === $e->id;
                 });
                 
+                $oldTaxNumber = $e->tax_number;
+                $oldContactName = $e->contact_name;
+                $oldContactPhone = $e->contact_phone;
+                $oldContactEmail = $e->contact_email;
+
                 if ($recruitmentPost) {
-                    $e->update([
-                        'tax_number' => $recruitmentPost->tax_number ?: null,
-                        'contact_name' => $recruitmentPost->contact_name ?: null,
-                        'contact_phone' => $recruitmentPost->contact_phone ?: null,
-                        'contact_email' => $recruitmentPost->contact_email ?: null,
-                    ]);
-    
-                    $count += 1;
-                    $this->info(PHP_EOL." - Synced successfully for $e->name enterprise!");
+                    $this->info(PHP_EOL."===> Start sync for $e->name");
+
+                    if ($recruitmentPost->tax_number != $oldTaxNumber && $recruitmentPost->tax_number != null) {
+                        $e->update(['tax_number' => $recruitmentPost->tax_number]);
+                        $isUpdate = true;
+                        $this->info(PHP_EOL." ------------ Synced tax number from $oldTaxNumber to $recruitmentPost->tax_number");
+                    }
+                    if ($recruitmentPost->contact_name != $oldContactName && $recruitmentPost->contact_name != null) {
+                        $e->update(['contact_name' => $recruitmentPost->contact_name]);
+                        $isUpdate = true;
+                        $this->info(PHP_EOL." ------------ Synced contact name from $oldContactName to $recruitmentPost->contact_name");
+                    }
+                    if ($recruitmentPost->contact_phone != $oldContactPhone && $recruitmentPost->contact_phone != null) {
+                        $e->update(['contact_phone' => $recruitmentPost->contact_phone]);
+                        $isUpdate = true;
+                        $this->info(PHP_EOL." ------------ Synced contact phone from $oldContactPhone to $recruitmentPost->contact_phone");
+                    }
+                    if ($recruitmentPost->contact_email != $oldContactEmail && $recruitmentPost->contact_email != null) {
+                        $e->update(['contact_email' => $recruitmentPost->contact_email]);
+                        $isUpdate = true;
+                        $this->info(PHP_EOL." ------------ Synced contact email from $oldContactEmail to $recruitmentPost->contact_email");
+                    }
+                    if ($isUpdate == true) {
+                        $count += 1;
+                        $this->info(PHP_EOL."===> Synced successfully for $e->name");
+                    } else {
+                        $this->info(PHP_EOL."===> There is no data to sync for $e->name");
+                    }
                 }
             }
 
@@ -60,7 +85,7 @@ class SyncEnterpriseInfo extends Command
             } else {
                 DB::commit();
             }
-            $this->info(PHP_EOL.'===> Sync success '.$count.' enterprises');
+            $this->info(PHP_EOL.'===> Sync success total '.$count.' enterprises');
         } catch (Exception $exception) {
             DB::rollBack();
             dump($exception);

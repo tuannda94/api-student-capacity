@@ -119,12 +119,12 @@
                                     <label for="" class="form-label">Doanh nghiệp</label>
                                     <select id="enterprise_id" name="enterprise_id" class="form-select form-major"
                                             data-control="select2"
-                                            data-placeholder="Chọn doanh nghiệp">
-                                        <option value="0">Chọn doanh nghiệp</option>
+                                            data-placeholder="Chọn doanh nghiệp (Mã số thuế - Tên doanh nghiệp)">
+                                        <option value="0">Chọn doanh nghiệp (Mã số thuế - Tên doanh nghiệp)</option>
                                         @foreach ($enterprises as $enterprise)
                                             <option
                                                 @selected(old('enterprise_id') ? old('enterprise_id') == $enterprise->id : auth()->user()->enterprise_id == $enterprise->id) value="{{ $enterprise->id }}">
-                                                {{ $enterprise->name }}
+                                                {{ $enterprise->tax_number }} - {{ $enterprise->name }}
                                                 {{--                                                @selected(old('enterprise_name') ? old('enterprise_name') == $enterprise->name : auth()->user()->enterprise_id == $enterprise->id) value="{{ $enterprise->name }}">--}}
                                                 {{--                                                {{ $enterprise->name }}--}}
                                             </option>

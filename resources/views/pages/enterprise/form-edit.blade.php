@@ -93,7 +93,7 @@
                                         <label class="form-label" for="">Người liên hệ </label>
                                         <input type="text" name="contact_name" value="{{ $enterprise->contact_name ?? old('contact_name') }}" class=" form-control"
                                             placeholder="">
-                                        @error('name')
+                                        @error('contact_name')
                                             <p id="checkname" class="text-danger">{{ $message }}</p>
                                         @enderror
                                     </div>
@@ -101,7 +101,7 @@
                                         <label class="form-label" for="">Email liên hệ </label>
                                         <input type="email" name="contact_email" value="{{ $enterprise->contact_email ?? old('contact_email') }}" class=" form-control"
                                             placeholder="">
-                                        @error('name')
+                                        @error('contact_email')
                                             <p id="checkname" class="text-danger">{{ $message }}</p>
                                         @enderror
                                     </div>
@@ -111,7 +111,7 @@
                                         <label class="form-label" for="">Mã số thuế </label>
                                         <input type="text" name="tax_number" value="{{ $enterprise->tax_number ?? old('tax_number') }}" class=" form-control"
                                             placeholder="">
-                                        @error('name')
+                                        @error('tax_number')
                                             <p id="checkname" class="text-danger">{{ $message }}</p>
                                         @enderror
                                     </div>
@@ -119,7 +119,7 @@
                                         <label class="form-label" for="">SĐT liên hệ </label>
                                         <input type="text" name="contact_phone" value="{{ $enterprise->contact_phone ?? old('contact_phone') }}" class=" form-control"
                                             placeholder="">
-                                        @error('name')
+                                        @error('contact_phone')
                                             <p id="checkname" class="text-danger">{{ $message }}</p>
                                         @enderror
                                     </div>
@@ -129,9 +129,6 @@
                                             <option value="1" {{ $enterprise->status == 1 ? 'selected' : '' }}>Hiển thị</option>
                                             <option value="0" {{ $enterprise->status == 0 ? 'selected' : '' }}>Không hiển thị</option>
                                         </select>
-                                        @error('name')
-                                            <p id="checkname" class="text-danger">{{ $message }}</p>
-                                        @enderror
                                     </div>
                                 </div>
                             </div>
@@ -148,9 +145,6 @@
                                 <label class="form-label" for="">Địa chỉ Website</label>
                                 <input type="text" name="link_web" value="{{ $enterprise->link_web ?? old('link_web') }}"
                                     class=" form-control" placeholder="">
-                                @error('link_web')
-                                    <p id="checkname" class="text-danger">{{ $message }}</p>
-                                @enderror
                             </div>
                             <div class="form-group mb-10">
                                 <label for="" class="form-label">Giới thiệu</label>
