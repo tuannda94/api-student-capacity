@@ -70,7 +70,7 @@ $.validator.addMethod(
         if (this.optional(element)) {
             return true;
         }
-        if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(value)) {
+        if (/[!@#$%^&*_+\=\[\]{};':"\\|,.<>\/?]+/.test(value)) { //cho phép sử dụng - và ( ) trong tên doanh nghiệp
             return false;
         } else {
             return true;

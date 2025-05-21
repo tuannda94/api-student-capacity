@@ -41,6 +41,7 @@ class RequestsEnterprise extends FormRequest
         if (!$this->route()->id || $this->has('logo'))  $rule = array_merge($rule, [
             'logo' => 'required|required|mimes:jpeg,png,jpg|max:10000',
         ]);
+
         return $rule;
     }
     // public function messages()
