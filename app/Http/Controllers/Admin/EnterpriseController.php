@@ -85,7 +85,7 @@ class EnterpriseController extends Controller
 
         return view('pages.enterprise.index', compact('listEnterprise', 'contest'));
     }
-    public function getModelDataStatus($id)
+    public function getModelDataById($id)
     {
         return $this->modulesEnterprise->find($id);
     }
