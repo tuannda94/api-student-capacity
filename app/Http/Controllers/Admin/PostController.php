@@ -519,8 +519,9 @@ class PostController extends Controller
     public function apiDetail($slug)
     {
         $data = $this->post::where('slug', $slug)->first();
-        $data->load(['user:id,name,email', 'enterprise:id,name,address,description,link_web', 'major']);
         if (!$data) abort(404);
+        $data->load(['user:id,name,email', 'enterprise:id,name,address,description,link_web', 'major']);
+
         return $this->responseApi(
             true,
             $data
