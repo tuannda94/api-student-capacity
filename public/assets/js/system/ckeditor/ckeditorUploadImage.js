@@ -1,48 +1,49 @@
-const {
-    ClassicEditor,
-    AutoImage,
-    Autosave,
-    BlockQuote,
-    Bold,
-    Essentials,
-    Heading,
-    ImageBlock,
-    ImageCaption,
-    ImageInline,
-    ImageInsert,
-    ImageInsertViaUrl,
-    ImageResize,
-    ImageStyle,
-    ImageTextAlternative,
-    ImageToolbar,
-    ImageUpload,
-    Indent,
-    IndentBlock,
-    Italic,
-    Link,
-    LinkImage,
-    List,
-    ListProperties,
-    MediaEmbed,
-    Paragraph,
-    PasteFromOffice,
-    SimpleUploadAdapter,
-    SpecialCharacters,
-    Table,
-    TableCaption,
-    TableCellProperties,
-    TableColumnResize,
-    TableProperties,
-    TableToolbar,
-    TodoList,
-    Underline
-} = window.CKEDITOR;
-
-const LICENSE_KEY =
-    'eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3Mzk5MjMxOTksImp0aSI6IjNkZDg0YWZlLTg1ZGUtNDY3My1iYmM5LTFjM2EyYTExODYwNyIsInVzYWdlRW5kcG9pbnQiOiJodHRwczovL3Byb3h5LWV2ZW50LmNrZWRpdG9yLmNvbSIsImRpc3RyaWJ1dGlvbkNoYW5uZWwiOlsiY2xvdWQiLCJkcnVwYWwiLCJzaCJdLCJ3aGl0ZUxhYmVsIjp0cnVlLCJsaWNlbnNlVHlwZSI6InRyaWFsIiwiZmVhdHVyZXMiOlsiKiJdLCJ2YyI6IjhhOTZiYzlhIn0.o1p4AdvS2gi63gTWCmUQ8X87xtffhsfc8ie_21mITPA7gCkRm7YD_1Z6PRRvN0TlwxH4k_VX6fbtSMNfOqdXig';
+import {
+	ClassicEditor,
+	Alignment,
+	AutoImage,
+	BlockQuote,
+	Bold,
+	Essentials,
+	GeneralHtmlSupport,
+	Heading,
+	ImageBlock,
+	ImageCaption,
+	ImageInline,
+	ImageInsert,
+	ImageInsertViaUrl,
+	ImageResize,
+	ImageStyle,
+	ImageTextAlternative,
+	ImageToolbar,
+	ImageUpload,
+	Indent,
+	IndentBlock,
+	Italic,
+	Link,
+	LinkImage,
+	List,
+	ListProperties,
+	MediaEmbed,
+	Paragraph,
+	PasteFromOffice,
+	SimpleUploadAdapter,
+	Table,
+	TableCaption,
+	TableCellProperties,
+	TableColumnResize,
+	TableProperties,
+	TableToolbar,
+	TextTransformation,
+	TodoList,
+	Underline
+} from './ckeditor5.js';
 
 const editorConfig = {
     toolbar: {
+        alignment: {
+            options: ['left', 'right', 'center', 'justify',]
+        },
         items: [
             'heading',
             '|',
@@ -50,7 +51,8 @@ const editorConfig = {
             'italic',
             'underline',
             '|',
-            // 'specialCharacters',
+            'alignment',
+            '|',
             'link',
             'insertImage',
             'mediaEmbed',
@@ -59,15 +61,12 @@ const editorConfig = {
             '|',
             'bulletedList',
             'numberedList',
-            // 'todoList',
-            // 'outdent',
-            // 'indent'
         ],
         shouldNotGroupWhenFull: false
     },
     plugins: [
         AutoImage,
-        Autosave,
+        Alignment,
         BlockQuote,
         Bold,
         Essentials,
@@ -93,7 +92,6 @@ const editorConfig = {
         Paragraph,
         PasteFromOffice,
         SimpleUploadAdapter,
-        SpecialCharacters,
         Table,
         TableCaption,
         TableCellProperties,
@@ -160,7 +158,7 @@ const editorConfig = {
             'resizeImage'
         ]
     },
-    licenseKey: LICENSE_KEY,
+    licenseKey: 'GPL',
     simpleUpload: {
         // uploadUrl: "{{ route('admin.ckeditor.upfile')"
         uploadUrl: "/admin/upload-image",
@@ -189,11 +187,19 @@ const editorConfig = {
             reversed: true
         }
     },
-    placeholder: 'Type or paste your content here!',
     table: {
         contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells', 'tableProperties', 'tableCellProperties']
     }
 };
 
-ClassicEditor.create(document.querySelector('#kt_docs_ckeditor_classic'), editorConfig);
-ClassicEditor.create(document.querySelector('#kt_docs_ckeditor_classic2'), editorConfig);
+ClassicEditor
+    .create( document.querySelector('#kt_docs_ckeditor_classic'), editorConfig)
+    .catch( error => {
+        console.error( error );
+    } );
+
+ClassicEditor
+    .create( document.querySelector('#kt_docs_ckeditor_classic2'), editorConfig)
+    .catch( error => {
+        console.error( error );
+    } );

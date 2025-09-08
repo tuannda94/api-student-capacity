@@ -82,12 +82,12 @@
             </span>
 
         </div>
-        <div class="table-responsive ">
+        <div class="table-responsive">
             @if (count($faqs) > 0)
                 <table class="table table-row-bordered table-row-gray-300 gy-7 table-hover">
                     <thead>
                         <tr>
-                            <th scope="col">Câu hỏi
+                            <th scope="col-3">Câu hỏi
                                 <a
                                     href="{{ route('admin.faq.list', [
                                         'sortBy' => request()->has('sortBy') ? (request('sortBy') == 'desc' ? 'asc' : 'desc') : 'asc',
@@ -124,11 +124,12 @@
                                 </a>
 
                             </th>
-                            <th scope="col">Trả lời</th>
-                            <th scope="col">Chủ đề</th>
-                            <th scope="col">Upvote</th>
-                            <th scope="col">Downvote</th>
-                            <th scope="col">Ngày tạo
+                            <th scope="col-3">Trả lời</th>
+                            <th scope="col-1">Chủ đề</th>
+                            <th scope="col-1">Lượt xem</th>
+                            <th scope="col-1">Upvote</th>
+                            <th scope="col-1">Downvote</th>
+                            <th scope="col-1">Ngày tạo
                                 <a
                                     href="{{ route('admin.faq.list', [
                                         'sortBy' => request()->has('sortBy') ? (request('sortBy') == 'desc' ? 'asc' : 'desc') : 'asc',
@@ -165,27 +166,21 @@
                                 </a>
 
                             </th>
-                            <th class="text-center" colspan="2">
+                            <th class="text-center">
 
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        @php
-                            $total = $faqs->total();
-                        @endphp
                         @forelse ($faqs as $item)
                             <tr>
                                 <td>
-                                    <button class="p-3" style="border:none;background:none; text-align: left;"
-                                        type="button" data-bs-toggle="modal"
-                                        data-bs-target="#deltai_team_{{ $item->id }}">
-                                        {!! $item->question !!}
+                                    <button class="p-3" style="border:none;background:none; text-align: left;" type="button">
+                                        <span>{!! Str::limit(strip_tags($item->question), 200, '...') !!}</span>
                                     </button>
                                 </td>
-
                                 <td>
-                                    <p>{!! $item->answer !!}</p>
+                                    <span>{!! Str::limit(strip_tags($item->answer), 200, '...') !!}</span>
                                 </td>
                                 <td>
                                     @if($item->type == config('util.FAQ.TYPE.INTERNSHIP'))
@@ -196,6 +191,7 @@
                                         <span class="badge bg-danger">Sự kiện</span>
                                     @endif
                                 </td>
+                                <td><p>{{ $item->view }}</p></td>
                                 <td><p>{{ $item->upRatings->count() }}</p></td>
                                 <td>
                                     @if ($item->downRatings->count() != 0)

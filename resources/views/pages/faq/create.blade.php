@@ -26,7 +26,7 @@
                             <div class="form-group mb-10">
                                 <label class="form-label" for="">Câu hỏi</label>
                                 <textarea type="text" id="kt_docs_ckeditor_classic" name="question" class=" form-control"
-                                    row="3"></textarea>
+                                    rows="3"></textarea>
                                 @error('question')
                                     <p class="text-danger">{{ $message }}</p>
                                 @enderror
@@ -52,7 +52,7 @@
                             <div class="form-group mb-10">
                                 <label class="form-label" for="">Câu trả lời</label>
                                 <textarea type="text" id="kt_docs_ckeditor_classic2" name="answer" class=" form-control"
-                                    row="3"></textarea>
+                                    rows="3"></textarea>
                                 @error('answer')
                                     <p class="text-danger">{{ $message }}</p>
                                 @enderror
@@ -83,10 +83,8 @@
 
 @endsection
 @section('page-script')
-    <script src="assets/plugins/custom/tinymce/tinymce.bundle.js"></script>
-    <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/44.1.0/ckeditor5.css" crossorigin>
-    <script src="https://cdn.ckeditor.com/ckeditor5/44.1.0/ckeditor5.umd.js" crossorigin></script>
-    <script src="assets/js/system/ckeditor/ckeditorUploadImage.js"></script>
+    <link rel="stylesheet" href="{{ asset('assets/js/system/ckeditor/ckeditor5.css') }}">
+    <script type="module" src="{{ asset('assets/js/system/ckeditor/ckeditorUploadImage.js') }}"></script>
     <script src="{{ asset('assets/js/system/question-and-answer/validateForm.js') }}"></script>
     <script src="{{ asset('assets/js/system/validate/validate.js') }}"></script>
 @endsection
