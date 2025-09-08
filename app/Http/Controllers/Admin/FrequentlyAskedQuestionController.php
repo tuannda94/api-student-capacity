@@ -160,6 +160,7 @@ class FrequentlyAskedQuestionController extends Controller
     public function apiDetail(FrequentlyAskedQuestion $faq)
     {
         if (!$faq) abort(404);
+        $faq->increment('view');
 
         return $this->responseApi(true,$faq);
     }

@@ -15,7 +15,8 @@ class FrequentlyAskedQuestion extends Model
     protected $fillable = [
         'question',
         'answer',
-        'type'
+        'type',
+        'view'
     ];
 
     protected $casts = [

@@ -409,6 +409,7 @@
             let careerType = $('select[name="career_type"]'); //hình thức tuyển dụng (Full/part/...)
             let careerTypeValue = $('select[name="career_type"] option:selected').text(); //hình thức tuyển dụng (Full/part/...)
             let ckInstance;
+
             ClassicEditor.create(
                 document.querySelector("#desCkEditor"),
                 {
@@ -443,6 +444,7 @@
                 }
             ).then((editor) => {
                 ckInstance = editor;
+                updateShortDes();
             })
             .catch((error) => {
             });
