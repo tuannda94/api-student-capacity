@@ -15,7 +15,7 @@ class FrequentlyAskedQuestion extends Model
     protected $fillable = [
         'question',
         'answer',
-        'type',
+        'category_id',
         'view'
     ];
 
@@ -30,5 +30,9 @@ class FrequentlyAskedQuestion extends Model
 
     public function downRatings() {
         return $this->hasMany(FaqRating::class, 'faq_id')->down();
+    }
+
+    public function category() {
+        return $this->belongsTo(FaqCategory::class, 'category_id');
     }
 }

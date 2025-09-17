@@ -40,11 +40,14 @@
                             <div class="form-group mb-10">
                                 <label for="" class="form-label">Chủ đề</label>
                                 <select class="form-select mb-2 select2-hidden-accessible" data-control="select2"
-                                    data-hide-search="false" tabindex="-1" aria-hidden="true" name="type">
-                                    <option value="" disabled>Chọn chủ đề</option>
-                                    <option value="{{ config('util.FAQ.TYPE.INTERNSHIP') }}">Thực tập</option>
-                                    <option value="{{ config('util.FAQ.TYPE.WORKING') }}">Việc làm</option>
-                                    <option value="{{ config('util.FAQ.TYPE.EVENT') }}">Sự kiện</option>
+                                    data-hide-search="false" tabindex="-1" aria-hidden="true" name="category_id">
+                                    <option value="" disabled selected>Chọn chủ đề</option>
+                                    @foreach ($categories as $root)
+                                        <option disabled> {{ $root->name }} </option>
+                                        @foreach ($root->children as $child)
+                                            <option value="{{$child->id}}">&nbsp;&nbsp;&nbsp;&nbsp;└─ {{$child->name}}</option>
+                                        @endforeach
+                                    @endforeach
                                 </select>
                             </div>
                         </div>

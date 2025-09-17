@@ -26,27 +26,34 @@
             </div>
             <div class=" col-lg-6">
                 <div class=" d-flex flex-row-reverse bd-highlight">
-                    <a href="{{ route('admin.faq.create') }}" class=" btn btn-primary">Tạo
-                        mới câu hỏi
+                    <a href="{{ route('admin.faq.create') }}" class=" btn btn-primary">
+                        Tạo mới câu hỏi
                     </a>
                 </div>
             </div>
         </div>
 
         <div class="row card-format">
-
-
-            <!-- <div class="col-12 col-lg-4 col-sx-12 col-md-12 col-sm-12 col-xxl-4 col-xl-4">
-                <div class="form-group p-2">
-                </div>
-            </div>
-            <div class="col-12 col-lg-4 col-sx-12 col-md-12 col-sm-12 col-xxl-4 col-xl-4">
-            </div> -->
             <div class="col-12 col-lg-4 col-sx-12 col-md-12 col-sm-12 col-xxl-4 col-xl-4">
                 <div class="  form-group p-2">
                     <label class="form-label">Tìm kiếm câu hỏi</label>
                     <input id="searchQuestion" type="text" value="{{ request('q') ?? '' }}"
                         placeholder="'*Enter' tìm kiếm ..." class=" ip-search form-control">
+                </div>
+            </div>
+            <div class="col-12 col-lg-4 col-sx-12 col-md-12 col-sm-12 col-xxl-4 col-xl-4">
+                <div class="form-group  pt-2">
+                    <label for="" class="form-label">Danh mục</label>
+                    <select id="select-category" class="form-select mb-2 select2-hidden-accessible" data-control="select2"
+                        data-hide-search="true" tabindex="-1" aria-hidden="true">
+                        <option class="form-control" value="" disabled selected>Chọn danh mục</option>
+                        @foreach ($categories as $root)
+                            <option @selected(request('category_id') == $root->id) value="{{ $root->id }}"> {{ $root->name }} </option>
+                            @foreach ($root->children as $child)
+                                <option @selected(request('category_id') == $child->id) value="{{$child->id}}">&nbsp;&nbsp;&nbsp;&nbsp;└─ {{$child->name}}</option>
+                            @endforeach
+                        @endforeach
+                    </select>
                 </div>
             </div>
         </div>
@@ -183,13 +190,10 @@
                                     <span>{!! Str::limit(strip_tags($item->answer), 200, '...') !!}</span>
                                 </td>
                                 <td>
-                                    @if($item->type == config('util.FAQ.TYPE.INTERNSHIP'))
-                                        <span class="badge bg-primary">Thực tập</span>
-                                    @elseif($item->type == config('util.FAQ.TYPE.WORKING'))
-                                        <span class="badge bg-success">Việc làm</span>
-                                    @else
-                                        <span class="badge bg-danger">Sự kiện</span>
+                                    @if (isset($item->category->parent))
+                                    <span class="badge bg-success">{{ $item->category->parent->name }}</span>
                                     @endif
+                                    <span class="badge bg-success my-1">{{ $item->category->name }}</span>
                                 </td>
                                 <td><p>{{ $item->view }}</p></td>
                                 <td><p>{{ $item->upRatings->count() }}</p></td>
@@ -374,6 +378,11 @@
                     // alert(key)
                     window.location = 'admin/question-and-answer?keyword=' + key;
                 }
+            });
+
+            $("#select-category").change(function () {
+                let categoryId = $(this).val();
+                window.location = 'admin/question-and-answer?category_id=' + categoryId;
             });
         });
     </script>

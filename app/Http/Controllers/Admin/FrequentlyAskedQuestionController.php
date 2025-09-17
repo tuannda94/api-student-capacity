@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\FaqCategory;
 use App\Models\FrequentlyAskedQuestion;
 use App\Services\Builder\Builder;
 use App\Services\Traits\TResponse;
@@ -15,27 +16,39 @@ class FrequentlyAskedQuestionController extends Controller
 {
     use TResponse;
     private $faq;
+    private $faqCategory;
 
-    public function __construct(FrequentlyAskedQuestion $faq) {
+    public function __construct(FrequentlyAskedQuestion $faq, FaqCategory $faqCategory) {
         $this->faq = $faq;
+        $this->faqCategory = $faqCategory;
     }
 
     private function getList(Request $request) 
     {
         $keyword = $request->has('keyword') ? $request->keyword : "";
-        $type = $request->has('type') ? $request->type : "";
+        $categoryId = $request->has('category_id') ? $request->category_id : "";
         $orderBy = $request->has('orderBy') ? $request->orderBy : 'id';
         $sortBy = $request->has('sortBy') ? $request->sortBy : "desc";
 
         $query = $this->faq::where('question', 'like', "%$keyword%")
-            ->with(['upRatings','downRatings']);
+            ->with(['upRatings','downRatings', 'category.parent']);
         if ($sortBy == "desc") {
             $query->orderByDesc($orderBy);
         } else {
             $query->orderBy($orderBy);
         }
-        if ($type != "") {
-            $query->where('type', $type);
+        
+        if ($categoryId != "") {
+            $rootCates = $this->faqCategory::roots()->with(['children'])->get();
+            if (in_array($categoryId, $rootCates->pluck('id')->toArray())) {
+                $childrenCateIds = $rootCates->first(function ($item) use ($categoryId) {
+                    return $item->id == $categoryId;
+                })->children->pluck('id')->toArray();
+                
+                $query->whereIn('category_id', $childrenCateIds);
+            } else {
+                $query->where('category_id', $categoryId);
+            }
         } 
         
         return $query;
@@ -44,16 +57,26 @@ class FrequentlyAskedQuestionController extends Controller
     /**ADMIN CRUD */ 
     public function index(Request $request) {
         try {
+            $categories = $this->faqCategory::roots()
+                ->with(['children'])
+                ->orderBy('name')
+                ->get();
             $faqs = $this->getList($request)->paginate(config('util.HOMEPAGE_ITEM_AMOUNT'));
             
-            return view('pages.faq.list', compact('faqs'));
+            return view('pages.faq.list', compact('faqs', 'categories'));
         } catch (\Throwable $th) {
+            dd($th);
             return response()->json(['status' => 'error']);
         }
     }
 
     public function create() {
-        return view('pages.faq.create');
+        $categories = $this->faqCategory::roots()
+            ->with(['children'])
+            ->orderBy('name')
+            ->get();
+
+        return view('pages.faq.create', compact('categories'));
     }
 
     public function store(Request $request)
@@ -63,13 +86,13 @@ class FrequentlyAskedQuestionController extends Controller
             [
                 'question' => 'required',
                 'answer' => 'required',
-                'type' => 'required|numeric',
+                'category_id' => 'required|numeric',
             ],
             [
                 'question.required' => 'Chưa nhập trường này',
                 'answer.required' => 'Chưa nhập trường này',
-                'type.required' => 'Chưa nhập trường này',
-                'type.numeric' => 'Sai định dạng!',
+                'category_id.required' => 'Chưa nhập trường này',
+                'category_id.numeric' => 'Sai định dạng!',
             ]
         );
 
@@ -81,7 +104,7 @@ class FrequentlyAskedQuestionController extends Controller
             $this->faq::create([
                 'question' => $request->question,
                 'answer' => $request->answer,
-                'type' => $request->type,
+                'category_id' => $request->category_id,
             ]);
 
             return Redirect::route('admin.faq.list');
@@ -91,7 +114,12 @@ class FrequentlyAskedQuestionController extends Controller
     }
 
     public function edit(FrequentlyAskedQuestion $faq) {
-        return view('pages.faq.edit', compact('faq'));
+        $categories = $this->faqCategory::roots()
+            ->with(['children'])
+            ->orderBy('name')
+            ->get();
+
+        return view('pages.faq.edit', compact('faq', 'categories'));
     }
 
     public function update(Request $request, FrequentlyAskedQuestion $faq)
@@ -101,13 +129,13 @@ class FrequentlyAskedQuestionController extends Controller
             [
                 'question' => 'required',
                 'answer' => 'required',
-                'type' => 'required|numeric',
+                'category_id' => 'required|numeric',
             ],
             [
                 'question.required' => 'Chưa nhập trường này',
                 'answer.required' => 'Chưa nhập trường này',
-                'type.required' => 'Chưa nhập trường này',
-                'type.numeric' => 'Sai định dạng!',
+                'category_id.required' => 'Chưa nhập trường này',
+                'category_id.numeric' => 'Sai định dạng!',
             ]
         );
 
@@ -119,7 +147,7 @@ class FrequentlyAskedQuestionController extends Controller
             $faq->update([
                 'question' => $request->question,
                 'answer' => $request->answer,
-                'type' => $request->type,
+                'category_id' => $request->category_id,
             ]);
 
             return Redirect::route('admin.faq.list');
@@ -140,16 +168,8 @@ class FrequentlyAskedQuestionController extends Controller
     }
 
     /**API for client */
-    public function getListFAQ(Request $request, $type) {
-        if ($type == 'internship') {
-            $typeCode = 0;
-        } else if ($type == 'job') {
-            $typeCode = 1;
-        } else if ($type == 'event') {
-            $typeCode = 2;
-        }
+    public function getListFAQ(Request $request) {
         $data = $this->getList($request)
-            ->where('type', $typeCode)
             ->paginate(request('limit') ?? 12);
 
         if (!$data) abort(404);
@@ -168,7 +188,7 @@ class FrequentlyAskedQuestionController extends Controller
     public function apiRelate(Request $request, FrequentlyAskedQuestion $faq)
     {
         $data = $this->getList($request)
-            ->where('type', $faq->type)
+            ->where('category_id', $faq->category_id)
             ->where('id', '<>', $faq->id)
             ->paginate(request('limit') ?? 6);
         

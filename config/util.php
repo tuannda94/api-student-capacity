@@ -15,11 +15,6 @@ return [
     ],
 
     'FAQ' => [
-        'TYPE' => [
-            'INTERNSHIP' => 0,
-            'WORKING' => 1,
-            'EVENT' => 2,
-        ],
         'RATING' => [
             'TYPE' => [
                 'UPVOTE' => 1,
