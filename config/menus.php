@@ -62,8 +62,20 @@ return [
         </span>',
         "name" => "Q&A",
         "role" => $ROLE_HAS_ADMINS,
-        "param" => '',
-        "link" => "admin.faq.list",
+        "subs-menu" => [
+            [
+                "name" => "Danh mục",
+                "param" => '',
+                "link" => "admin.faq_category.list",
+                "role" => $ROLE_HAS_ADMINS
+            ],
+            [
+                "name" => "Danh sách câu hỏi",
+                "param" => '',
+                "link" => "admin.faq.list",
+                "role" => $ROLE_HAS_ADMINS
+            ]
+        ]
     ], // Q&A
     [
         "icon" => '<span class="svg-icon svg-icon-primary svg-icon-2x"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo1/dist/../src/media/svg/icons/General/Search.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
