@@ -41,10 +41,11 @@ class FrequentlyAskedQuestionController extends Controller
         if ($categoryId != "") {
             $rootCates = $this->faqCategory::roots()->with(['children'])->get();
             if (in_array($categoryId, $rootCates->pluck('id')->toArray())) {
+                //nếu lọc theo root category thì sẽ lấy cả của category con và chính nó
                 $childrenCateIds = $rootCates->first(function ($item) use ($categoryId) {
                     return $item->id == $categoryId;
                 })->children->pluck('id')->toArray();
-                
+                array_push($childrenCateIds, $categoryId);
                 $query->whereIn('category_id', $childrenCateIds);
             } else {
                 $query->where('category_id', $categoryId);
@@ -65,7 +66,6 @@ class FrequentlyAskedQuestionController extends Controller
             
             return view('pages.faq.list', compact('faqs', 'categories'));
         } catch (\Throwable $th) {
-            dd($th);
             return response()->json(['status' => 'error']);
         }
     }
@@ -170,10 +170,10 @@ class FrequentlyAskedQuestionController extends Controller
     /**API for client */
     public function getListFAQ(Request $request) {
         $data = $this->getList($request)
-            ->paginate(request('limit') ?? 12);
+            ->paginate(20);
 
         if (!$data) abort(404);
-
+        
         return $this->responseApi(true, $data);
     }
 

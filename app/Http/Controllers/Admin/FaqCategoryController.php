@@ -149,6 +149,13 @@ class FaqCategoryController extends Controller
     public function destroy(FaqCategory $faqCategory)
     {
         try {
+            if ($faqCategory->children()->count() != 0) { //nếu là danh mục cha mà có danh mục con thì ko cho xóa
+                return false;
+            } 
+            if ($faqCategory->parent()->count() != 0 && $faqCategory->faqs()->count() != 0) {
+                return false;
+            }
+            // if ($faqCategory->children())
             $faqCategory->delete();
 
             return redirect()->back();
@@ -165,7 +172,6 @@ class FaqCategoryController extends Controller
         try {
             $categories = $this->faqCategory::roots()
                 ->with(['children'])
-                ->orderBy('name')
                 ->get();
             
             return $this->responseApi(true, $categories);

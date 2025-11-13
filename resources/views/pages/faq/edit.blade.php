@@ -25,12 +25,12 @@
                                 @endif
                             </div>
                             <div class="form-group mb-10">
-                                <label for="" class="form-label">Chủ đề</label>
+                                <label for="" class="form-label">Danh mục</label>
                                 <select class="form-select mb-2 select2-hidden-accessible" data-control="select2"
                                     data-hide-search="false" tabindex="-1" aria-hidden="true" name="category_id">
-                                    <option value="" disabled>Chọn chủ đề</option>
+                                    <option value="" disabled>Chọn danh mục</option>
                                     @foreach ($categories as $root)
-                                        <option disabled> {{ $root->name }} </option>
+                                        <option value="{{$root->id}}"> {{ $root->name }} </option>
                                         @foreach ($root->children as $child)
                                             <option @selected($faq->category_id == $child->id) value="{{$child->id}}">&nbsp;&nbsp;&nbsp;&nbsp;└─ {{$child->name}}</option>
                                         @endforeach

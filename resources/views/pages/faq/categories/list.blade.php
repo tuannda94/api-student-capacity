@@ -54,7 +54,7 @@
                                     </button>
                                 </td>
                                 <td>
-                                    <span></span>
+                                    <span>{{ $item->faqs()->count() }}</span>
                                 </td>
                                 <td>{{ $item->created_at }}</td>
                                 <td>
