@@ -190,10 +190,14 @@
                                     <span>{!! Str::limit(strip_tags($item->answer), 200, '...') !!}</span>
                                 </td>
                                 <td>
-                                    @if (isset($item->category->parent))
-                                    <span class="badge bg-success">{{ $item->category->parent->name }}</span>
+                                    @if (!isset($item->category))
+                                    <span class="badge bg-warning">Chưa có danh mục</span>
+                                    @else 
+                                        @if(isset($item->category->parent))
+                                        <span class="badge bg-success">{{ $item->category->parent->name }}</span>
+                                        @endif
+                                        <span class="badge bg-success my-1">{{ $item->category->name }}</span>
                                     @endif
-                                    <span class="badge bg-success my-1">{{ $item->category->name }}</span>
                                 </td>
                                 <td><p>{{ $item->view }}</p></td>
                                 <td><p>{{ $item->upRatings->count() }}</p></td>
