@@ -181,6 +181,7 @@ class FrequentlyAskedQuestionController extends Controller
     {
         if (!$faq) abort(404);
         $faq->increment('view');
+        $faq->load(['category']);
 
         return $this->responseApi(true,$faq);
     }
