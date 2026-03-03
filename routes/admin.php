@@ -21,6 +21,8 @@ use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\SendMailController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EnterpriseController;
+use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\EventParticipantController;
 use App\Http\Controllers\Admin\FaqCategoryController;
 use App\Http\Controllers\Admin\FaqRatingController;
 use App\Http\Controllers\Admin\FrequentlyAskedQuestionController;
@@ -30,7 +32,9 @@ use App\Http\Controllers\Admin\RecruitmentController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\PrintPDFController;
 use App\Http\Controllers\Admin\PrintExcelController;
+use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SupportController;
+use App\Models\EventParticipant;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::prefix('dashboard')->group(function () {
@@ -521,6 +525,33 @@ Route::group([
         Route::put('/{companyContact}/re-status', [CompanyContactController::class, 're_status'])->name('admin.cc.reStatus');
         Route::delete('delete/{companyContact}', [CompanyContactController::class, 'destroy'])->name('admin.cc.delete');
     });
+    Route::prefix('events')->group(function () {
+        Route::prefix('{event}/participants')->group(function() {
+            Route::get('', [EventParticipantController::class, 'list'])->name('admin.event.participants');
+            Route::post('/add-mentor', [EventParticipantController::class, 'addMentor'])->name('admin.event.addMentor');
+            Route::delete('{participant}/remove', [EventParticipantController::class, 'remove'])->name('admin.event.remove');
+            Route::put('{participant}/approve', [EventParticipantController::class, 'approve'])->name('admin.event.approveMentor');
+            Route::put('{participant}/reject', [EventParticipantController::class, 'reject'])->name('admin.event.rejectMentor');
+        });
+        Route::get('', [EventController::class, 'index'])->name('admin.event.list');
+        Route::get('edit/{event}', [EventController::class, 'edit'])->name('admin.event.edit');
+        Route::put('update/{event}', [EventController::class, 'update'])->name('admin.event.update');
+        Route::get('create', [EventController::class, 'create'])->name('admin.event.create');
+        Route::post('store', [EventController::class, 'store'])->name('admin.event.store');
+        Route::delete('delete/{event}', [EventController::class, 'destroy'])->name('admin.event.delete');
+    });
+    Route::prefix('services')->group(function () {
+        Route::prefix('{service}/requests')->group(function() {
+            Route::get('', [ServiceController::class, 'requestList'])->name('admin.service.requests');
+        });
+        Route::get('', [ServiceController::class, 'index'])->name('admin.service.list');
+        Route::get('edit/{service}', [ServiceController::class, 'edit'])->name('admin.service.edit');
+        Route::put('update/{service}', [ServiceController::class, 'update'])->name('admin.service.update');
+        Route::get('create', [ServiceController::class, 'create'])->name('admin.service.create');
+        Route::post('store', [ServiceController::class, 'store'])->name('admin.service.store');
+        Route::delete('delete/{service}', [ServiceController::class, 'destroy'])->name('admin.service.delete');
+    });
+
     Route::get('support-poly', [SupportController::class, 'index'])->name('admin.support');
 });
 

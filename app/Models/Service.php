@@ -7,11 +7,11 @@ use App\Casts\FormatImageGet;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Event extends Model
+class Service extends Model
 {
     use HasFactory;
 
-    protected $table = 'events';
+    protected $table = 'services';
 
     protected $casts = [
         'created_at' => FormatDate::class,
@@ -22,18 +22,16 @@ class Event extends Model
     protected $fillable = [
         'name',
         'description',
-        'start_at',
-        'end_at',
-        'created_by',
         'thumbnail',
         'status',
+        'created_by',
     ];
-
-    public function participants() {
-        return $this->hasMany(EventParticipant::class);
-    }
 
     public function createdBy() {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function requests() {
+        return $this->hasMany(ServiceRequest::class);
     }
 }
