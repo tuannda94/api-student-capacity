@@ -29,6 +29,27 @@ return [
         ]
     ],
  
+    'EVENT' => [
+        'PARTICIPANT' => [
+            'ROLE' => [
+                'USER' => 0,
+                'MENTOR' => 1,
+            ],
+            'STATUS' => [
+                'REVIEWING' => 0,
+                'APPROVE' => 1,
+                'REJECT' => 2,
+            ],
+        ],
+    ],
+
+    'SERVICE' => [
+        'REQUEST_STATUS' => [
+            'IN_PROGRESS' => 0,
+            'FINISH' => 1,
+        ]
+    ],
+
     'TAKE_EXAM_STATUS_CANCEL' => 0, //TRẠNG THÁI HỦY BÀI THI
     'TAKE_EXAM_STATUS_UNFINISHED' => 1, // TRẠNG THÁI CHƯA HOÀN THÀNH BÀI THI
     'TAKE_EXAM_STATUS_COMPLETE' => 2, // TRẠNG THái đã HOÀN THÀNH BÀI THI
