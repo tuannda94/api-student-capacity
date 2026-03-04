@@ -69,6 +69,7 @@ return [
     'JUDGE_ROLE' => 4,
     'TEACHER_ROLE' => 5,
     'STAFF_ROLE' => 6,
+    'MENTOR_ROLE' => 7,
 
     "CONTEST_STATUS_REGISTERING" => 0,
     "CONTEST_STATUS_GOING_ON" => 1,

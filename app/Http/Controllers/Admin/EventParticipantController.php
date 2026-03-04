@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\EventParticipant;
 use App\Models\User;
 use App\Services\Traits\TResponse;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class EventParticipantController extends Controller
@@ -29,22 +30,16 @@ class EventParticipantController extends Controller
         $joinedIds = $event->participants()->pluck('user_id')->toArray();
 
         if ($type == 1) { //mentor đã được duyệt
-            $query->mentor()->approve();
+            $query->mentor();
         }
-
-        if ($type == 2) { //mentor đang chờ duyệt
-            $query->mentor()->reviewing();
-        }
-
-        if ($type == 3) { //mentor bị từ chối
-            $query->mentor()->reject();
-        }
-
-        if ($type == 4) { //user thường
+        if ($type == 2) { //user thường
             $query->normalUser();
         }
         $participants = $query->with(['user'])->paginate(10)->appends(['type' => $type]);
         $users = $this->user::where('status', 1)
+            ->whereHas('roles', function (Builder $query) {
+                $query->where('id', config('util.MENTOR_ROLE'));
+            })
             ->whereNotIn('id', $joinedIds)
             ->get();
 
@@ -79,32 +74,6 @@ class EventParticipantController extends Controller
             if (!(auth()->user()->hasRole(config('util.ROLE_ADMINS')))) return false;
             if ($event->id != $participant->event_id) return abort(400);
             $participant->delete();
-
-            return redirect()->back();
-        } catch (\Throwable $th) {
-            return redirect('error');
-        }
-    }
-
-    public function approve(Event $event, EventParticipant $participant)
-    {
-        try {
-            if (!(auth()->user()->hasRole(config('util.ROLE_ADMINS')))) return false;
-            if ($event->id != $participant->event_id) return abort(400);
-            $participant->update(['status' => config('util.EVENT.PARTICIPANT.STATUS.APPROVE')]);
-
-            return redirect()->back();
-        } catch (\Throwable $th) {
-            return redirect('error');
-        }
-    }
-
-    public function reject(Event $event, EventParticipant $participant)
-    {
-        try {
-            if (!(auth()->user()->hasRole(config('util.ROLE_ADMINS')))) return false;
-            if ($event->id != $participant->event_id) return abort(400);
-            $participant->update(['status' => config('util.EVENT.PARTICIPANT.STATUS.REJECT')]);
 
             return redirect()->back();
         } catch (\Throwable $th) {
