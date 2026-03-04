@@ -1,12 +1,12 @@
 @extends('layouts.main')
-@section('title', 'Quản lý sự kiện')
-@section('page-title', 'Quản lý sự kiện')
+@section('title', 'Quản lý đặc quyền')
+@section('page-title', 'Quản lý đặc quyền')
 @section('content')
     <div class="card card-flush p-4">
         <div class="row">
             <div class=" col-lg-6">
-                <h1>Danh sách sự kiện
-                    <a href="{{ route('admin.event.list') }}">
+                <h1>Danh sách đặc quyền
+                    <a href="{{ route('admin.privilege.list') }}">
                         <span role="button" data-bs-toggle="tooltip" title="Tải lại trang "
                             class="refresh-btn svg-icon svg-icon-primary svg-icon-2x">
                             <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo2/dist/../src/media/svg/icons/General/Update.svg--><svg
@@ -26,66 +26,49 @@
             </div>
             <div class=" col-lg-6">
                 <div class=" d-flex flex-row-reverse bd-highlight">
-                    <a href="{{ route('admin.event.create') }}" class=" btn btn-primary">
-                        Tạo sự kiện mới
+                    <a href="{{ route('admin.privilege.create') }}" class=" btn btn-primary">
+                        Tạo đặc quyền mới
                     </a>
                 </div>
             </div>
         </div>
         <div class="table-responsive">
-            @if (count($events) > 0)
+            @if (count($privileges) > 0)
                 <table class="table table-row-bordered table-row-gray-300 gy-7 table-hover">
                     <thead>
                         <tr>
-                            <th scope="col">Sự kiện</th>
-                            <th scope="col">Người tạo</th>
+                            <th scope="col">Đặc quyền</th>
+                            <th scope="col">Link</th>
                             <th scope="col">Ảnh bìa</th>
-                            <th scope="col">Ngày bắt đầu</th>
-                            <th scope="col">Ngày kết thúc</th>
-                            <th scope="col">Trạng thái</th>
-                            <th scope="col">Doanh nghiệp đồng hành</th>
-                            <th scope="col">Số lượt phỏng vấn</th>
-                            <th scope="col">Số vị trí tuyển dụng</th>
-                            <th class="text-center">
-
-                            </th>
+                            <th scope="col">Mô tả</th>
+                            <th scope="col">Hạn đăng ký</th>
+                            <th scope="col">Hạn sử dụng</th>
+                            <th class="text-center"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($events as $item)
+                        @forelse ($privileges as $item)
                             <tr>
                                 <td>
-                                    <a href="{{ route('admin.event.participants', ['event' => $item->id]) }} ">
-                                        {{ $item->name }}
-                                    </a>
+                                    <span> {{ $item->title }} </span>
                                 </td>
                                 <td>
-                                    <span>{{ $item->createdBy->email }}</span>
+                                    <span>{{ $item->link }}</span>
                                 </td>
                                 <td>
                                     @if($item->thumbnail)
-                                        <img style="width:250px;height:50%" src="{{ $item->thumbnail }}" alt="">
+                                        <img style="max-height:150px" src="{{ $item->thumbnail }}" alt="">
                                     @else
                                         Chưa có ảnh bìa
                                     @endif
                                 </td>
-                                <td>{{ $item->start_at }}</td>
-                                <td>{{ $item->end_at }} </td>
+                                <td>{{ $item->description }}</td>
                                 <td>
-                                    @if ($item->status == config('util.ACTIVE_STATUS'))
-                                        <span class="badge bg-primary">Active</span>
-                                    @else
-                                        <span class="badge bg-danger">Inactive</span>
-                                    @endif
+                                    <span>{{ $item->register_deadline}}</span>
                                 </td>
                                 <td>
-                                    <a href="{{ route('admin.event.sponsors', ['event' => $item->id]) }}"
-                                        class=" btn btn-primary btn-sm">
-                                        Xem
-                                    </a>
+                                    {{ $item->expire_date }} 
                                 </td>
-                                <td>{{ $item->interview_count }} </td>
-                                <td>{{ $item->jobs_opening_count }} </td>
                                 <td>
                                     <div data-bs-toggle="tooltip" title="Thao tác" class="btn-group dropstart">
                                         <button type="button" class="btn btn-sm dropdown-toggle"
@@ -109,7 +92,7 @@
                                         </button>
                                         <ul class="dropdown-menu  px-4 ">
                                             <li class="my-3">
-                                                <a href="{{ route('admin.event.edit', $item->id) }}">
+                                                <a href="{{ route('admin.privilege.edit', $item->id) }}">
                                                     <span role="button" class="svg-icon svg-icon-success svg-icon-2x">
                                                         <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo2/dist/../src/media/svg/icons/Design/Edit.svg--><svg
                                                             xmlns="http://www.w3.org/2000/svg"
@@ -134,7 +117,7 @@
                                             </li>
 
                                             <li class="my-3">
-                                                <form action="{{ route('admin.event.delete', $item->id) }}"
+                                                <form action="{{ route('admin.privilege.delete', $item->id) }}"
                                                     id="delete_{{$item->id}}"
                                                     method="post">
                                                     @csrf
@@ -173,7 +156,7 @@
                         @endforelse
                     </tbody>
                 </table>
-                {{ $events->appends(request()->all())->links('pagination::bootstrap-4') }}
+                {{ $privileges->appends(request()->all())->links('pagination::bootstrap-4') }}
             @else
                 <h2>Không có dữ liệu !!!</h2>
             @endif

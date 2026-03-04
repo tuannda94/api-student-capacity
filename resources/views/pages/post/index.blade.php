@@ -482,8 +482,8 @@
                                 <td>
                                     @if ($class == \App\Models\Recruitment::class)
                                         <a href="{{ route('admin.candidate.list', ['post_id' => $key->id]) }}"
-                                            class=" btn btn-primary btn-sm">Danh
-                                            sách ứng tuyển
+                                            class=" btn btn-primary btn-sm">
+                                            Danh sách ứng tuyển
                                         </a>
                                     @endif
                                 </td>

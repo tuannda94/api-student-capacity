@@ -6,11 +6,9 @@
         <div class="col-lg-12">
             <ol class="breadcrumb text-muted fs-6 fw-bold">
                 <li class="breadcrumb-item pe-3">
-
                     <a href="{{ route('admin.event.list') }}" class="pe-3">
                         Danh sách sự kiện
                     </a>
-
                 </li>
                 <li class="breadcrumb-item px-3 text-muted">Thêm mới sự kiện</li>
             </ol>
@@ -36,36 +34,6 @@
                                     @endphp
                                 @endif
                             </div>
-                            <div class="form-group mb-10">
-                                <label class="form-label" for="">Mô tả</label>
-                                <input type="text" name="description" class=" form-control" value="{{ old('description') }}"/>
-                                @error('name')
-                                    <p class="text-danger">{{ $message }}</p>
-                                @enderror
-                                @if (session()->has('errorName'))
-                                    <p class="text-danger">{{ session()->get('errorName') }}</p>
-                                    @php
-                                        Session::forget('errorName');
-                                    @endphp
-                                @endif
-                            </div>
-                            <div class="form-group mb-10">
-                                <label class="form-label" for="">Ảnh bìa</label>
-                                <input name="thumbnail" type='file' id="file-input" class="form-control" />
-                                <img class="mw-10 mt-4 border rounded-3" id="image-preview"
-                                    src="https://vanhoadoanhnghiepvn.vn/wp-content/uploads/2020/08/112815953-stock-vector-no-image-available-icon-flat-vector.jpg" />
-                                @error('thumbnail')
-                                    <p class="text-danger">{{ $message }}</p>
-                                @enderror
-                                @if (session()->has('errorName'))
-                                    <p class="text-danger">{{ session()->get('errorName') }}</p>
-                                    @php
-                                        Session::forget('errorName');
-                                    @endphp
-                                @endif
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
                             <div class="form-group mb-10">
                                 <label for="" class="form-label">Thời gian bắt đầu</label>
                                 <input type="datetime-local" name="start_at" class="form-control" value="{{ old('start_at') }}">
@@ -93,11 +61,93 @@
                                 @endif
                             </div>
                             <div class="form-group mb-10">
+                                <label class="form-label" for="">Link đăng ký (link google form của phòng QHDN tự tạo)</label>
+                                <input type="text" name="register_link" class=" form-control" value="{{ old('register_link') }}"/>
+                                @error('register_link')
+                                    <p class="text-danger">{{ $message }}</p>
+                                @enderror
+                                @if (session()->has('errorName'))
+                                    <p class="text-danger">{{ session()->get('errorName') }}</p>
+                                    @php
+                                        Session::forget('errorName');
+                                    @endphp
+                                @endif
+                            </div>
+                            <div class="form-group mb-10">
+                                <label class="form-label" for="">Số lượt phỏng vấn</label>
+                                <input type="number" name="interview_count" class=" form-control" value="{{ old('interview_count') }}"/>
+                                @error('interview_count')
+                                    <p class="text-danger">{{ $message }}</p>
+                                @enderror
+                                @if (session()->has('errorName'))
+                                    <p class="text-danger">{{ session()->get('errorName') }}</p>
+                                    @php
+                                        Session::forget('errorName');
+                                    @endphp
+                                @endif
+                            </div>
+                            <div class="form-group mb-10">
+                                <label class="form-label" for="">Số vị trí tuyển dụng</label>
+                                <input type="text" name="jobs_opening_count" class=" form-control" value="{{ old('jobs_opening_count') }}"/>
+                                @error('jobs_opening_count')
+                                    <p class="text-danger">{{ $message }}</p>
+                                @enderror
+                                @if (session()->has('errorName'))
+                                    <p class="text-danger">{{ session()->get('errorName') }}</p>
+                                    @php
+                                        Session::forget('errorName');
+                                    @endphp
+                                @endif
+                            </div>
+                            <div class="form-group mb-10">
+                                <label class="form-label" for="">Mô tả (hiển thị ở ngay dưới tên sự kiện ở trang ngày hội việc làm)</label>
+                                <textarea type="text-area" rows="4" name="description" class=" form-control">{{old('description')}}</textarea>
+                                @error('description')
+                                    <p class="text-danger">{{ $message }}</p>
+                                @enderror
+                                @if (session()->has('errorName'))
+                                    <p class="text-danger">{{ session()->get('errorName') }}</p>
+                                    @php
+                                        Session::forget('errorName');
+                                    @endphp
+                                @endif
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group mb-10">
+                                <label class="form-label" for="">Ảnh bìa</label>
+                                <input name="thumbnail" type='file' id="file-input" class="form-control" />
+                                <img class="mw-10 mt-2 border rounded-3" id="image-preview"
+                                    src="https://vanhoadoanhnghiepvn.vn/wp-content/uploads/2020/08/112815953-stock-vector-no-image-available-icon-flat-vector.jpg" />
+                                @error('thumbnail')
+                                    <p class="text-danger">{{ $message }}</p>
+                                @enderror
+                                @if (session()->has('errorName'))
+                                    <p class="text-danger">{{ session()->get('errorName') }}</p>
+                                    @php
+                                        Session::forget('errorName');
+                                    @endphp
+                                @endif
+                            </div>
+                            <div class="form-group mb-10">
                                 <label class="form-label" for="">Trạng thái</label>
                                 <select name="status" class="form-control mb-2" >
-                                    <option value="{{config('util.ACTIVE_STATUS')}}">Active</option>
-                                    <option value="{{config('util.INACTIVE_STATUS')}}">Inactive</option>
+                                    <option value="{{config('util.ACTIVE_STATUS')}}">Hoạt động</option>
+                                    <option value="{{config('util.INACTIVE_STATUS')}}">Không hoạt động</option>
                                 </select>
+                            </div>
+                            <div class="form-group mb-10">
+                                <label class="form-label" for="">Note (hiển thị ở phần thư ngỏ ở trang ngày hội việc làm)</label>
+                                <textarea type="text" name="note" class=" form-control">{{ old('note') }}</textarea>
+                                @error('note')
+                                    <p class="text-danger">{{ $message }}</p>
+                                @enderror
+                                @if (session()->has('errorName'))
+                                    <p class="text-danger">{{ session()->get('errorName') }}</p>
+                                    @php
+                                        Session::forget('errorName');
+                                    @endphp
+                                @endif
                             </div>
                         </div>
                     </div>

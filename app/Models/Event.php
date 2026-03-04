@@ -27,6 +27,10 @@ class Event extends Model
         'created_by',
         'thumbnail',
         'status',
+        'register_link',
+        'interview_count',
+        'jobs_opening_count',
+        'note',
     ];
 
     public function participants() {
@@ -35,5 +39,9 @@ class Event extends Model
 
     public function createdBy() {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function sponsors() {
+        return $this->hasMany(Sponsor::class, 'event_id');
     }
 }

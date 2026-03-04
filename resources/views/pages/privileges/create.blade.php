@@ -1,33 +1,32 @@
 @extends('layouts.main')
-@section('title', 'Quản lý dịch vụ')
-@section('page-title', 'Quản lý dịch vụ')
+@section('title', 'Quản lý đặc quyền')
+@section('page-title', 'Quản lý đặc quyền')
 @section('content')
     <div class="row mb-4">
         <div class="col-lg-12">
             <ol class="breadcrumb text-muted fs-6 fw-bold">
                 <li class="breadcrumb-item pe-3">
 
-                    <a href="{{ route('admin.service.list') }}" class="pe-3">
-                        Danh sách dịch vụ
+                    <a href="{{ route('admin.privilege.list') }}" class="pe-3">
+                        Danh sách đặc quyền
                     </a>
 
                 </li>
-                <li class="breadcrumb-item px-3 text-muted">Thêm mới dịch vụ</li>
+                <li class="breadcrumb-item px-3 text-muted">Thêm mới đặc quyền</li>
             </ol>
         </div>
     </div>
     <div class="row">
         <div class="col-lg-12">
             <div class="card card-flush h-lg-100 p-10">
-                <form id="formservice" action="{{ route('admin.service.update', ['service'=> $service->id]) }}" method="post" enctype="multipart/form-data">
+                <form id="formPrivilege" action="{{ route('admin.privilege.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
-                    @method('PUT')
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group mb-10">
-                                <label class="form-label" for="">Tên dịch vụ</label>
-                                <input type="text" name="name" class=" form-control" value="{{ old('name', $service->name) }}"/>
-                                @error('name')
+                                <label class="form-label" for="">Tên đặc quyền</label>
+                                <input type="text" name="title" class=" form-control" value="{{ old('title') }}"/>
+                                @error('title')
                                     <p class="text-danger">{{ $message }}</p>
                                 @enderror
                                 @if (session()->has('errorName'))
@@ -40,8 +39,8 @@
                             <div class="form-group mb-10">
                                 <label class="form-label" for="">Ảnh bìa</label>
                                 <input name="thumbnail" type='file' id="file-input" class="form-control" />
-                                <img class="mw-10 mt-4 border rounded-3" style="max-height:350px" id="image-preview"
-                                    src="{{ $service->thumbnail }}" />
+                                <img class="mw-10 mt-4 border rounded-3" id="image-preview"
+                                    src="https://vanhoadoanhnghiepvn.vn/wp-content/uploads/2020/08/112815953-stock-vector-no-image-available-icon-flat-vector.jpg" />
                                 @error('thumbnail')
                                     <p class="text-danger">{{ $message }}</p>
                                 @enderror
@@ -56,7 +55,7 @@
                         <div class="col-lg-6">
                             <div class="form-group mb-10">
                                 <label class="form-label" for="">Mô tả</label>
-                                <input type="text" name="description" class=" form-control" value="{{ old('description', $service->description) }}"/>
+                                <input type="text" name="description" class=" form-control" value="{{ old('description') }}"/>
                                 @error('name')
                                     <p class="text-danger">{{ $message }}</p>
                                 @enderror
@@ -69,7 +68,7 @@
                             </div>
                             <div class="form-group mb-10">
                                 <label class="form-label" for="">Link đăng ký</label>
-                                <input type="text" name="link" class=" form-control" value="{{ old('link', $service->link) }}"/>
+                                <input type="text" name="link" class=" form-control" value="{{ old('link') }}"/>
                                 @error('link')
                                     <p class="text-danger">{{ $message }}</p>
                                 @enderror
@@ -81,11 +80,30 @@
                                 @endif
                             </div>
                             <div class="form-group mb-10">
-                                <label class="form-label" for="">Trạng thái</label>
-                                <select name="status" class="form-control mb-2" >
-                                    <option @selected($service->status == config('util.ACTIVE_STATUS')) value="{{config('util.ACTIVE_STATUS')}}">Active</option>
-                                    <option @selected($service->status == config('util.INACTIVE_STATUS')) value="{{config('util.INACTIVE_STATUS')}}">Inactive</option>
-                                </select>
+                                <label class="form-label" for="">Hạn đăng ký</label>
+                                <input type="date" name="register_deadline" class=" form-control" value="{{ old('register_deadline') }}"/>
+                                @error('register_deadline')
+                                    <p class="text-danger">{{ $message }}</p>
+                                @enderror
+                                @if (session()->has('errorName'))
+                                    <p class="text-danger">{{ session()->get('errorName') }}</p>
+                                    @php
+                                        Session::forget('errorName');
+                                    @endphp
+                                @endif
+                            </div>
+                            <div class="form-group mb-10">
+                                <label class="form-label" for="">Hạn sử dụng</label>
+                                <input type="date" name="expire_date" class=" form-control" value="{{ old('expire_date') }}"/>
+                                @error('expire_date')
+                                    <p class="text-danger">{{ $message }}</p>
+                                @enderror
+                                @if (session()->has('errorName'))
+                                    <p class="text-danger">{{ session()->get('errorName') }}</p>
+                                    @php
+                                        Session::forget('errorName');
+                                    @endphp
+                                @endif
                             </div>
                         </div>
                     </div>

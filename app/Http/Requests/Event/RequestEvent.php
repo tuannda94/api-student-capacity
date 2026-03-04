@@ -24,22 +24,17 @@ class RequestEvent extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|max: 255',
-            'description' => 'max:1000',
+            'name' => 'required|max:255',
+            'description' => 'max:5000',
+            'note' => 'max:5000',
+            'register_link' => 'nullable|url',
+            'interview_count' => 'numeric|min:0',
+            'jobs_opening_count' => 'numeric|min:0',
             'start_at' => 'required|date|before_or_equal:end_at',
             'end_at' => 'required|date|after_or_equal:start_at|after_or_equal:now',
-            'thumbnail' => 'required|mimes:jpeg,png,jpg|max:10000',
-        ];
-    }
-
-    public function messages()
-    {
-        return [
-            'name.required' => 'Tên không được bỏ trống',
-            'name.max' => 'Tên không được lớn hơn 255 ký tự',
-            'start_at.before_or_equal' => 'Thời gian bắt đầu không được nhỏ hơn thời gian kết thúc',
-            'end_at.after_or_equal:start_at' => 'Thời gian kết thúc phải lớn hơn thời gian bắt đầu',
-            'end_at.after_or_equal' => 'Thời gian kết thúc phải lớn hơn thời điểm hiện tại',
+            'thumbnail' => $this->isMethod('post') 
+                ? 'required|mimes:jpeg,png,jpg|max:10000'
+                : 'nullable|mimes:jpeg,png,jpg|max:10000',
         ];
     }
 }

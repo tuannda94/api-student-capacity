@@ -67,6 +67,19 @@
                                 @endif
                             </div>
                             <div class="form-group mb-10">
+                                <label class="form-label" for="">Link đăng ký</label>
+                                <input type="text" name="link" class=" form-control" value="{{ old('link') }}"/>
+                                @error('link')
+                                    <p class="text-danger">{{ $message }}</p>
+                                @enderror
+                                @if (session()->has('errorName'))
+                                    <p class="text-danger">{{ session()->get('errorName') }}</p>
+                                    @php
+                                        Session::forget('errorName');
+                                    @endphp
+                                @endif
+                            </div>
+                            <div class="form-group mb-10">
                                 <label class="form-label" for="">Trạng thái</label>
                                 <select name="status" class="form-control mb-2" >
                                     <option value="{{config('util.ACTIVE_STATUS')}}">Active</option>
