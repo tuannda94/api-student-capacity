@@ -40,6 +40,7 @@
                             <th scope="col">Dịch vụ</th>
                             <th scope="col">Người tạo</th>
                             <th scope="col">Ảnh bìa</th>
+                            <th scope="col">Link đăng ký</th>
                             <th scope="col">Mô tả</th>
                             <th scope="col">Trạng thái</th>
                             <th scope="col">Số lượt đăng ký dịch vụ</th>
@@ -64,6 +65,7 @@
                                         Chưa có ảnh bìa
                                     @endif
                                 </td>
+                                <td>{{ $item->link }}</td>
                                 <td>{{ $item->description }}</td>
                                 <td>
                                     @if ($item->status == config('util.ACTIVE_STATUS'))
