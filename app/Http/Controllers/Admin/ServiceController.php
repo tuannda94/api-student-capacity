@@ -77,10 +77,11 @@ class ServiceController extends Controller
                 'name' => $request->name,
                 'status' => $request->status,
                 'description' => $request->description,
+                'link' => $request->link,
                 'created_by' => auth()->user()->id,
             ];
             $thumbnail = $this->uploadFile($request->file('thumbnail'));
-            if (!$thumbnail)  return redirect()->back()->with('error', 'Thêm mới thất bại !');
+            if (!$thumbnail)  return redirect()->back()->with('error', 'Upload ảnh thất bại !');
             $data['thumbnail'] = $thumbnail;
             $this->service->create($data);
             
@@ -100,10 +101,18 @@ class ServiceController extends Controller
                 'name' => $request->name,
                 'status' => $request->status,
                 'description' => $request->description,
+                'link' => $request->link,
+                'thumbnail' => $service->thumbnail,
             ];
-            $thumbnail = $this->uploadFile($request->file('thumbnail'));
-            if (!$thumbnail)  return redirect()->back()->with('error', 'Thêm mới thất bại !');
-            $data['thumbnail'] = $thumbnail;
+            // nếu có upload ảnh mới
+            if ($request->hasFile('thumbnail')) {
+                $thumbnail = $this->uploadFile($request->file('thumbnail'));
+                if (!$thumbnail) {
+                    return redirect()->back()->with('error', 'Upload ảnh thất bại!');
+                }
+                $data['thumbnail'] = $thumbnail;
+            }
+            
             $service->update($data);
             
             return redirect()->route('admin.service.list');
@@ -124,9 +133,11 @@ class ServiceController extends Controller
     }
 
     /**API for client */
-    public function getListEvents(Request $request) {
+    public function getServices(Request $request) {
         $data = $this->getList($request)
-            ->paginate(20);
+            ->where('status', config('util.ACTIVE_STATUS'))
+            ->limit(6)
+            ->get();
         if (!$data) abort(404);
         
         return $this->responseApi(true, $data);

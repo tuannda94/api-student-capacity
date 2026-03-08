@@ -41,17 +41,4 @@ class EventParticipant extends Model
     {
         return $query->where('role', config('util.EVENT.PARTICIPANT.ROLE.USER'));
     }
-
-    public function scopeReviewing($query)
-    {
-        return $query->where('status', config('util.EVENT.PARTICIPANT.STATUS.REVIEWING'));
-    }
-    public function scopeApprove($query)
-    {
-        return $query->where('status', config('util.EVENT.PARTICIPANT.STATUS.APPROVE'));
-    }
-    public function scopeReject($query)
-    {
-        return $query->where('status', config('util.EVENT.PARTICIPANT.STATUS.REJECT'));
-    }
 }

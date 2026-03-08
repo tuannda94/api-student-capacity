@@ -32,9 +32,10 @@ use App\Http\Controllers\Admin\RecruitmentController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\PrintPDFController;
 use App\Http\Controllers\Admin\PrintExcelController;
+use App\Http\Controllers\Admin\PrivilegeController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SupportController;
-use App\Models\EventParticipant;
+use App\Http\Controllers\Admin\StatController;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::prefix('dashboard')->group(function () {
@@ -526,12 +527,17 @@ Route::group([
         Route::delete('delete/{companyContact}', [CompanyContactController::class, 'destroy'])->name('admin.cc.delete');
     });
     Route::prefix('events')->group(function () {
-        Route::prefix('{event}/participants')->group(function() {
-            Route::get('', [EventParticipantController::class, 'list'])->name('admin.event.participants');
-            Route::post('/add-mentor', [EventParticipantController::class, 'addMentor'])->name('admin.event.addMentor');
-            Route::delete('{participant}/remove', [EventParticipantController::class, 'remove'])->name('admin.event.remove');
-            Route::put('{participant}/approve', [EventParticipantController::class, 'approve'])->name('admin.event.approveMentor');
-            Route::put('{participant}/reject', [EventParticipantController::class, 'reject'])->name('admin.event.rejectMentor');
+        Route::prefix('{event}')->group(function() {
+            Route::prefix('participants')->group(function () {
+                Route::get('', [EventParticipantController::class, 'list'])->name('admin.event.participants');
+                Route::post('/add-mentor', [EventParticipantController::class, 'addMentor'])->name('admin.event.addMentor');
+                Route::delete('{participant}/remove', [EventParticipantController::class, 'remove'])->name('admin.event.removeParticipant');
+            });
+            Route::prefix('sponsors')->group(function () {
+                Route::get('', [EventController::class, 'sponsors'])->name('admin.event.sponsors');
+                Route::post('/add', [EventController::class, 'addSponsors'])->name('admin.event.addSponsors');
+                Route::delete('{sponsor}/remove', [EventController::class, 'deleteSponsor'])->name('admin.event.removeSponsor');
+            });
         });
         Route::get('', [EventController::class, 'index'])->name('admin.event.list');
         Route::get('edit/{event}', [EventController::class, 'edit'])->name('admin.event.edit');
@@ -551,7 +557,22 @@ Route::group([
         Route::post('store', [ServiceController::class, 'store'])->name('admin.service.store');
         Route::delete('delete/{service}', [ServiceController::class, 'destroy'])->name('admin.service.delete');
     });
-
+    Route::prefix('stats')->group(function () {
+        Route::get('', [StatController::class, 'index'])->name('admin.stat.list');
+        Route::get('edit/{stat}', [StatController::class, 'edit'])->name('admin.stat.edit');
+        Route::put('update/{stat}', [StatController::class, 'update'])->name('admin.stat.update');
+        Route::get('create', [StatController::class, 'create'])->name('admin.stat.create');
+        Route::post('store', [StatController::class, 'store'])->name('admin.stat.store');
+        Route::delete('delete/{stat}', [StatController::class, 'destroy'])->name('admin.stat.delete');
+    });
+    Route::prefix('privileges')->group(function () {
+        Route::get('', [PrivilegeController::class, 'index'])->name('admin.privilege.list');
+        Route::get('edit/{privilege}', [PrivilegeController::class, 'edit'])->name('admin.privilege.edit');
+        Route::put('update/{privilege}', [PrivilegeController::class, 'update'])->name('admin.privilege.update');
+        Route::get('create', [PrivilegeController::class, 'create'])->name('admin.privilege.create');
+        Route::post('store', [PrivilegeController::class, 'store'])->name('admin.privilege.store');
+        Route::delete('delete/{privilege}', [PrivilegeController::class, 'destroy'])->name('admin.privilege.delete');
+    });
     Route::get('support-poly', [SupportController::class, 'index'])->name('admin.support');
 });
 

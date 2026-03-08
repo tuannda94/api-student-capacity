@@ -1,117 +1,139 @@
 @extends('layouts.main')
-@section('title', 'Quản lý người tham gia sự kiện')
-@section('page-title', 'Quản lý người tham gia sự kiện')
+@section('title', 'Quản lý sự kiện')
+@section('page-title', 'Quản lý sự kiện')
 @section('content')
-    <div>
-        <div class="card card-flush p-4 mt-4">
-            <div class="row">
-                <div class=" col-lg-6">
-                    <h1>Danh sách tham gia sự kiện {{$event->name}}</h1>
-                </div>
-                <div class=" col-lg-6">
-                    @if ($type == 1) 
-                    <div class=" d-flex flex-row-reverse bd-highlight">
-                        <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#add_mentor_{{ $event->id }}">
-                            Thêm mentor
-                        </button>
+    <div class="card card-flush p-4">
+        <div class="row">
+            <div class=" col-lg-6">
+                <h1>Doanh nghiệp đồng hành cùng {{ $event->name }}</h1>
+            </div>
+            <div class=" col-lg-6">
+                <div class=" d-flex flex-row-reverse bd-highlight">
+                    <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#add_enterprise_{{ $event->id }}">
+                        Thêm doanh nghiệp
+                    </button>
 
-                        <!-- Modal -->
-                        <div class="modal fade" id="add_mentor_{{ $event->id }}" tabindex="-1"
-                                aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">
-                                            Thêm mentors
-                                        </h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form action="{{ route('admin.event.addMentor', [$event->id]) }}" method="POST">
-                                            @csrf
-                                            <div class="mb-3">
-                                                <label class="form-label">Chọn mentor</label>
-                                                <select 
-                                                    id="selectUser" 
-                                                    class="form-select mb-2 select2-hidden-accessible"
-                                                    data-control="select2"
-                                                    data-hide-search="false" 
-                                                    tabindex="-1" 
-                                                    aria-hidden="true" 
-                                                    name="user_ids[]"
-                                                    multiple="multiple"
-                                                >
-                                                    @foreach ($users as $u)
-                                                        <option
-                                                             value="{{ $u->id }}">
-                                                            {{ $u->name }} ({{$u->email}})
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
+                    <!-- Modal -->
+                    <div class="modal fade" id="add_enterprise_{{ $event->id }}" tabindex="-1"
+                            aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">
+                                        Thêm doanh nghiệp
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="{{ route('admin.event.addSponsors', [$event->id]) }}" method="POST">
+                                        @csrf
+                                        <div class="mb-3">
+                                            <label class="form-label">Chọn hạng</label>
+                                            <select class="form-select" name="priority">
+                                                <option value="0">Ban tổ chức</option>
+                                                <option value="4">Tài trợ kim cương</option>
+                                                <option value="3">Tài trợ vàng</option>
+                                                <option value="2">Tài trợ bạc</option>
+                                                <option value="1">Doanh nghiệp đồng hành</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Chọn doanh nghiệp</label>
+                                            <select 
+                                                id="selectUser" 
+                                                class="form-select mb-2 select2-hidden-accessible"
+                                                data-control="select2"
+                                                data-hide-search="false" 
+                                                tabindex="-1" 
+                                                aria-hidden="true" 
+                                                name="sponsor_ids[]"
+                                                multiple="multiple"
+                                            >
+                                                @foreach ($enterprises as $e)
+                                                    <option
+                                                        value="{{ $e->id }}">
+                                                        {{ $e->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
 
-                                            <div class="text-end">
-                                                <button type="submit" class="btn btn-primary">
-                                                    Thêm mentors
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
+                                        <div class="text-end">
+                                            <button type="submit" class="btn btn-primary">
+                                                Thêm doanh nghiệp
+                                            </button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    @endif
                 </div>
             </div>
-            {{-- Tabs --}}
-            <ul class="nav nav-tabs">
-                <li class="nav-item">
-                    <a class="nav-link {{ $type == 1 ? 'active' : '' }}"
-                    href="{{ route('admin.event.participants', [$event->id, 'type' => 1]) }}">
-                        Mentor chính thức ({{$event->participants()->mentor()->count()}})
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link {{ $type == 2 ? 'active' : '' }}"
-                    href="{{ route('admin.event.participants', [$event->id, 'type' => 2]) }}">
-                        User thường ({{$event->participants()->normalUser()->count()}})
-                    </a>
-                </li>
-            </ul>
-
-            {{-- Content --}}
-            <div id="participant-content" class="mt-4 position-relative">
-                @if (count($participants) > 0)
+        </div>
+        {{-- Tabs --}}
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link {{ $priority == 0 ? 'active' : '' }}"
+                href="{{ route('admin.event.sponsors', [$event->id, 'priority' => 0]) }}">
+                    Ban tổ chức ({{$event->sponsors()->host()->count()}})
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ $priority == 4 ? 'active' : '' }}"
+                href="{{ route('admin.event.sponsors', [$event->id, 'priority' => 4]) }}">
+                    Nhà tài trợ kim cương ({{$event->sponsors()->diamond()->count()}})
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ $priority == 3 ? 'active' : '' }}"
+                href="{{ route('admin.event.sponsors', [$event->id, 'priority' => 3]) }}">
+                    Nhà tài trợ vàng ({{$event->sponsors()->gold()->count()}})
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ $priority == 2 ? 'active' : '' }}"
+                href="{{ route('admin.event.sponsors', [$event->id, 'priority' => 2]) }}">
+                    Nhà tài trợ bạc ({{$event->sponsors()->silver()->count()}})
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ $priority == 1 ? 'active' : '' }}"
+                href="{{ route('admin.event.sponsors', [$event->id, 'priority' => 1]) }}">
+                    Doanh nghiệp đồng hành ({{$event->sponsors()->participant()->count()}})
+                </a>
+            </li>
+        </ul>
+        <div class="table-responsive">
+        @if (count($sponsors) > 0)
                 <table class="table table-row-bordered table-row-gray-300 gy-7 table-hover">
                     <thead>
                         <tr>
-                            <th scope="col">Tên người tham gia</th>
-                            <th scope="col">Email người tham gia</th>
-                            <th scope="col">Ảnh đại diện</th>
-                            <th scope="col">Thời điểm tham gia</th>
+                            <th scope="col">Tên doanh nghiệp</th>
+                            <th scope="col">Logo</th>
+                            <th scope="col">Email liên hệ</th>
+                            <th scope="col">SĐT liên hệ</th>
                             <th class="text-center">
 
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($participants as $item)
+                        @forelse ($sponsors as $item)
                             <tr>
                                 <td>
-                                    <span>{{ $item->user->name }}</span>
-                                </td>
-                                <td>
-                                    <span>{{ $item->user->email }}</span>
+                                    <span>{{ $item->company->name }}</span>
                                 </td>
                                 <td>
                                     <img style="max-height: 150px;" alt="avatar"
-                                        src="{{ $item->user->avatar ?? 'assets/media/avatars/blank.png' }}" />
+                                        src="{{ $item->company->logo ?? 'assets/media/avatars/blank.png' }}" />
                                 </td>
                                 <td>
-                                    <span>{{ $item->created_at }}</span>
+                                    <span>{{ $item->company->contact_email }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ $item->company->contact_phone }}</span>
                                 </td>
                                 <td>
                                     <div data-bs-toggle="tooltip" title="Thao tác" class="btn-group dropstart">
@@ -136,7 +158,7 @@
                                         </button>
                                         <ul class="dropdown-menu  px-4 ">
                                             <li class="my-3">
-                                                <form action="{{ route('admin.event.removeParticipant', [$event->id, $item->id]) }}"
+                                                <form action="{{ route('admin.event.removeSponsor', [$event->id, $item->id]) }}"
                                                     id="delete_{{$item->id}}"
                                                     method="post">
                                                     @csrf
@@ -175,13 +197,14 @@
                         @endforelse
                     </tbody>
                 </table>
-                {{ $participants->appends(request()->all())->links('pagination::bootstrap-4') }}
+                {{ $sponsors->appends(request()->all())->links('pagination::bootstrap-4') }}
             @else
                 <h2>Không có dữ liệu !!!</h2>
             @endif
-            </div>
         </div>
     </div>
+
+
 @endsection
 
 @section('page-script')
@@ -189,8 +212,8 @@
     <script>
     $(document).ready(function() {
         $('#selectUser').select2({
-            dropdownParent: $('#add_mentor_{{ $event->id }}'),
-            placeholder: "Chọn user",
+            dropdownParent: $('#add_enterprise_{{ $event->id }}'),
+            placeholder: "Chọn doanh nghiệp",
             width: '100%',
             closeOnSelect: false
         });

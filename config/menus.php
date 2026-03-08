@@ -97,6 +97,13 @@ return [
         ]
     ], // Dịch vụ - sự kiện
     [
+        "icon" => '',
+        "name" => 'Đặc quyền sinh viên',
+        "role" => $ROLE_HAS_ADMINS,
+        "param" => '',
+        "link" => "admin.privilege.list",
+    ], //đặc quyền sinh viên
+    [
         "icon" => '<span class="svg-icon svg-icon-primary svg-icon-2x"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo1/dist/../src/media/svg/icons/General/Search.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
             <rect x="0" y="0" width="24" height="24"/>
@@ -261,6 +268,12 @@ return [
         "name" => "Cấu hình",
         "role" => $ROLE_HAS_ADMINS,
         "subs-menu" => [
+            [
+                "name" => "Thông số trang chủ",
+                "role" => $ROLE_HAS_ADMINS,
+                "param" => '',
+                "link" => 'admin.stat.list',
+            ],
             [
                 "name" => "Cơ sở",
                 "role" => $ROLE_HAS_ADMINS,

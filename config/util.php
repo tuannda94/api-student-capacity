@@ -43,6 +43,14 @@ return [
         ],
     ],
 
+    'SPONSOR_PRIORITY' => [
+        'HOST' => 0, //BTC
+        'PARTICIPANT' => 1, //tham gia thường
+        'SILVER' => 2, //tài trợ bạc
+        'GOLD' => 3, //tài trợ vàng
+        'DIAMOND' => 4, //tài trợ kim cương
+    ],
+
     'SERVICE' => [
         'REQUEST_STATUS' => [
             'IN_PROGRESS' => 0,

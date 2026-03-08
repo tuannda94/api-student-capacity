@@ -569,4 +569,26 @@ class UserController extends Controller
             ]);
         }
     }
+
+    public function getMentors(Request $request) 
+    {
+        try {
+            $mentors = $this->modeluser::where('status', config('util.ACTIVE_STATUS'))
+                ->whereHas('roles', function ($query) {
+                    $query->where('id', config('util.MENTOR_ROLE'));
+                })
+                ->get();
+            
+            return response()->json([
+                'status' => true,
+                'payload' => $mentors,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th->getMessage());
+            return response()->json([
+                'status' => false,
+                'payload' => "error",
+            ]);
+        }
+    }
 }

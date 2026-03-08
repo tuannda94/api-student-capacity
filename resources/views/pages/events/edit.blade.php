@@ -53,7 +53,7 @@
                             <div class="form-group mb-10">
                                 <label class="form-label" for="">Ảnh bìa</label>
                                 <input name="thumbnail" type='file' id="file-input" class="form-control" />
-                                <img class="mw-10 mt-4 border rounded-3" id="image-preview"
+                                <img class="mw-10 mt-4 border rounded-3" style="max-height:350px" id="image-preview"
                                     src="{{ $event->thumbnail }}" />
                                 @error('thumbnail')
                                     <p class="text-danger">{{ $message }}</p>

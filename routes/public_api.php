@@ -19,10 +19,13 @@ use App\Http\Controllers\Admin\SkillController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\Admin\CompanyContactController;
+use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\FaqCategoryController;
 use App\Http\Controllers\Admin\FaqRatingController;
 use App\Http\Controllers\Admin\FrequentlyAskedQuestionController;
+use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SponsorController as AdminSponsorController;
+use App\Http\Controllers\Admin\StatController;
 use App\Http\Controllers\Admin\StudentStatusController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\WishlistController;
@@ -152,3 +155,8 @@ Route::prefix('question-and-answer')->group(function () {
 Route::group(['prefix'=>'company-contact', 'middleware' =>'throttle:3'], function () {
     Route::post('add', [CompanyContactController::class, 'apiSaveCompanyContact']);
 });
+
+Route::get('stats', [StatController::class, 'getListStats']);
+Route::get('mentors', [AdminUserController::class, 'getMentors']);
+Route::get('services', [ServiceController::class, 'getServices']);
+Route::get('events', [EventController::class, 'getCurrentEvent']);
