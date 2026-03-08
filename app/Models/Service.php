@@ -25,6 +25,7 @@ class Service extends Model
         'thumbnail',
         'status',
         'created_by',
+        'link',
     ];
 
     public function createdBy() {
