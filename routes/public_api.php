@@ -23,12 +23,14 @@ use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\FaqCategoryController;
 use App\Http\Controllers\Admin\FaqRatingController;
 use App\Http\Controllers\Admin\FrequentlyAskedQuestionController;
+use App\Http\Controllers\Admin\PrivilegeController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SponsorController as AdminSponsorController;
 use App\Http\Controllers\Admin\StatController;
 use App\Http\Controllers\Admin\StudentStatusController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\WishlistController;
+use App\Models\Privilege;
 use Illuminate\Support\Facades\Route;
 
 
@@ -160,3 +162,4 @@ Route::get('stats', [StatController::class, 'getListStats']);
 Route::get('mentors', [AdminUserController::class, 'getMentors']);
 Route::get('services', [ServiceController::class, 'getServices']);
 Route::get('events', [EventController::class, 'getCurrentEvent']);
+Route::get('privileges', [PrivilegeController::class, 'getPrivileges']);
