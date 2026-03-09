@@ -112,4 +112,14 @@ class PrivilegeController extends Controller
         }
     }
 
+
+    /**API for client */
+    public function getPrivileges(Request $request)
+    {
+        $data = $this->getList($request)
+            ->paginate(20);
+        if (!$data) abort(404);
+        
+        return $this->responseApi(true, $data);
+    }
 }

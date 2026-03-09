@@ -577,6 +577,7 @@ class UserController extends Controller
                 ->whereHas('roles', function ($query) {
                     $query->where('id', config('util.MENTOR_ROLE'));
                 })
+                ->with('info')
                 ->get();
             
             return response()->json([

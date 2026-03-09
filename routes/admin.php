@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\FaqRatingController;
 use App\Http\Controllers\Admin\FrequentlyAskedQuestionController;
 use App\Http\Controllers\Admin\JobController;
 use App\Http\Controllers\Admin\KeywordController;
+use App\Http\Controllers\Admin\MentorController;
 use App\Http\Controllers\Admin\RecruitmentController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\PrintPDFController;
@@ -572,6 +573,11 @@ Route::group([
         Route::get('create', [PrivilegeController::class, 'create'])->name('admin.privilege.create');
         Route::post('store', [PrivilegeController::class, 'store'])->name('admin.privilege.store');
         Route::delete('delete/{privilege}', [PrivilegeController::class, 'destroy'])->name('admin.privilege.delete');
+    });
+    Route::prefix('mentors')->group(function () {
+        Route::get('', [MentorController::class, 'index'])->name('admin.mentor.list');
+        Route::post('/add', [MentorController::class, 'addMentors'])->name('admin.mentor.addMentors');
+        Route::post('/info', [MentorController::class, 'saveInfo'])->name('admin.mentor.saveInfo');
     });
     Route::get('support-poly', [SupportController::class, 'index'])->name('admin.support');
 });
