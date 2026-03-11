@@ -576,7 +576,8 @@ Route::group([
     });
     Route::prefix('mentors')->group(function () {
         Route::get('', [MentorController::class, 'index'])->name('admin.mentor.list');
-        Route::post('/add', [MentorController::class, 'addMentors'])->name('admin.mentor.addMentors');
+        Route::post('/add', [MentorController::class, 'addMentorsHaveAccount'])->name('admin.mentor.addMentorsHaveAccount');
+        Route::post('/add-no-account', [MentorController::class, 'addMentorNoAccount'])->name('admin.mentor.addMentorNoAccount');
         Route::post('/info', [MentorController::class, 'saveInfo'])->name('admin.mentor.saveInfo');
     });
     Route::get('support-poly', [SupportController::class, 'index'])->name('admin.support');

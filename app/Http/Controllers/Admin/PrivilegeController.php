@@ -42,7 +42,7 @@ class PrivilegeController extends Controller
                 
             return view('pages.privileges.list', compact('privileges'));
         } catch (\Throwable $th) {
-            return response()->json(['status' => 'error']);
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 
@@ -64,9 +64,9 @@ class PrivilegeController extends Controller
             $data['thumbnail'] = $thumbnail;
             $this->privilege->create($data);
             
-            return redirect()->route('admin.privilege.list');
+            return redirect()->route('admin.privilege.list')->with('success', 'Thêm đặc quyền sinh viên thành công');
         } catch (\Throwable $th) {
-            return redirect('error');
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 
@@ -95,9 +95,9 @@ class PrivilegeController extends Controller
             }
             $privilege->update($data);
             
-            return redirect()->route('admin.privilege.list');
+            return redirect()->route('admin.privilege.list')->with('success', 'Sửa đặc quyền sinh viên thành công');
         } catch (\Throwable $th) {
-            return redirect('error');
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 
@@ -106,9 +106,9 @@ class PrivilegeController extends Controller
             if (!(auth()->user()->hasRole(config('util.ROLE_ADMINS')))) return false;
             $privilege->delete();
 
-            return redirect()->back();
+            return redirect()->back()->with('success', 'Xóa đặc quyền sinh viên thành công');
         } catch (\Throwable $th) {
-            return redirect('error');
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 

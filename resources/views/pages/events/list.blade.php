@@ -1,11 +1,11 @@
 @extends('layouts.main')
-@section('title', 'Quản lý sự kiện')
-@section('page-title', 'Quản lý sự kiện')
+@section('title', 'Quản lý ngày hội việc làm')
+@section('page-title', 'Quản lý ngày hội việc làm')
 @section('content')
     <div class="card card-flush p-4">
         <div class="row">
             <div class=" col-lg-6">
-                <h1>Danh sách sự kiện
+                <h1>Danh sách ngày hội việc làm
                     <a href="{{ route('admin.event.list') }}">
                         <span role="button" data-bs-toggle="tooltip" title="Tải lại trang "
                             class="refresh-btn svg-icon svg-icon-primary svg-icon-2x">
@@ -27,7 +27,7 @@
             <div class=" col-lg-6">
                 <div class=" d-flex flex-row-reverse bd-highlight">
                     <a href="{{ route('admin.event.create') }}" class=" btn btn-primary">
-                        Tạo sự kiện mới
+                        Tạo ngày hội việc làm mới
                     </a>
                 </div>
             </div>
@@ -37,7 +37,7 @@
                 <table class="table table-row-bordered table-row-gray-300 gy-7 table-hover">
                     <thead>
                         <tr>
-                            <th scope="col">Sự kiện</th>
+                            <th scope="col">ngày hội việc làm</th>
                             <th scope="col">Người tạo</th>
                             <th scope="col">Ảnh bìa</th>
                             <th scope="col">Ngày bắt đầu</th>

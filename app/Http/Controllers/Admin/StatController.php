@@ -24,7 +24,7 @@ class StatController extends Controller
                 
             return view('pages.stats.list', compact('stats'));
         } catch (\Throwable $th) {
-            return response()->json(['status' => 'error']);
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 
@@ -45,9 +45,9 @@ class StatController extends Controller
             $data['icon'] = $icon;
             $this->stat->create($data);
             
-            return redirect()->route('admin.stat.list');
+            return redirect()->route('admin.stat.list')->with('success', 'Thêm thông số thành công');
         } catch (\Throwable $th) {
-            return redirect('error');
+            return back()->with('error', $th->getMessage());
         }
     }
 
@@ -75,10 +75,9 @@ class StatController extends Controller
             }
             $stat->update($data);
             
-            return redirect()->route('admin.stat.list');
+            return redirect()->route('admin.stat.list')->with('success', 'Sửa thông số thành công');;
         } catch (\Throwable $th) {
-            dd($th);
-            return redirect('error');
+            return back()->with('error', $th->getMessage());
         }
     }
 
@@ -87,9 +86,9 @@ class StatController extends Controller
             if (!(auth()->user()->hasRole(config('util.ROLE_ADMINS')))) return false;
             $stat->delete();
 
-            return redirect()->back();
+            return redirect()->back()->with('success', 'Xóa thông số thành công');;
         } catch (\Throwable $th) {
-            return abort(400);
+            return back()->with('error', $th->getMessage());
         }
     }
 

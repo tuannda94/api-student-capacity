@@ -79,17 +79,17 @@ return [
     ], // Q&A
     [
         "icon" => '',
-        "name" => 'Dịch vụ - Sự kiện',
+        "name" => 'Chức năng mới request 03/2026',
         "role" => $ROLE_HAS_ADMINS,
         "subs-menu" => [
             [
-                "name" => "Dịch vụ",
+                "name" => "Dịch vụ việc làm",
                 "param" => '',
                 "link" => "admin.service.list",
                 "role" => $ROLE_HAS_ADMINS
             ],
             [
-                "name" => "Sự kiện",
+                "name" => "Ngày hội việc làm",
                 "param" => '',
                 "link" => "admin.event.list",
                 "role" => $ROLE_HAS_ADMINS
@@ -105,7 +105,19 @@ return [
                 "role" => $ROLE_HAS_ADMINS,
                 "param" => '',
                 "link" => "admin.privilege.list",
-            ], //đặc quyền sinh viên
+            ], 
+            // [
+            //     "name" => 'Vườn ươm khởi nghiệp',
+            //     "role" => $ROLE_HAS_ADMINS,
+            //     "param" => '',
+            //     "link" => "admin.privilege.list",
+            // ], 
+            [
+                "name" => "Thông số trang chủ",
+                "role" => $ROLE_HAS_ADMINS,
+                "param" => '',
+                "link" => 'admin.stat.list',
+            ],
         ]
     ], // Dịch vụ - sự kiện
     
@@ -274,12 +286,6 @@ return [
         "name" => "Cấu hình",
         "role" => $ROLE_HAS_ADMINS,
         "subs-menu" => [
-            [
-                "name" => "Thông số trang chủ",
-                "role" => $ROLE_HAS_ADMINS,
-                "param" => '',
-                "link" => 'admin.stat.list',
-            ],
             [
                 "name" => "Cơ sở",
                 "role" => $ROLE_HAS_ADMINS,
