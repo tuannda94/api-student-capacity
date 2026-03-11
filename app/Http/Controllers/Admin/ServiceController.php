@@ -44,7 +44,7 @@ class ServiceController extends Controller
             
             return view('pages.services.list', compact('services'));
         } catch (\Throwable $th) {
-            return redirect('error');
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 
@@ -63,7 +63,7 @@ class ServiceController extends Controller
             
             return view('pages.services.requests', compact('service', 'requests', 'status'));
         } catch (\Throwable $th) {
-            return redirect('error');
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 
@@ -85,9 +85,9 @@ class ServiceController extends Controller
             $data['thumbnail'] = $thumbnail;
             $this->service->create($data);
             
-            return redirect()->route('admin.service.list');
+            return redirect()->route('admin.service.list')->with('success', 'Thêm dịch vụ thành công');
         } catch (\Throwable $th) {
-            return redirect('error');
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 
@@ -115,9 +115,9 @@ class ServiceController extends Controller
             
             $service->update($data);
             
-            return redirect()->route('admin.service.list');
+            return redirect()->route('admin.service.list')->with('success', 'Thêm dịch vụ thành công');
         } catch (\Throwable $th) {
-            return redirect('error');
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 
@@ -126,9 +126,9 @@ class ServiceController extends Controller
             if (!(auth()->user()->hasRole(config('util.ROLE_ADMINS')))) return false;
             $service->delete();
 
-            return redirect()->back();
+            return redirect()->back()->with('success', 'Xóa dịch vụ thành công');
         } catch (\Throwable $th) {
-            return redirect('error');
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 

@@ -47,7 +47,7 @@ class EventController extends Controller
                 
             return view('pages.events.list', compact('events'));
         } catch (\Throwable $th) {
-            return response()->json(['status' => 'error']);
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 
@@ -74,9 +74,9 @@ class EventController extends Controller
             $data['thumbnail'] = $thumbnail;
             $this->event->create($data);
             
-            return redirect()->route('admin.event.list');
+            return redirect()->route('admin.event.list')->with('success', 'Thêm ngày hội việc làm thành công');
         } catch (\Throwable $th) {
-            return redirect('error');
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 
@@ -108,9 +108,9 @@ class EventController extends Controller
             }
             $event->update($data);
             
-            return redirect()->route('admin.event.list');
+            return redirect()->route('admin.event.list')->with('success', 'Chỉnh sửa thành công');
         } catch (\Throwable $th) {
-            return redirect('error');
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 
@@ -119,9 +119,9 @@ class EventController extends Controller
             if (!(auth()->user()->hasRole(config('util.ROLE_ADMINS')))) return false;
             $event->delete();
 
-            return redirect()->back();
+            return redirect()->back()->with('success', 'Xóa ngày hội việc làm thành công');
         } catch (\Throwable $th) {
-            return redirect('error');
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 
@@ -175,7 +175,7 @@ class EventController extends Controller
 
             return back()->with('success', 'Thêm doanh nghiệp thành công');
         } catch (\Throwable $th) {
-            return back()->with('error', 'Something went wrong');
+            return back()->with('error', $th->getMessage());
         }
     }
 
@@ -186,9 +186,9 @@ class EventController extends Controller
             if ($sponsor->event_id != $event->id) return false;
             $sponsor->delete();
 
-            return redirect()->back();
+            return redirect()->back()->with('success', 'Xóa doanh nghiệp thành công');
         } catch (\Throwable $th) {
-            return redirect('error');
+            return back()->with('error', $th->getMessage());
         }
     }
 

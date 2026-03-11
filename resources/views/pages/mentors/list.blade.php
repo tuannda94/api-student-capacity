@@ -26,24 +26,28 @@
             </div>
             <div class=" col-lg-6">
                 <div class=" d-flex flex-row-reverse bd-highlight">
-                    <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#add_mentors">
-                        Thêm mentors
+                    <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#add_mentor_no_account">
+                        Thêm mentors chưa có tài khoản
                     </button>
 
-                    <!-- Modal -->
-                    <div class="modal fade" id="add_mentors" tabindex="-1"
+                    <button class="btn btn-primary mx-2" type="button" data-bs-toggle="modal" data-bs-target="#add_mentors_has_account">
+                        Thêm mentors đã có tài khoản (trừ tài khoản có quyền admin/super admin)
+                    </button>
+
+                    <!-- Modal add mentors have account-->
+                    <div class="modal fade" id="add_mentors_has_account" tabindex="-1"
                             aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-lg">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="exampleModalLabel">
-                                        Thêm mentors
+                                        Thêm mentors từ tài khoản có trong hệ thống
                                     </h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                             aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <form action="{{ route('admin.mentor.addMentors') }}" method="POST">
+                                    <form action="{{ route('admin.mentor.addMentorsHaveAccount') }}" method="POST">
                                         @csrf
                                         <div class="mb-3">
                                             <label class="form-label">Chọn mentor</label>
@@ -63,6 +67,78 @@
                                             </select>
                                         </div>
 
+                                        <div class="text-end">
+                                            <button type="submit" class="btn btn-primary">
+                                                Thêm Mentor
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal add mentors have no account-->
+                    <div class="modal fade" id="add_mentor_no_account" tabindex="-1"
+                            aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">
+                                        Thêm mentors chưa có tài khoản trong hệ thống
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="{{ route('admin.mentor.addMentorNoAccount') }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="mb-3 form-group">
+                                                    <label class="form-label">Họ tên</label>
+                                                    <input class="form-control" type="text" name="name" value="{{old('name')}}">
+                                                </div>
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label" for="">Avatar</label>
+                                                    <input name="avatar" type='file' id="file-input" class="form-control" />
+                                                    <img class="mt-2 border rounded-3" style="max-height:150px;" id="image-preview"
+                                                        src="https://vanhoadoanhnghiepvn.vn/wp-content/uploads/2020/08/112815953-stock-vector-no-image-available-icon-flat-vector.jpg" />
+                                                </div>
+                                                <div class="mb-3 form-group">
+                                                    <label class="form-label">Khu vực</label>
+                                                    <select name="location" class="form-control">
+                                                        <option value="" disabled>Chọn tỉnh / thành</option>
+                                                        @foreach(config('util.PROVINCES') as $key => $province)
+                                                            <option value="{{$key}}"> {{$province}} </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="mb-3 form-group">
+                                                    <label class="form-label">Email</label>
+                                                    <input class="form-control" type="email" name="email" value="{{old('email')}}">
+                                                </div>
+                                                <div class="mb-3 form-group">
+                                                    <label class="form-label">Trình độ học vấn</label>
+                                                    <input class="form-control" type="text" name="education" value="{{old('education')}}">
+                                                </div>
+                                                <div class="mb-3 form-group">
+                                                    <label class="form-label">Kinh nghiệm làm việc</label>
+                                                    <input class="form-control" type="text" name="experience" value="{{old('experience')}}">
+                                                </div>
+                                                <div class="mb-3 form-group">
+                                                    <label class="form-label">Vị trí công tác</label>
+                                                    <input class="form-control" type="text" name="position" value="{{old('position')}}">
+                                                </div>
+                                                <div class="mb-3 form-group">
+                                                    <label class="form-label">Thông tin thêm</label>
+                                                    <textarea class="form-control" type="text" name="note">{{old('note')}}</textarea>
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
                                         <div class="text-end">
                                             <button type="submit" class="btn btn-primary">
                                                 Thêm Mentor
@@ -203,7 +279,7 @@
                                 </td>
                             </tr>
 
-                            <!-- Modal -->
+                            <!-- Modal cập nhật thông tin mentor-->
                             <div class="modal fade" id="add_mentor_info_{{$item->id}}" tabindex="-1"
                                     aria-labelledby="exampleModalLabel" aria-hidden="true">
                                 <div class="modal-dialog modal-lg">
@@ -279,14 +355,17 @@
 
 @section('page-script')
     <script src="assets/js/system/formatlist/formatlis.js"></script>
+    <script src="assets/js/system/preview-file/previewImg.js"></script>
     <script>
     $(document).ready(function() {
         $('#selectUser').select2({
-            dropdownParent: $('#add_mentors'),
+            dropdownParent: $('#add_mentors_has_account'),
             placeholder: "Chọn user",
             width: '100%',
             closeOnSelect: false
         });
     });
+
+    preview.showFile('#file-input', '#image-preview');
     </script>
 @endsection

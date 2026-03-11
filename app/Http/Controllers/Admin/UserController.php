@@ -143,11 +143,12 @@ class UserController extends Controller
         );
     }
 
-    public function listAdmin()
+    public function listAdmin(Request $request)
     {
         if (!$users = $this->getUser()) return abort(404);
         $roles = $this->role::all();
-        return view('pages.auth.index', ['users' => $users, 'roles' => $roles]);
+
+        return view('pages.auth.index', compact('users', 'roles'));
     }
 
     private function checkRole()

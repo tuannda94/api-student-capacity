@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\MentorInfo;
 use App\Models\User;
 use App\Services\Traits\TResponse;
+use App\Services\Traits\TUploadImage;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 
 class MentorController extends Controller
@@ -55,11 +57,11 @@ class MentorController extends Controller
 
             return view('pages.mentors.list', compact('mentors', 'availableMentors'));
         } catch (\Throwable $th) {
-            return response()->json(['status' => 'error']);
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 
-    public function addMentors(Request $request)
+    public function addMentorsHaveAccount(Request $request)
     {
         try {
             $request->validate([
@@ -72,9 +74,49 @@ class MentorController extends Controller
                 $user->syncRoles($role->name);
             }
 
-            return back()->with('success', 'Thêm doanh nghiệp thành công');
+            return back()->with('success', 'Thêm mentors thành công');
         } catch (\Throwable $th) {
-            return back()->with('error', 'Something went wrong');
+            return back()->with('error', $th->getMessage());
+        }
+    }
+
+    public function addMentorNoAccount(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $userData = [
+                'name' => $request->name,
+                'email' => $request->email,
+            ];
+
+            //kiểm tra có up avatar không?
+            if ($request->hasFile('avatar')) {
+                $avatar = $this->uploadFile($request->file('avatar'));
+                if (!$avatar) {
+                    return redirect()->back()->with('error', 'Upload ảnh thất bại!');
+                }
+                $userData['avatar'] = $avatar;
+            }
+            $user = $this->mentor::create($userData); //tạo bản ghi trong bảng user
+            //set role mentor cho user mới tạo
+            $role = Role::find(config('util.MENTOR_ROLE'));
+            $user->syncRoles($role->name);
+
+            //lưu mentor_infos
+            $user->info()->create([
+                'location' => $request->location,
+                'experience' => $request->experience,
+                'education' => $request->education,
+                'position' => $request->position,
+                'note' => $request->note,
+            ]);
+            DB::commit();
+            
+            return back()->with('success', 'Thêm mentors thành công');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            
+            return back()->with('error', $th->getMessage());
         }
     }
 
@@ -93,7 +135,7 @@ class MentorController extends Controller
     
             return back()->with('success', 'Cập nhật thành công');
         } catch (\Throwable $th) {
-            return back()->with('error', 'Something went wrong');
+            return back()->with('error', $th->getMessage());
         }
     }
 
