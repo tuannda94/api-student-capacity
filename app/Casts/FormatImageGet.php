@@ -15,6 +15,9 @@ class FormatImageGet implements CastsAttributes
 
     public function get($model, string $key, $value, array $attributes)
     {
+        if (!$value) {
+            return null;
+        }
         if ($this->__checkRoute()) return $value;
         //check file exist in S3 bucket
         $s3 = new S3Client([

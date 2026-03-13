@@ -17,13 +17,13 @@ class Stat extends Model
         'created_at' => FormatDate::class,
         'updated_at' => FormatDate::class,
         'icon' => FormatImageGet::class,
+        'data' => 'array',
     ];
 
     protected $fillable = [
         'name',
         'icon',
-        'value',
-        'unit',
-        'status',
+        'data',
+        'type',
     ];
 }

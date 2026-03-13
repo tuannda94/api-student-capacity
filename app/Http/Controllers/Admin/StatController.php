@@ -20,16 +20,20 @@ class StatController extends Controller
 
     public function index(Request $request) {
         try {
-            $stats = $this->stat::paginate(config('util.HOMEPAGE_ITEM_AMOUNT'));
+            $type = $request->type ?? 1;
+            $stats = $this->stat::where('type', $type)
+                ->paginate(config('util.HOMEPAGE_ITEM_AMOUNT'));
                 
-            return view('pages.stats.list', compact('stats'));
+            return view('pages.stats.list', compact('stats', 'type'));
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());
         }
     }
 
-    public function create() {
-        return view('pages.stats.create');
+    public function create(Request $request) {
+        $type = $request->type ?? 1;
+
+        return view('pages.stats.create', compact('type'));
     }
 
     public function store(Request $request) {
@@ -37,12 +41,14 @@ class StatController extends Controller
             $data = [
                 'name' => $request->name,
                 'status' => $request->status,
-                'value' => $request->value,
-                'unit' => $request->unit,
+                'data' => $request->data,
+                'type' => $request->query('type')
             ];
-            $icon = $this->uploadFile($request->file('icon'));
-            if (!$icon)  return redirect()->back()->with('error', 'Thêm mới thất bại !');
-            $data['icon'] = $icon;
+            if ($request->file('icon')) {
+                $icon = $this->uploadFile($request->file('icon'));
+                if (!$icon)  return redirect()->back()->with('error', 'Thêm mới thất bại !');
+                $data['icon'] = $icon;
+            }
             $this->stat->create($data);
             
             return redirect()->route('admin.stat.list')->with('success', 'Thêm thông số thành công');
@@ -94,8 +100,7 @@ class StatController extends Controller
 
     /**API for client */
     public function getListStats() {
-        $data = $this->stat::where('status', config('util.ACTIVE_STATUS'))->limit(5)->get();
-
+        $data = $this->stat::get();
         if (!$data) abort(404);
         
         return $this->responseApi(true, $data);
