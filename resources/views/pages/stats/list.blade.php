@@ -1,11 +1,11 @@
 @extends('layouts.main')
-@section('title', 'Quản lý thông số')
-@section('page-title', 'Quản lý thông số')
+@section('title', 'Quản lý thiết lập trang chủ')
+@section('page-title', 'Quản lý thiết lập trang chủ')
 @section('content')
     <div class="card card-flush p-4">
         <div class="row">
             <div class=" col-lg-6">
-                <h1>Danh sách thông số
+                <h1>Danh sách thiết lập trang chủ
                     <a href="{{ route('admin.stat.list') }}">
                         <span role="button" data-bs-toggle="tooltip" title="Tải lại trang "
                             class="refresh-btn svg-icon svg-icon-primary svg-icon-2x">
@@ -26,22 +26,48 @@
             </div>
             <div class=" col-lg-6">
                 <div class=" d-flex flex-row-reverse bd-highlight">
-                    <a href="{{ route('admin.stat.create') }}" class=" btn btn-primary">
-                        Tạo thông số mới
+                    <a href="{{ route('admin.stat.create', ['type' => $type]) }}" class=" btn btn-primary">
+                        Tạo thiết lập mới
                     </a>
                 </div>
             </div>
         </div>
+        {{-- Tabs --}}
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link {{ $type == 1 ? 'active' : '' }}"
+                href="{{ route('admin.stat.list', ['type' => 1]) }}">
+                    Thông số count up
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ $type == 2 ? 'active' : '' }}"
+                href="{{ route('admin.stat.list', ['type' => 2]) }}">
+                    Card thông tin (bên dưới banner)
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ $type == 3 ? 'active' : '' }}"
+                href="{{ route('admin.stat.list', ['type' => 3]) }}">
+                    Ngày hội việc làm
+                </a>
+            </li>
+        </ul>
         <div class="table-responsive">
             @if (count($stats) > 0)
                 <table class="table table-row-bordered table-row-gray-300 gy-7 table-hover">
                     <thead>
                         <tr>
                             <th scope="col">Tên</th>
-                            <th scope="col">Icon</th>
+                            <th scope="col">Ảnh</th>
+                            @if ($type == 1)
                             <th scope="col">Giá trị</th>
                             <th scope="col">Đơn vị</th>
-                            <th scope="col">Trạng thái</th>
+                            @elseif ($type == 2)
+                            <th scope="col">Danh sách nút bấm</th>
+                            @else
+                            <th scope="col">Mô tả</th>
+                            @endif
                             <th class="text-center">
 
                             </th>
@@ -55,20 +81,25 @@
                                 </td>
                                 <td>
                                     @if($item->icon)
-                                        <img style="max-height:25px" src="{{ $item->icon }}" alt="">
+                                        <img style="max-height:250px" src="{{ $item->icon }}" alt="">
                                     @else
                                         Chưa có icon
                                     @endif
                                 </td>
-                                <td>{{ $item->value }}</td>
-                                <td>{{ $item->unit }}</td>
-                                <td>
-                                    @if ($item->status == config('util.ACTIVE_STATUS'))
-                                        <span class="badge bg-primary">Active</span>
-                                    @else
-                                        <span class="badge bg-danger">Inactive</span>
-                                    @endif
-                                </td>
+                                @if($type == 1)
+                                <td>{{$item->data[0]['value']}}</td>
+                                <td>{{$item->data[0]['unit']}}</td>
+                                @elseif($type == 2)
+                                    <td>
+                                        <ul>
+                                            @foreach ($item->data as $button)
+                                                <li>{{$button['label']}} - {{$button['url']}}</li>
+                                            @endforeach
+                                        </ul>
+                                    </td>
+                                @else
+                                <td>{{$item->data[0]['description']}}</td>
+                                @endif
                                 <td>
                                     <div data-bs-toggle="tooltip" title="Thao tác" class="btn-group dropstart">
                                         <button type="button" class="btn btn-sm dropdown-toggle"
@@ -91,6 +122,7 @@
                                             </span>
                                         </button>
                                         <ul class="dropdown-menu  px-4 ">
+                                            {{-- 
                                             <li class="my-3">
                                                 <a href="{{ route('admin.stat.edit', $item->id) }}">
                                                     <span role="button" class="svg-icon svg-icon-success svg-icon-2x">
@@ -115,7 +147,7 @@
                                                     Chỉnh sửa
                                                 </a>
                                             </li>
-
+                                            --}}
                                             <li class="my-3">
                                                 <form action="{{ route('admin.stat.delete', $item->id) }}"
                                                     id="delete_{{$item->id}}"

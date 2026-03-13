@@ -113,7 +113,7 @@ return [
             //     "link" => "admin.privilege.list",
             // ], 
             [
-                "name" => "Thông số trang chủ",
+                "name" => "Thiết lập trang chủ",
                 "role" => $ROLE_HAS_ADMINS,
                 "param" => '',
                 "link" => 'admin.stat.list',
