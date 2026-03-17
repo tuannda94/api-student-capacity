@@ -54,14 +54,11 @@ const pageSliderForm = {
         $(".btn-home").on("click", function (e) {
             $(this).addClass("btn-primary");
             $(".able").val(null);
-            $(".btn-round").removeClass("btn-primary");
-            $(".btn-major").removeClass("btn-primary");
-            $(".btn-code").removeClass("btn-primary");
-            $(".btn-capacity").removeClass("btn-primary");
-            $("#major").hide();
-            $(".form-round").val(0);
-            $("#round").hide();
-            $(".form-major").val(0);
+            $(".btn-service").removeClass("btn-primary");
+            $(".btn-mentor").removeClass("btn-primary");
+            $(".btn-event").removeClass("btn-primary");
+            $(".btn-recruitment").removeClass("btn-primary");
+            $(".btn-privilege").removeClass("btn-primary");
         });
         $(".btn-capacity").on("click", function (e) {
             $(this).addClass("btn-primary");
@@ -88,6 +85,51 @@ const pageSliderForm = {
             $(".form-round").val(0);
             $("#round").hide();
             $(".form-major").val(0);
+        });
+        $(".btn-service").on("click", function (e) {
+            $(this).addClass("btn-primary");
+            $(".able").val("App\\Models\\Service");
+            $(".btn-home").removeClass("btn-primary");
+            $(".btn-mentor").removeClass("btn-primary");
+            $(".btn-event").removeClass("btn-primary");
+            $(".btn-recruitment").removeClass("btn-primary");
+            $(".btn-privilege").removeClass("btn-primary");
+        });
+        $(".btn-mentor").on("click", function (e) {
+            $(this).addClass("btn-primary");
+            $(".able").val("App\\Models\\User");
+            $(".btn-home").removeClass("btn-primary");
+            $(".btn-service").removeClass("btn-primary");
+            $(".btn-event").removeClass("btn-primary");
+            $(".btn-recruitment").removeClass("btn-primary");
+            $(".btn-privilege").removeClass("btn-primary");
+        });
+        $(".btn-event").on("click", function (e) {
+            $(this).addClass("btn-primary");
+            $(".able").val("App\\Models\\Event");
+            $(".btn-home").removeClass("btn-primary");
+            $(".btn-mentor").removeClass("btn-primary");
+            $(".btn-service").removeClass("btn-primary");
+            $(".btn-recruitment").removeClass("btn-primary");
+            $(".btn-privilege").removeClass("btn-primary");
+        });
+        $(".btn-recruitment").on("click", function (e) {
+            $(this).addClass("btn-primary");
+            $(".able").val("App\\Models\\Recruitment");
+            $(".btn-home").removeClass("btn-primary");
+            $(".btn-mentor").removeClass("btn-primary");
+            $(".btn-service").removeClass("btn-primary");
+            $(".btn-event").removeClass("btn-primary");
+            $(".btn-privilege").removeClass("btn-primary");
+        });
+        $(".btn-privilege").on("click", function (e) {
+            $(this).addClass("btn-primary");
+            $(".able").val("App\\Models\\Privilege");
+            $(".btn-home").removeClass("btn-primary");
+            $(".btn-mentor").removeClass("btn-primary");
+            $(".btn-service").removeClass("btn-primary");
+            $(".btn-event").removeClass("btn-primary");
+            $(".btn-recruitment").removeClass("btn-primary");
         });
     },
     selectRoundChildContest: function () {

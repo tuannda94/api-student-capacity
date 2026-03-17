@@ -65,6 +65,7 @@ class Post
             $query = $this->post::onlyTrashed()->where('title', 'like', "%$keyword%")->orderByDesc('deleted_at');
             return $query;
         }
+        
         // $query = $this->post::where('title', 'like', "%$keyword%");
         $query = $this->post::query();
         $query->where('title', 'like', "%$keyword%");
@@ -126,8 +127,15 @@ class Post
         if ($enterprise_id != 0) {
             $query->where('enterprise_id', $enterprise_id)->where('postable_type', $this->recruitment::class);
         }
-        if ($type == 'event') {
+
+        if ($type == 'post-event') {
             $query->where('postable_type', $this->event::class);
+        } else if ($type == 'post-capacity') {
+            $query->where('postable_type', $this->contest::class);
+        } else if ($type == 'post-recruitment') {
+            $query->where('postable_type', $this->recruitment::class);
+        } else if ($type == 'post-contest') {
+            $query->where('postable_type', $this->contest::class);
         }
 //        if (!auth()->user()->hasRole(config('util.SUPER_ADMIN_ROLE'))) {
 //            $query->where('branch_id', auth()->user()->branch_id);

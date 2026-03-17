@@ -359,9 +359,19 @@
                                     @endif
                                 @else
                                     @if ($slider->sliderable_type == 'App\Models\Contest')
-                                        {{ 'Đánh giá năng lực ' }}
+                                        {{ 'Đánh giá năng lực' }}
                                     @elseif($slider->sliderable_type == 'App\Models\Challenge')
-                                        {{ 'Code online ' }}
+                                        {{ 'Code online' }}
+                                    @elseif($slider->sliderable_type == 'App\Models\Service')
+                                        {{ 'Dịch vụ việc làm' }}
+                                    @elseif($slider->sliderable_type == 'App\Models\User')
+                                        {{ 'Mentorship' }}
+                                    @elseif($slider->sliderable_type == 'App\Models\Event')
+                                        {{ 'Ngày hội việc làm' }}
+                                    @elseif($slider->sliderable_type == 'App\Models\Recruitment')
+                                        {{ 'Tuyển dụng' }}
+                                    @elseif($slider->sliderable_type == 'App\Models\Privilege')
+                                        {{ 'Đặc quyền sinh viên' }}
                                     @else
                                         {{ 'Trang chủ ' }}
                                     @endif
