@@ -111,19 +111,19 @@
                                 <button type="button" class="btn {{ $slider->sliderable_type == null ? 'btn-primary' : 'btn-light' }} btn-home">Trang chủ </button>
                             </div>
                             <div class="col-2">
-                                <button type="button" class="btn  {{ $slider->sliderable_type == 'App\Models\Service' ? 'btn-primary' : 'btn-light' }} btn-capacity">Dịch vụ việc làm</button>
+                                <button type="button" class="btn  {{ $slider->sliderable_type == 'App\Models\Service' ? 'btn-primary' : 'btn-light' }} btn-service">Dịch vụ việc làm</button>
                             </div>
                             <div class="col-2">
-                                <button type="button" class="btn  {{ $slider->sliderable_type == 'App\Models\User' ? 'btn-primary' : 'btn-light' }} btn-capacity">Mentorship</button>
+                                <button type="button" class="btn  {{ $slider->sliderable_type == 'App\Models\User' ? 'btn-primary' : 'btn-light' }} btn-mentor">Mentorship</button>
                             </div>
                             <div class="col-2">
-                                <button type="button" class="btn  {{ $slider->sliderable_type == 'App\Models\Event' ? 'btn-primary' : 'btn-light' }} btn-capacity">Ngày hội việc làm</button>
+                                <button type="button" class="btn  {{ $slider->sliderable_type == 'App\Models\Event' ? 'btn-primary' : 'btn-light' }} btn-event">Ngày hội việc làm</button>
                             </div>
                             <div class="col-2">
-                                <button type="button" class="btn  {{ $slider->sliderable_type == 'App\Models\Recruitment' ? 'btn-primary' : 'btn-light' }} btn-capacity">Recruitment</button>
+                                <button type="button" class="btn  {{ $slider->sliderable_type == 'App\Models\Recruitment' ? 'btn-primary' : 'btn-light' }} btn-recruitment">Tuyển dụng</button>
                             </div>
                             <div class="col-2">
-                                <button type="button" class="btn  {{ $slider->sliderable_type == 'App\Models\Privilege' ? 'btn-primary' : 'btn-light' }} btn-capacity">Đặc quyền sinh viên</button>
+                                <button type="button" class="btn  {{ $slider->sliderable_type == 'App\Models\Privilege' ? 'btn-primary' : 'btn-light' }} btn-privilege">Đặc quyền sinh viên</button>
                             </div>
                         </div>
                         <!-- <div class="form-group mb-10"

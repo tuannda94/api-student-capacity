@@ -98,7 +98,7 @@
                                         </ul>
                                     </td>
                                 @else
-                                <td>{{$item->data[0]['description']}}</td>
+                                <td>{!! $item->data[0]['description'] !!}</td>
                                 @endif
                                 <td>
                                     <div data-bs-toggle="tooltip" title="Thao tác" class="btn-group dropstart">
@@ -122,7 +122,6 @@
                                             </span>
                                         </button>
                                         <ul class="dropdown-menu  px-4 ">
-                                            {{-- 
                                             <li class="my-3">
                                                 <a href="{{ route('admin.stat.edit', $item->id) }}">
                                                     <span role="button" class="svg-icon svg-icon-success svg-icon-2x">
@@ -147,7 +146,6 @@
                                                     Chỉnh sửa
                                                 </a>
                                             </li>
-                                            --}}
                                             <li class="my-3">
                                                 <form action="{{ route('admin.stat.delete', $item->id) }}"
                                                     id="delete_{{$item->id}}"

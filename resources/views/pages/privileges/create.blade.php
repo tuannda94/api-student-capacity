@@ -54,19 +54,6 @@
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group mb-10">
-                                <label class="form-label" for="">Mô tả</label>
-                                <input type="text" name="description" class=" form-control" value="{{ old('description') }}"/>
-                                @error('name')
-                                    <p class="text-danger">{{ $message }}</p>
-                                @enderror
-                                @if (session()->has('errorName'))
-                                    <p class="text-danger">{{ session()->get('errorName') }}</p>
-                                    @php
-                                        Session::forget('errorName');
-                                    @endphp
-                                @endif
-                            </div>
-                            <div class="form-group mb-10">
                                 <label class="form-label" for="">Link đăng ký</label>
                                 <input type="text" name="link" class=" form-control" value="{{ old('link') }}"/>
                                 @error('link')
@@ -105,6 +92,36 @@
                                     @endphp
                                 @endif
                             </div>
+                            <div class="form-group mb-10">
+                                <label class="form-label" for="">Mô tả ngắn</label>
+                                <textarea type="text" name="short_description" class="form-control" id="kt_docs_ckeditor_classic"> 
+                                    {{ old('short_description') }}
+                                </textarea>
+                                @error('description')
+                                    <p class="text-danger">{{ $message }}</p>
+                                @enderror
+                                @if (session()->has('errorName'))
+                                    <p class="text-danger">{{ session()->get('errorName') }}</p>
+                                    @php
+                                        Session::forget('errorName');
+                                    @endphp
+                                @endif
+                            </div>
+                            <div class="form-group mb-10">
+                                <label class="form-label" for="">Mô tả đầy đủ</label>
+                                <textarea type="text" name="description" class="form-control" id="kt_docs_ckeditor_classic2"> 
+                                    {{ old('description') }}
+                                </textarea>
+                                @error('description')
+                                    <p class="text-danger">{{ $message }}</p>
+                                @enderror
+                                @if (session()->has('errorName'))
+                                    <p class="text-danger">{{ session()->get('errorName') }}</p>
+                                    @php
+                                        Session::forget('errorName');
+                                    @endphp
+                                @endif
+                            </div>
                         </div>
                     </div>
 
@@ -125,6 +142,8 @@
 @endsection
 @section('page-script')
     <script src="assets/js/system/preview-file/previewImg.js"></script>
+    <script src="assets/plugins/custom/ckeditor/ckeditor-classic.bundle.js"></script>
+    <script src="assets/js/system/ckeditor/ckeditor.js"></script>
     <script>
         preview.showFile('#file-input', '#image-preview');
     </script>

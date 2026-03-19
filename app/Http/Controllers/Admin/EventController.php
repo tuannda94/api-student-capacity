@@ -69,9 +69,17 @@ class EventController extends Controller
                 'jobs_opening_count' => $request->jobs_opening_count,
                 'created_by' => auth()->user()->id,
             ];
-            $thumbnail = $this->uploadFile($request->file('thumbnail'));
-            if (!$thumbnail)  return redirect()->back()->with('error', 'Upload ảnh thất bại !');
-            $data['thumbnail'] = $thumbnail;
+            if ($request->hasFile('thumbnail')) {
+                $thumbnailFile = $request->file('thumbnail');
+                $thumbnail = $this->uploadFile($thumbnailFile);
+                $data['thumbnail'] = $thumbnail;
+            }
+            if ($request->hasFile('timeline')) {
+                $timelineFile = $request->file('timeline');
+                $timeline = $this->uploadFile($timelineFile);
+                $data['timeline'] = $timeline;
+            }
+            
             $this->event->create($data);
             
             return redirect()->route('admin.event.list')->with('success', 'Thêm ngày hội việc làm thành công');
@@ -96,15 +104,22 @@ class EventController extends Controller
                 'register_link' => $request->register_link,
                 'interview_count' => $request->interview_count,
                 'jobs_opening_count' => $request->jobs_opening_count,
-                'thumbnail' => $event->thumbnail,
             ];
             // nếu có upload ảnh mới
             if ($request->hasFile('thumbnail')) {
-                $thumbnail = $this->uploadFile($request->file('thumbnail'));
+                $thumbnail = $this->uploadFile($request->file('thumbnail'), $event->thumbnail);
                 if (!$thumbnail) {
                     return redirect()->back()->with('error', 'Upload ảnh thất bại!');
                 }
                 $data['thumbnail'] = $thumbnail;
+            }
+            // nếu có upload ảnh mới
+            if ($request->hasFile('timeline')) {
+                $timeline = $this->uploadFile($request->file('timeline'), $event->timeline);
+                if (!$timeline) {
+                    return redirect()->back()->with('error', 'Upload ảnh thất bại!');
+                }
+                $data['timeline'] = $timeline;
             }
             $event->update($data);
             

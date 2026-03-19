@@ -14,7 +14,7 @@ use Spatie\Permission\Models\Role;
 
 class MentorController extends Controller
 {
-    use TResponse;
+    use TResponse, TUploadImage;
     protected $mentor;
     protected $mentorInfo;
 
@@ -139,14 +139,27 @@ class MentorController extends Controller
         }
     }
 
-    // public function destroy(MentorInfo $mentorInfo) {
-    //     try {
-    //         if (!(auth()->user()->hasRole(config('util.ROLE_ADMINS')))) return false;
-    //         $mentorInfo->delete();
+    public function destroy(User $mentor) {
+        try {
+            if (!(auth()->user()->hasRole(config('util.ROLE_ADMINS')))) return false;
+            DB::beginTransaction();
+            //loại bỏ role mentor của user
+            $mentorRole = Role::find(config('util.MENTOR_ROLE'));
+            $mentor->removeRole($mentorRole);
 
-    //         return redirect()->back();
-    //     } catch (\Throwable $th) {
-    //         return redirect('error');
-    //     }
-    // }
+            //kiểm tra nếu user không còn role nào khác thì setRole student
+            if ($mentor->roles()->count() == 0) {
+                $defaultRole = Role::find(config('util.STUDENT_ROLE'));
+                $mentor->assignRole($defaultRole);
+            }
+            $mentor->info->delete();
+            DB::commit();
+
+            return redirect()->back();
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            return redirect('error');
+        }
+    }
 }

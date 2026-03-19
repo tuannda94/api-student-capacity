@@ -44,7 +44,7 @@ class StatController extends Controller
                 'data' => $request->data,
                 'type' => $request->query('type')
             ];
-            if ($request->file('icon')) {
+            if ($request->hasFile('icon')) {
                 $icon = $this->uploadFile($request->file('icon'));
                 if (!$icon)  return redirect()->back()->with('error', 'Thêm mới thất bại !');
                 $data['icon'] = $icon;
@@ -66,18 +66,15 @@ class StatController extends Controller
             $data = [
                 'name' => $request->name,
                 'status' => $request->status,
-                'value' => $request->value,
-                'unit' => $request->unit,
-                'icon' => $stat->icon,
+                'data' => $request->data,
             ];
             
-            if ($request->file('icon') != null) {
-                $icon = $this->uploadFile($request->file('icon'));
+            if ($request->hasFile('icon')) {
+                $icon = $this->uploadFile($request->file('icon'), $stat->icon);
                 if (!$icon) {
                     return redirect()->back()->with('error', 'Thêm mới thất bại !');
-                } else {
-                    $data['icon'] = $icon;
-                }
+                } 
+                $data['icon'] = $icon;
             }
             $stat->update($data);
             

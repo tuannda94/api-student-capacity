@@ -579,6 +579,7 @@ Route::group([
         Route::post('/add', [MentorController::class, 'addMentorsHaveAccount'])->name('admin.mentor.addMentorsHaveAccount');
         Route::post('/add-no-account', [MentorController::class, 'addMentorNoAccount'])->name('admin.mentor.addMentorNoAccount');
         Route::post('/info', [MentorController::class, 'saveInfo'])->name('admin.mentor.saveInfo');
+        Route::delete('/delete/{mentor}', [MentorController::class, 'destroy'])->name('admin.mentor.delete');
     });
     Route::get('support-poly', [SupportController::class, 'index'])->name('admin.support');
 });

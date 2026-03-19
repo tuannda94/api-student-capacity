@@ -40,6 +40,7 @@
                             <th scope="col">ngày hội việc làm</th>
                             <th scope="col">Người tạo</th>
                             <th scope="col">Ảnh bìa</th>
+                            <th scope="col">Timeline</th>
                             <th scope="col">Ngày bắt đầu</th>
                             <th scope="col">Ngày kết thúc</th>
                             <th scope="col">Trạng thái</th>
@@ -65,6 +66,13 @@
                                 <td>
                                     @if($item->thumbnail)
                                         <img style="width:250px;height:50%" src="{{ $item->thumbnail }}" alt="">
+                                    @else
+                                        Chưa có ảnh bìa
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($item->timeline)
+                                        <img style="max-width:400px0px;max-height:250px" src="{{ $item->timeline }}" alt="">
                                     @else
                                         Chưa có ảnh bìa
                                     @endif

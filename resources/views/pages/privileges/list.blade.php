@@ -40,7 +40,8 @@
                             <th scope="col">Đặc quyền</th>
                             <th scope="col">Link</th>
                             <th scope="col">Ảnh bìa</th>
-                            <th scope="col">Mô tả</th>
+                            <th scope="col">Mô tả ngắn</th>
+                            <th scope="col">Mô tả đầy đủ</th>
                             <th scope="col">Hạn đăng ký</th>
                             <th scope="col">Hạn sử dụng</th>
                             <th class="text-center"></th>
@@ -62,7 +63,8 @@
                                         Chưa có ảnh bìa
                                     @endif
                                 </td>
-                                <td>{{ $item->description }}</td>
+                                <td>{!! $item->short_description !!}</td>
+                                <td>{!! $item->description !!}</td>
                                 <td>
                                     <span>{{ $item->register_deadline}}</span>
                                 </td>
