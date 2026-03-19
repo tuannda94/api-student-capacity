@@ -151,7 +151,9 @@
                         <div class="col-lg-6">
                             <div class="form-group mb-10">
                                 <label class="form-label" for="">Mô tả</label>
-                                <textarea type="number" name="data[0][description]" class=" form-control">{{ old('data[0][description]') }}</textarea>
+                                <textarea type="text" name="data[0][description]" class="form-control" id="kt_docs_ckeditor_classic2">
+                                    {{ old('data[0][description]') }}
+                                </textarea>
                             </div>
                         </div>
                     </div>
@@ -174,6 +176,8 @@
 @endsection
 @section('page-script')
     <script src="assets/js/system/preview-file/previewImg.js"></script>
+    <script src="assets/plugins/custom/ckeditor/ckeditor-classic.bundle.js"></script>
+    <script src="assets/js/system/ckeditor/ckeditor.js"></script>
     <script>
         preview.showFile('#file-input', '#image-preview');
 

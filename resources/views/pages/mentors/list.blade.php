@@ -242,8 +242,8 @@
                                                 </a>
                                             </li>
 
-                                            <!-- <li class="my-3">
-                                                <form action=""
+                                            <li class="my-3">
+                                                <form action="{{ route('admin.mentor.delete', ['mentor' => $item->id]) }}"
                                                     id="delete_{{$item->id}}"
                                                     method="post">
                                                     @csrf
@@ -252,7 +252,7 @@
                                                         style=" background: none ; border: none ; list-style : none"
                                                         type="submit">
                                                         <span role="button" class="svg-icon svg-icon-danger svg-icon-2x">
-                                                            begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo2/dist/../src/media/svg/icons/Home/Trash.svg<svg
+                                                            <!-- begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo2/dist/../src/media/svg/icons/Home/Trash.svg--><svg
                                                                 xmlns="http://www.w3.org/2000/svg"
                                                                 xmlns:xlink="http://www.w3.org/1999/xlink" width="24px"
                                                                 height="24px" viewBox="0 0 24 24" version="1.1">
@@ -268,12 +268,12 @@
                                                                         fill="#000000" opacity="0.3" />
                                                                 </g>
                                                             </svg>
-                                                            end::Svg Icon
+                                                            <!-- end::Svg Icon-->
                                                         </span>
                                                         Xóa bỏ
                                                     </button>
                                                 </form>
-                                            </li> -->
+                                            </li>
                                         </ul>
                                     </div>
                                 </td>

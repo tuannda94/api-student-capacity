@@ -25,6 +25,7 @@ class Privilege extends Model
         'register_deadline',
         'expire_date',
         'description',
+        'short_description',
         'link',
     ];
 }

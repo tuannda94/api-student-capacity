@@ -17,6 +17,7 @@ class Event extends Model
         'created_at' => FormatDate::class,
         'updated_at' => FormatDate::class,
         'thumbnail' => FormatImageGet::class,
+        'timeline' => FormatImageGet::class,
     ];
 
     protected $fillable = [
@@ -26,6 +27,7 @@ class Event extends Model
         'end_at',
         'created_by',
         'thumbnail',
+        'timeline',
         'status',
         'register_link',
         'interview_count',

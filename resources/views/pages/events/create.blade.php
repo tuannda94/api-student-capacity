@@ -101,8 +101,21 @@
                             </div>
                             <div class="form-group mb-10">
                                 <label class="form-label" for="">Mô tả (hiển thị ở ngay dưới tên sự kiện ở trang ngày hội việc làm)</label>
-                                <textarea type="text-area" rows="4" name="description" class=" form-control">{{old('description')}}</textarea>
+                                <textarea type="text-area" rows="4" name="description" id="kt_docs_ckeditor_classic" class=" form-control">{{old('description')}}</textarea>
                                 @error('description')
+                                    <p class="text-danger">{{ $message }}</p>
+                                @enderror
+                                @if (session()->has('errorName'))
+                                    <p class="text-danger">{{ session()->get('errorName') }}</p>
+                                    @php
+                                        Session::forget('errorName');
+                                    @endphp
+                                @endif
+                            </div>
+                            <div class="form-group mb-10">
+                                <label class="form-label" for="">Thư ngỏ</label>
+                                <textarea type="text" name="note" id="kt_docs_ckeditor_classic2" class=" form-control">{{ old('note') }}</textarea>
+                                @error('note')
                                     <p class="text-danger">{{ $message }}</p>
                                 @enderror
                                 @if (session()->has('errorName'))
@@ -117,9 +130,24 @@
                             <div class="form-group mb-10">
                                 <label class="form-label" for="">Ảnh bìa</label>
                                 <input name="thumbnail" type='file' id="file-input" class="form-control" />
-                                <img class="mw-10 mt-2 border rounded-3" id="image-preview"
+                                <img class="mw-10 mt-2 border rounded-3" style="max-height:350px" id="image-preview"
                                     src="https://vanhoadoanhnghiepvn.vn/wp-content/uploads/2020/08/112815953-stock-vector-no-image-available-icon-flat-vector.jpg" />
                                 @error('thumbnail')
+                                    <p class="text-danger">{{ $message }}</p>
+                                @enderror
+                                @if (session()->has('errorName'))
+                                    <p class="text-danger">{{ session()->get('errorName') }}</p>
+                                    @php
+                                        Session::forget('errorName');
+                                    @endphp
+                                @endif
+                            </div>
+                            <div class="form-group mb-10">
+                                <label class="form-label" for="">Ảnh timeline</label>
+                                <input name="timeline" type='file' id="file-input-2" class="form-control" />
+                                <img class="mw-10 mt-2 border rounded-3" style="max-height:250px" id="image-preview-2"
+                                    src="https://vanhoadoanhnghiepvn.vn/wp-content/uploads/2020/08/112815953-stock-vector-no-image-available-icon-flat-vector.jpg" />
+                                @error('timeline')
                                     <p class="text-danger">{{ $message }}</p>
                                 @enderror
                                 @if (session()->has('errorName'))
@@ -135,19 +163,6 @@
                                     <option value="{{config('util.ACTIVE_STATUS')}}">Hoạt động</option>
                                     <option value="{{config('util.INACTIVE_STATUS')}}">Không hoạt động</option>
                                 </select>
-                            </div>
-                            <div class="form-group mb-10">
-                                <label class="form-label" for="">Note (hiển thị ở phần thư ngỏ ở trang ngày hội việc làm)</label>
-                                <textarea type="text" name="note" class=" form-control">{{ old('note') }}</textarea>
-                                @error('note')
-                                    <p class="text-danger">{{ $message }}</p>
-                                @enderror
-                                @if (session()->has('errorName'))
-                                    <p class="text-danger">{{ session()->get('errorName') }}</p>
-                                    @php
-                                        Session::forget('errorName');
-                                    @endphp
-                                @endif
                             </div>
                         </div>
                     </div>
@@ -169,7 +184,10 @@
 @endsection
 @section('page-script')
     <script src="assets/js/system/preview-file/previewImg.js"></script>
+    <script src="assets/plugins/custom/ckeditor/ckeditor-classic.bundle.js"></script>
+    <script src="assets/js/system/ckeditor/ckeditor.js"></script>
     <script>
         preview.showFile('#file-input', '#image-preview');
+        preview.showFile('#file-input-2', '#image-preview-2');
     </script>
 @endsection

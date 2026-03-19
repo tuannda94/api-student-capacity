@@ -55,6 +55,7 @@ class PrivilegeController extends Controller
             $data = [
                 'title' => $request->title,
                 'description' => $request->description,
+                'short_description' => $request->short_description,
                 'register_deadline' => $request->register_deadline,
                 'expire_date' => $request->expire_date,
                 'link' => $request->link,
@@ -79,15 +80,15 @@ class PrivilegeController extends Controller
             $data = [
                 'title' => $request->title,
                 'description' => $request->description,
+                'short_description' => $request->short_description,
                 'register_deadline' => $request->register_deadline,
                 'expire_date' => $request->expire_date,
                 'link' => $request->link,
-                'thumbnail' => $privilege->thumbnail,
             ];
 
             // nếu có upload ảnh mới
             if ($request->hasFile('thumbnail')) {
-                $thumbnail = $this->uploadFile($request->file('thumbnail'));
+                $thumbnail = $this->uploadFile($request->file('thumbnail'), $privilege->thumbnail);
                 if (!$thumbnail) {
                     return redirect()->back()->with('error', 'Upload ảnh thất bại!');
                 }

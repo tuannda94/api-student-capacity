@@ -23,7 +23,7 @@ class ServiceController extends Controller
     {
         $keyword = $request->has('keyword') ? $request->keyword : "";
         $orderBy = $request->has('orderBy') ? $request->orderBy : 'id';
-        $sortBy = $request->has('sortBy') ? $request->sortBy : "desc";
+        $sortBy = $request->has('sortBy') ? $request->sortBy : "asc";
 
         $query = $this->service::where('name', 'like', "%$keyword%")
             ->with(['createdBy', 'requests']);
@@ -77,6 +77,7 @@ class ServiceController extends Controller
                 'name' => $request->name,
                 'status' => $request->status,
                 'description' => $request->description,
+                'short_description' => $request->short_description,
                 'link' => $request->link,
                 'created_by' => auth()->user()->id,
             ];
@@ -101,12 +102,12 @@ class ServiceController extends Controller
                 'name' => $request->name,
                 'status' => $request->status,
                 'description' => $request->description,
+                'short_description' => $request->short_description,
                 'link' => $request->link,
-                'thumbnail' => $service->thumbnail,
             ];
             // nếu có upload ảnh mới
             if ($request->hasFile('thumbnail')) {
-                $thumbnail = $this->uploadFile($request->file('thumbnail'));
+                $thumbnail = $this->uploadFile($request->file('thumbnail'), $service->thumbnail);
                 if (!$thumbnail) {
                     return redirect()->back()->with('error', 'Upload ảnh thất bại!');
                 }
@@ -115,7 +116,7 @@ class ServiceController extends Controller
             
             $service->update($data);
             
-            return redirect()->route('admin.service.list')->with('success', 'Thêm dịch vụ thành công');
+            return redirect()->route('admin.service.list')->with('success', 'Sửa dịch vụ thành công');
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());
         }

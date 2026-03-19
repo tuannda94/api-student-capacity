@@ -579,7 +579,7 @@ class UserController extends Controller
                     $query->where('id', config('util.MENTOR_ROLE'));
                 })
                 ->with('info')
-                ->get();
+                ->paginate(10);
             
             return response()->json([
                 'status' => true,

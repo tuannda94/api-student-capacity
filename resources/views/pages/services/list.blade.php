@@ -41,7 +41,8 @@
                             <th scope="col">Người tạo</th>
                             <th scope="col">Ảnh bìa</th>
                             <th scope="col">Link đăng ký</th>
-                            <th scope="col">Mô tả</th>
+                            <th scope="col">Mô tả ngắn</th>
+                            <th scope="col">Mô tả đầy đủ</th>
                             <th scope="col">Trạng thái</th>
                             <th scope="col">Số lượt đăng ký dịch vụ</th>
                             <th class="text-center"></th>
@@ -66,7 +67,8 @@
                                     @endif
                                 </td>
                                 <td>{{ $item->link }}</td>
-                                <td>{{ $item->description }}</td>
+                                <td>{!! $item->short_description !!}</td>
+                                <td>{!! $item->description !!}</td>
                                 <td>
                                     @if ($item->status == config('util.ACTIVE_STATUS'))
                                         <span class="badge bg-primary">Active</span>
