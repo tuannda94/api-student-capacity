@@ -211,10 +211,12 @@ class EventController extends Controller
     public function getCurrentEvent() {
         $data = $this->event::where('status', config('util.ACTIVE_STATUS'))
             ->where('start_at', '<=', now())
-            ->where('end_at', '>=', now())
-            ->orderBy('end_at')
+            ->orderByDesc('end_at')
+            ->with(['posts' => function ($query) {
+                $query->orderByDesc('created_at');
+            }])
             ->first();
-
+            
         if (!$data) abort(404);
         $data->load(['sponsors.company']);
 

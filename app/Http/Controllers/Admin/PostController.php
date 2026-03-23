@@ -105,6 +105,8 @@ class PostController extends Controller
                 ->getLatestInfoWithDiffTaxNumber()
                 ->select('tax_number', 'contact_name', 'contact_phone', 'contact_email')
                 ->get();
+            $events = $this->event::select('id', 'name')->where('status', 1)->get();
+            
             $this->db::commit();
             return view(
                 'pages.post.form-add',
@@ -118,6 +120,7 @@ class PostController extends Controller
                     'enterprises' => $enterprises,
                     'majors' => $majors,
                     'tax_numbers' => $tax_numbers,
+                    'events' => $events,
                 ]
             );
         } catch (\Throwable $th) {
@@ -245,6 +248,8 @@ class PostController extends Controller
             ->getLatestInfoWithDiffTaxNumber()
             ->select('tax_number', 'contact_name', 'contact_phone', 'contact_email')
             ->get();
+        $events = $this->event::select('id', 'name')->where('status', 1)->get();
+        
         if ($post->postable && (get_class($post->postable) == $this->round::class)) {
             $round = $this->round::find($post->postable->id)->load('contest:id,name');
         }
@@ -276,6 +281,7 @@ class PostController extends Controller
             'enterprises' => $enterprises,
             'post_type' => $post_type,
             'tax_numbers' => $tax_numbers,
+            'events' => $events,
         ]);
     }
 
@@ -476,14 +482,13 @@ class PostController extends Controller
             ->paginate(request('limit') ?? 12);
         $data->load(
             [
-                'postable:id,name',
-                'postable.enterprise:enterprises.id,enterprises.name,enterprises.logo,enterprises.link_web',
+                'postable',
                 'user:id,name,email',
-                'enterprise:id,name,address,description,link_web'
-            ]
-        )->makeHidden([
-            'deleted_at', 'updated_at',
-        ]);
+            ])->loadMorph('postable', [
+                Enterprise::class => ['enterprise:id,name,address,description,link_web'],
+            ])->makeHidden([
+                'deleted_at', 'updated_at',
+            ]);
         if (!$data) abort(404);
         return $this->responseApi(
             true,

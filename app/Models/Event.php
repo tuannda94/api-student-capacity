@@ -46,4 +46,9 @@ class Event extends Model
     public function sponsors() {
         return $this->hasMany(Sponsor::class, 'event_id');
     }
+
+    public function posts()
+    {
+        return $this->morphMany(Post::class, 'postable');
+    }
 }

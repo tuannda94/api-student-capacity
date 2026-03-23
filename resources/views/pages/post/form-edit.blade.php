@@ -126,7 +126,21 @@
                                         @endif
                                     </select>
                                 </div>
-
+                            </div>
+                            <div
+                                style=" {{ $post->postable !== null && get_class($post->postable) == \App\Models\Event::class ? '' : 'display:none' }}"
+                                id="event">
+                                <label class="form-label">Sự kiện/Ngày hội việc làm</label>
+                                <select id="select-contest-p" class="form-select form-contest " data-control="select2"
+                                        data-placeholder="Chọn sự kiện (ngày hội việc làm) ">
+                                    <option value="0">Chọn sự kiện</option>
+                                    @foreach ($events as $item)
+                                        <option
+                                            @selected($post->postable->id == $item->id && get_class($post->postable) == \App\Models\Event::class) value="{{ $item->id }}">
+                                            {{ $item->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
                             <!-- <div style="{{ $post->postable !== null && get_class($post->postable) == \App\Models\Recruitment::class ? '' : 'display:none' }}"
                                 id="recruitment">

@@ -90,4 +90,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(MentorInfo::class, 'mentor_id');
     }
+
+    public function projects()
+    {
+        return $this->morphToMany(Project::class, 'participant', 'project_participants');
+    }
 }
