@@ -69,5 +69,10 @@ class Enterprise extends Model
         return $this->hasMany(Post::class, 'enterprise_id');
     }
 
+    public function projects()
+    {
+        return $this->morphToMany(Project::class, 'participant', 'project_participants');
+    }
+
     use HasFactory;
 }

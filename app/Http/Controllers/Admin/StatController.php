@@ -84,7 +84,7 @@ class StatController extends Controller
         }
     }
 
-    public function destroy(stat $stat) {
+    public function destroy(Stat $stat) {
         try {
             if (!(auth()->user()->hasRole(config('util.ROLE_ADMINS')))) return false;
             $stat->delete();

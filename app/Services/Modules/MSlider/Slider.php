@@ -78,6 +78,9 @@ class Slider
             ->when(request()->has('privilege'), function ($q) {
                 return $q->whereNull('sliderable_id')->where('sliderable_type', 'App\Models\Privilege');
             })
+            ->when(request()->has('project'), function ($q) {
+                return $q->whereNull('sliderable_id')->where('sliderable_type', 'App\Models\Project');
+            })
             ->hasDateTimeBetween('start_time', request('start_time') ?? null, request('end_time') ?? null)
             ->hasSubTime(
                 $key,

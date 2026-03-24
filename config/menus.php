@@ -106,12 +106,18 @@ return [
                 "param" => '',
                 "link" => "admin.privilege.list",
             ], 
-            // [
-            //     "name" => 'Vườn ươm khởi nghiệp',
-            //     "role" => $ROLE_HAS_ADMINS,
-            //     "param" => '',
-            //     "link" => "admin.privilege.list",
-            // ], 
+            [
+                "name" => 'Vườn ươm khởi nghiệp (dự án)',
+                "role" => $ROLE_HAS_ADMINS,
+                "param" => '',
+                "link" => "admin.project.list",
+            ], 
+            [
+                "name" => 'Lĩnh vực dự án',
+                "role" => $ROLE_HAS_ADMINS,
+                "param" => '',
+                "link" => "admin.topic.list",
+            ], 
             [
                 "name" => "Thiết lập trang chủ",
                 "role" => $ROLE_HAS_ADMINS,

@@ -64,6 +64,20 @@
                                     </select>
                                 </div>
                             </div>
+                            <div style="{{ old('event_id') ? '' : 'display:none' }}" id="event">
+                                <div class="form-group mb-10">
+                                    <label for="" class="form-label">Sự kiện/ngày hội việc làm</label>
+                                    <select name="event_id" class="form-select form-major" data-control="select2"
+                                            data-placeholder="Chọn sự kiện (ngày hội việc làm)">
+                                        <option value="0">Chọn sự kiện</option>
+                                        @foreach ($events as $item)
+                                            <option @selected(old('event_id') == $item->id) value="{{ $item->id }}">
+                                                {{ $item->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                             <div style="{{ old('capacity_id') ? '' : 'display:none' }}" id="capacity">
                                 <div class="form-group mb-10">
                                     <label for="" class="form-label">Bài test</label>
@@ -76,9 +90,7 @@
                                             </option>
                                         @endforeach
                                     </select>
-
                                 </div>
-
                             </div>
                             <div style="{{ old('round_id') ? '' : 'display:none' }}" id="round">
                                 <label class="form-label">Cuộc thi </label>

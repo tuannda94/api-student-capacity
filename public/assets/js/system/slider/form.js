@@ -29,28 +29,28 @@ const messages = {
 
 const pageSliderForm = {
     tabSelect: function () {
-        $(".btn-major").on("click", function (e) {
-            $("#major").show();
-            $("#round").hide();
-            $(".form-round").val(0);
-            $(this).addClass("btn-primary");
-            $(".btn-round").removeClass("btn-primary");
-            $(".btn-home").removeClass("btn-primary");
-            $(".btn-code").removeClass("btn-primary");
-            $(".btn-capacity").removeClass("btn-primary");
-            $(".btn-home-re").removeClass("btn-primary");
-        });
-        $(".btn-round").on("click", function (e) {
-            $("#round").show();
-            $("#major").hide();
-            $(".form-major").val(0);
-            $(".btn-major").removeClass("btn-primary");
-            $(".btn-home-re").removeClass("btn-primary");
-            $(".btn-home").removeClass("btn-primary");
-            $(".btn-code").removeClass("btn-primary");
-            $(".btn-capacity").removeClass("btn-primary");
-            $(this).addClass("btn-primary");
-        });
+        // $(".btn-major").on("click", function (e) {
+        //     $("#major").show();
+        //     $("#round").hide();
+        //     $(".form-round").val(0);
+        //     $(this).addClass("btn-primary");
+        //     $(".btn-round").removeClass("btn-primary");
+        //     $(".btn-home").removeClass("btn-primary");
+        //     $(".btn-code").removeClass("btn-primary");
+        //     $(".btn-capacity").removeClass("btn-primary");
+        //     $(".btn-home-re").removeClass("btn-primary");
+        // });
+        // $(".btn-round").on("click", function (e) {
+        //     $("#round").show();
+        //     $("#major").hide();
+        //     $(".form-major").val(0);
+        //     $(".btn-major").removeClass("btn-primary");
+        //     $(".btn-home-re").removeClass("btn-primary");
+        //     $(".btn-home").removeClass("btn-primary");
+        //     $(".btn-code").removeClass("btn-primary");
+        //     $(".btn-capacity").removeClass("btn-primary");
+        //     $(this).addClass("btn-primary");
+        // });
         $(".btn-home").on("click", function (e) {
             $(this).addClass("btn-primary");
             $(".able").val(null);
@@ -59,33 +59,34 @@ const pageSliderForm = {
             $(".btn-event").removeClass("btn-primary");
             $(".btn-recruitment").removeClass("btn-primary");
             $(".btn-privilege").removeClass("btn-primary");
+            $(".btn-project").removeClass("btn-primary");
         });
-        $(".btn-capacity").on("click", function (e) {
-            $(this).addClass("btn-primary");
-            $(".able").val("App\\Models\\Contest");
-            $(".btn-round").removeClass("btn-primary");
-            $(".btn-major").removeClass("btn-primary");
-            $(".btn-code").removeClass("btn-primary");
-            $(".btn-home").removeClass("btn-primary");
-            $(".btn-home-re").removeClass("btn-primary");
-            $("#major").hide();
-            $(".form-round").val(0);
-            $("#round").hide();
-            $(".form-major").val(0);
-        });
-        $(".btn-code").on("click", function (e) {
-            $(this).addClass("btn-primary");
-            $(".able").val("App\\Models\\Challenge");
-            $(".btn-round").removeClass("btn-primary");
-            $(".btn-major").removeClass("btn-primary");
-            $(".btn-home").removeClass("btn-primary");
-            $(".btn-capacity").removeClass("btn-primary");
-            $(".btn-home-re").removeClass("btn-primary");
-            $("#major").hide();
-            $(".form-round").val(0);
-            $("#round").hide();
-            $(".form-major").val(0);
-        });
+        // $(".btn-capacity").on("click", function (e) {
+        //     $(this).addClass("btn-primary");
+        //     $(".able").val("App\\Models\\Contest");
+        //     $(".btn-round").removeClass("btn-primary");
+        //     $(".btn-major").removeClass("btn-primary");
+        //     $(".btn-code").removeClass("btn-primary");
+        //     $(".btn-home").removeClass("btn-primary");
+        //     $(".btn-home-re").removeClass("btn-primary");
+        //     $("#major").hide();
+        //     $(".form-round").val(0);
+        //     $("#round").hide();
+        //     $(".form-major").val(0);
+        // });
+        // $(".btn-code").on("click", function (e) {
+        //     $(this).addClass("btn-primary");
+        //     $(".able").val("App\\Models\\Challenge");
+        //     $(".btn-round").removeClass("btn-primary");
+        //     $(".btn-major").removeClass("btn-primary");
+        //     $(".btn-home").removeClass("btn-primary");
+        //     $(".btn-capacity").removeClass("btn-primary");
+        //     $(".btn-home-re").removeClass("btn-primary");
+        //     $("#major").hide();
+        //     $(".form-round").val(0);
+        //     $("#round").hide();
+        //     $(".form-major").val(0);
+        // });
         $(".btn-service").on("click", function (e) {
             $(this).addClass("btn-primary");
             $(".able").val("App\\Models\\Service");
@@ -94,6 +95,7 @@ const pageSliderForm = {
             $(".btn-event").removeClass("btn-primary");
             $(".btn-recruitment").removeClass("btn-primary");
             $(".btn-privilege").removeClass("btn-primary");
+            $(".btn-project").removeClass("btn-primary");
         });
         $(".btn-mentor").on("click", function (e) {
             $(this).addClass("btn-primary");
@@ -103,6 +105,7 @@ const pageSliderForm = {
             $(".btn-event").removeClass("btn-primary");
             $(".btn-recruitment").removeClass("btn-primary");
             $(".btn-privilege").removeClass("btn-primary");
+            $(".btn-project").removeClass("btn-primary");
         });
         $(".btn-event").on("click", function (e) {
             $(this).addClass("btn-primary");
@@ -112,6 +115,7 @@ const pageSliderForm = {
             $(".btn-service").removeClass("btn-primary");
             $(".btn-recruitment").removeClass("btn-primary");
             $(".btn-privilege").removeClass("btn-primary");
+            $(".btn-project").removeClass("btn-primary");
         });
         $(".btn-recruitment").on("click", function (e) {
             $(this).addClass("btn-primary");
@@ -121,6 +125,7 @@ const pageSliderForm = {
             $(".btn-service").removeClass("btn-primary");
             $(".btn-event").removeClass("btn-primary");
             $(".btn-privilege").removeClass("btn-primary");
+            $(".btn-project").removeClass("btn-primary");
         });
         $(".btn-privilege").on("click", function (e) {
             $(this).addClass("btn-primary");
@@ -129,6 +134,17 @@ const pageSliderForm = {
             $(".btn-mentor").removeClass("btn-primary");
             $(".btn-service").removeClass("btn-primary");
             $(".btn-event").removeClass("btn-primary");
+            $(".btn-recruitment").removeClass("btn-primary");
+            $(".btn-project").removeClass("btn-primary");
+        });
+        $(".btn-project").on("click", function (e) {
+            $(this).addClass("btn-primary");
+            $(".able").val("App\\Models\\Project");
+            $(".btn-home").removeClass("btn-primary");
+            $(".btn-mentor").removeClass("btn-primary");
+            $(".btn-service").removeClass("btn-primary");
+            $(".btn-event").removeClass("btn-primary");
+            $(".btn-recruitment").removeClass("btn-primary");
             $(".btn-recruitment").removeClass("btn-primary");
         });
     },

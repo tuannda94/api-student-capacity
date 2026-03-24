@@ -34,9 +34,11 @@ use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\PrintPDFController;
 use App\Http\Controllers\Admin\PrintExcelController;
 use App\Http\Controllers\Admin\PrivilegeController;
+use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SupportController;
 use App\Http\Controllers\Admin\StatController;
+use App\Http\Controllers\Admin\TopicController;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::prefix('dashboard')->group(function () {
@@ -580,6 +582,22 @@ Route::group([
         Route::post('/add-no-account', [MentorController::class, 'addMentorNoAccount'])->name('admin.mentor.addMentorNoAccount');
         Route::post('/info', [MentorController::class, 'saveInfo'])->name('admin.mentor.saveInfo');
         Route::delete('/delete/{mentor}', [MentorController::class, 'destroy'])->name('admin.mentor.delete');
+    });
+    Route::prefix('projects')->group(function () {
+        Route::get('', [ProjectController::class, 'index'])->name('admin.project.list');
+        Route::get('edit/{project}', [ProjectController::class, 'edit'])->name('admin.project.edit');
+        Route::put('update/{project}', [ProjectController::class, 'update'])->name('admin.project.update');
+        Route::get('create', [ProjectController::class, 'create'])->name('admin.project.create');
+        Route::post('store', [ProjectController::class, 'store'])->name('admin.project.store');
+        Route::delete('/delete/{project}', [ProjectController::class, 'destroy'])->name('admin.project.delete');
+    });
+    Route::prefix('topics')->group(function () {
+        Route::get('', [TopicController::class, 'index'])->name('admin.topic.list');
+        Route::get('edit/{topic}', [TopicController::class, 'edit'])->name('admin.topic.edit');
+        Route::put('update/{topic}', [TopicController::class, 'update'])->name('admin.topic.update');
+        Route::get('create', [TopicController::class, 'create'])->name('admin.topic.create');
+        Route::post('store', [TopicController::class, 'store'])->name('admin.topic.store');
+        Route::delete('/delete/{topic}', [ProjectController::class, 'destroy'])->name('admin.topic.delete');
     });
     Route::get('support-poly', [SupportController::class, 'index'])->name('admin.support');
 });

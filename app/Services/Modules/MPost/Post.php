@@ -259,7 +259,6 @@ class Post
             $image = $this->uploadFile($fileImage);
             $data['thumbnail_url'] = $image;
         }
-
         if ($request->contest_id != 0) {
             $dataContest = $this->contest::find($request->contest_id);
             $dataContest->posts()->create($data);
@@ -273,12 +272,14 @@ class Post
         } elseif ($request->recruitment_id != 0) {
             $dataRound = $this->recruitment::find($request->recruitment_id);
             $dataRound->posts()->create($data);
-        } elseif ($request->post_type === 'recruitment') {
+        } elseif ($request->post_type == 'recruitment') {
             $data['postable_type'] = $this->recruitment::class;
             $this->post::create($data);
-        } elseif ($request->post_type === 'event') {
-            $data['postable_type'] = $this->event::class;
-            $this->post::create($data);
+        } elseif ($request->post_type == 'event' && $request->event_id != 0) {
+            $dataEvent = $this->event::find($request->event_id);
+            $dataEvent->posts()->create($data);
+            // $data['postable_type'] = $this->event::class;
+            // $this->post::create($data);
         }
     }
 
