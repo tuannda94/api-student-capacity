@@ -22,7 +22,7 @@ class BranchController extends Controller
     private function getList()
     {
         try {
-            $dataBranch = Branch::sort(request('sort') == 'asc' ? 'asc' : 'desc', request('sort_by') ?? null, 'branches')
+            $dataBranch = Branch::sort(request('sort') == 'desc' ? 'desc' : 'asc', request('sort_by') ?? null, 'branches')
                 ->withCount(['users'])
                 ->where('status', 1)
                 ->search(request('q') ?? null, ['name']);
