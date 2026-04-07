@@ -46,7 +46,7 @@
                                 Vòng thi
                             </button>
                             <button type="button"
-                                    class="click-event mygroup btn {{ $post->postable_type == 'App\Models\Event' ? 'btn-primary' : '' }} col btn-light">
+                                    class="click-event mygroup btn {{ $post->postable !== null && get_class($post->postable) == 'App\Models\Event' ? 'btn-primary' : '' }} col btn-light">
                                 Tin tức - sự kiện
                             </button>
                         </div>
@@ -136,7 +136,7 @@
                                     <option value="0">Chọn sự kiện</option>
                                     @foreach ($events as $item)
                                         <option
-                                            @selected($post->postable->id == $item->id && get_class($post->postable) == \App\Models\Event::class) value="{{ $item->id }}">
+                                            @selected(($post->postable !== null ? $post->postable->id : 0) == $item->id && get_class($post->postable) == \App\Models\Event::class) value="{{ $item->id }}">
                                             {{ $item->name }}
                                         </option>
                                     @endforeach
