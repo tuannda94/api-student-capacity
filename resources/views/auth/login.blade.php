@@ -97,6 +97,7 @@
         var hostUrl = "{{ asset('assets') . '/' }}";
     </script>
     <!--begin::Global Javascript Bundle(used by all pages)-->
+    <script type="text/javascript" src="assets/js/custom/documentation/general/moment.min.js"></script>
     <script src="{{ asset('assets/plugins/global/plugins.bundle.js') }}"></script>
     <script src="{{ asset('assets/js/scripts.bundle.js') }}"></script>
     <!--end::Global Javascript Bundle-->

@@ -3,6 +3,7 @@
 </script>
 <script src="assets/js/custom/documentation/general/29b41ee1c8.js"></script>
 <!--begin::Global Javascript Bundle(used by all pages)-->
+<script type="text/javascript" src="assets/js/custom/documentation/general/moment.min.js"></script>
 <script src="assets/plugins/global/plugins.bundle.js"></script>
 <script src="assets/js/scripts.bundle.js"></script>
 {{-- <script src="assets/plugins/custom/prismjs/prismjs.bundle.js"></script> --}}
